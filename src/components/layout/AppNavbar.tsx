@@ -19,6 +19,13 @@ export function AppNavbar() {
 					<span className="sr-only">Toggle sidebar</span>
 				</Button>
 				<NavbarBrand>
+					<img
+						src="/clash-of-clans-icon.png"
+						alt="Clash of Clans"
+						width={32}
+						height={32}
+						className="mr-2"
+					/>
 					<span className="self-center text-xl font-semibold whitespace-nowrap text-white">
 						Clash of Clans Tracker
 					</span>
