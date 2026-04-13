@@ -38,13 +38,13 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 
 	return (
 		<Modal show={isOpen} onClose={() => handleClose()}>
-			<ModalHeader>Create New Playthrough</ModalHeader>
+			<ModalHeader>Create New Village</ModalHeader>
 			<ModalBody>
 				<div className="space-y-4">
 					<div>
 						<div className="mb-2 block">
 							<Label htmlFor="playthrough-name">
-								Playthrough Name{" "}
+								Village Name{" "}
 								<span className="text-red-600 dark:text-red-400">*</span>
 							</Label>
 						</div>
@@ -63,7 +63,7 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 						</div>
 						<Textarea
 							id="playthrough-description"
-							placeholder="Add a description for this playthrough..."
+							placeholder="Add a description for this village..."
 							value={description}
 							onChange={(e) => setDescription(e.target.value)}
 							rows={3}

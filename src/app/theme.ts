@@ -13,6 +13,8 @@ export const customTheme: CustomFlowbiteTheme = createTheme({
         "bg-accent hover:bg-accent/80 focus:ring-accent/50 dark:bg-accent dark:hover:bg-accent/80 dark:focus:ring-accent/30 text-white",
       highlight:
         "bg-highlight hover:bg-highlight/80 focus:ring-highlight/50 dark:bg-highlight dark:hover:bg-highlight/80 dark:focus:ring-highlight/30 text-white",
+      action:
+        "bg-action hover:bg-action/80 focus:ring-action/50 dark:bg-action dark:hover:bg-action/80 dark:focus:ring-action/30 text-white",
     },
     outlineColor: {
       primary:
@@ -23,6 +25,8 @@ export const customTheme: CustomFlowbiteTheme = createTheme({
         "border-accent text-accent hover:border-accent/80 hover:bg-accent focus:ring-accent/50 dark:border-accent dark:text-accent dark:hover:bg-accent dark:focus:ring-accent/30 border hover:text-white dark:hover:text-white",
       highlight:
         "border-highlight text-highlight hover:border-highlight/80 hover:bg-highlight focus:ring-highlight/50 dark:border-highlight dark:text-highlight dark:hover:bg-highlight dark:focus:ring-highlight/30 border hover:text-white dark:hover:text-white",
+      action:
+        "border-action text-action hover:border-action/80 hover:bg-action focus:ring-action/50 dark:border-action dark:text-action dark:hover:bg-action dark:focus:ring-action/30 border hover:text-white dark:hover:text-white",
     },
   },
   badge: {
@@ -36,6 +40,8 @@ export const customTheme: CustomFlowbiteTheme = createTheme({
           "bg-accent/20 text-accent hover:bg-accent/30 dark:bg-accent/30 dark:text-accent dark:hover:bg-accent/40",
         highlight:
           "bg-highlight/20 text-highlight hover:bg-highlight/30 dark:bg-highlight/30 dark:text-highlight dark:hover:bg-highlight/40",
+        action:
+          "bg-action/20 text-action hover:bg-action/30 dark:bg-action/30 dark:text-action dark:hover:bg-action/40",
       },
     },
   },
@@ -49,6 +55,8 @@ export const customTheme: CustomFlowbiteTheme = createTheme({
         "border-accent bg-accent/15 text-accent dark:bg-accent/25 dark:text-accent",
       highlight:
         "border-highlight bg-highlight/15 text-highlight dark:bg-highlight/25 dark:text-highlight",
+      action:
+        "border-action bg-action/15 text-action dark:bg-action/25 dark:text-action",
     },
     closeButton: {
       color: {
@@ -60,6 +68,8 @@ export const customTheme: CustomFlowbiteTheme = createTheme({
           "bg-accent/15 text-accent hover:bg-accent/25 focus:ring-accent dark:bg-accent/25 dark:text-accent dark:hover:bg-accent/35",
         highlight:
           "bg-highlight/15 text-highlight hover:bg-highlight/25 focus:ring-highlight dark:bg-highlight/25 dark:text-highlight dark:hover:bg-highlight/35",
+        action:
+          "bg-action/15 text-action hover:bg-action/25 focus:ring-action dark:bg-action/25 dark:text-action dark:hover:bg-action/35",
       },
     },
   },
@@ -69,6 +79,7 @@ export const customTheme: CustomFlowbiteTheme = createTheme({
       secondary: "fill-secondary",
       accent: "fill-accent",
       highlight: "fill-highlight",
+      action: "fill-action",
     },
   },
   progress: {
@@ -77,6 +88,7 @@ export const customTheme: CustomFlowbiteTheme = createTheme({
       secondary: "bg-secondary",
       accent: "bg-accent",
       highlight: "bg-highlight",
+      action: "bg-action",
     },
   },
   checkbox: {
@@ -89,6 +101,8 @@ export const customTheme: CustomFlowbiteTheme = createTheme({
         "text-accent focus:ring-accent dark:focus:ring-accent dark:ring-offset-gray-800",
       highlight:
         "text-highlight focus:ring-highlight dark:focus:ring-highlight dark:ring-offset-gray-800",
+      action:
+        "text-action focus:ring-action dark:focus:ring-action dark:ring-offset-gray-800",
     },
   },
   toggleSwitch: {
@@ -103,6 +117,8 @@ export const customTheme: CustomFlowbiteTheme = createTheme({
             "bg-accent group-focus:ring-accent/50 dark:group-focus:ring-accent/30",
           highlight:
             "bg-highlight group-focus:ring-highlight/50 dark:group-focus:ring-highlight/30",
+          action:
+            "bg-action group-focus:ring-action/50 dark:group-focus:ring-action/30",
         },
       },
     },
@@ -117,6 +133,8 @@ export const customTheme: CustomFlowbiteTheme = createTheme({
         "text-accent focus:ring-accent dark:focus:ring-accent dark:ring-offset-gray-800",
       highlight:
         "text-highlight focus:ring-highlight dark:focus:ring-highlight dark:ring-offset-gray-800",
+      action:
+        "text-action focus:ring-action dark:focus:ring-action dark:ring-offset-gray-800",
     },
   },
   avatar: {
@@ -126,7 +144,14 @@ export const customTheme: CustomFlowbiteTheme = createTheme({
         secondary: "ring-secondary dark:ring-secondary",
         accent: "ring-accent dark:ring-accent",
         highlight: "ring-highlight dark:ring-highlight",
+        action: "ring-action dark:ring-action",
       },
+    },
+  },
+  card: {
+    root: {
+      base: "flex rounded-lg border border-primary/30 bg-primary shadow-md",
+      children: "flex h-full flex-col justify-center gap-4 p-6 text-white",
     },
   },
   dropdown: {
@@ -147,8 +172,19 @@ export const customTheme: CustomFlowbiteTheme = createTheme({
     },
   },
   sidebar: {
+    root: {
+      inner: "h-full overflow-y-auto bg-transparent px-3 py-4",
+    },
     item: {
-      base: "cursor-pointer text-sm",
+      base: "flex items-center justify-center rounded-lg p-2 text-sm font-normal cursor-pointer text-white hover:bg-white/10 dark:text-white dark:hover:bg-white/10",
+      active: "bg-white/20 dark:bg-white/10",
+      icon: {
+        base: "shrink-0 text-white/70 transition duration-75",
+        active: "text-white",
+      },
+      content: {
+        base: "flex-1 whitespace-nowrap px-3",
+      },
     },
   },
   tabs: {

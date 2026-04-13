@@ -21,23 +21,23 @@ export function PlaythroughSwitcher() {
 					renderTrigger={() => (
 						<button
 							type="button"
-							className="flex w-full cursor-pointer items-center gap-2 rounded-lg p-2 text-left hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+							className="flex w-full cursor-pointer items-center gap-2 rounded-lg p-2 text-left hover:bg-white/10 focus:ring-2 focus:ring-white/20 focus:outline-none dark:hover:bg-white/10 dark:focus:ring-white/20"
 						>
-							<div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-blue-500 text-sm font-bold text-white">
+							<div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white">
 								{activePlaythrough?.name?.[0]?.toUpperCase() ?? "?"}
 							</div>
 							<div className="min-w-0 flex-1">
-								<span className="truncate text-sm font-medium text-gray-900 dark:text-white">
+								<span className="truncate text-sm font-medium text-white">
 									{activePlaythrough?.name || "None Selected"}
 								</span>
 							</div>
-							<LuChevronsUpDown className="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
+							<LuChevronsUpDown className="size-4 shrink-0 text-white/60" />
 						</button>
 					)}
 				>
-					<DropdownHeader>Playthroughs</DropdownHeader>
+					<DropdownHeader>Villages</DropdownHeader>
 					{playthroughs.length === 0 ? (
-						<DropdownItem disabled>No playthroughs yet</DropdownItem>
+						<DropdownItem disabled>No villages yet</DropdownItem>
 					) : (
 						playthroughs.map((playthrough) => (
 							<DropdownItem
@@ -47,7 +47,7 @@ export function PlaythroughSwitcher() {
 								<div className="flex w-full items-center gap-2">
 									<span className="truncate">{playthrough.name}</span>
 									{activePlaythrough?.id === playthrough.id && (
-										<span className="ml-auto text-xs font-medium text-blue-600 dark:text-blue-400">
+										<span className="ml-auto text-xs font-medium text-primary">
 											Active
 										</span>
 									)}
@@ -62,7 +62,7 @@ export function PlaythroughSwitcher() {
 								<LuPlus className="size-4" />
 							</div>
 							<span className="font-medium text-gray-500 dark:text-gray-400">
-								Add Playthrough
+								Add Village
 							</span>
 						</div>
 					</DropdownItem>

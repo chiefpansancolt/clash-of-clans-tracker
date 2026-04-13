@@ -30,8 +30,7 @@ export default function Settings() {
 		const url = URL.createObjectURL(blob);
 		const link = document.createElement("a");
 		link.href = url;
-		// CHANGE_ME: Update the filename prefix to match your app name
-		link.download = `tracker-backup-${new Date().toISOString().split("T")[0]}.json`;
+		link.download = `coc-tracker-backup-${new Date().toISOString().split("T")[0]}.json`;
 		document.body.appendChild(link);
 		link.click();
 		document.body.removeChild(link);
@@ -89,7 +88,7 @@ export default function Settings() {
 	};
 
 	return (
-		<section className="min-h-screen bg-gray-50 p-8 dark:bg-gray-900">
+		<section className="min-h-screen bg-highlight p-8 dark:bg-gray-900">
 			<div className="mx-auto">
 				<div className="mb-8">
 					<h1 className="text-4xl font-bold text-gray-900 dark:text-white">Settings</h1>
@@ -123,12 +122,12 @@ export default function Settings() {
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 					<Card>
 						<div className="mb-4 flex items-center justify-between">
-							<h2 className="text-xl font-bold text-gray-900 dark:text-white">
+							<h2 className="text-xl font-bold text-white">
 								Data Management
 							</h2>
 							<Badge color="info">
 								{playthroughs.length}{" "}
-								{playthroughs.length === 1 ? "Playthrough" : "Playthroughs"}
+								{playthroughs.length === 1 ? "Village" : "Villages"}
 							</Badge>
 						</div>
 
@@ -140,9 +139,9 @@ export default function Settings() {
 								</div>
 								<Button onClick={handleExportData} className="w-full">
 									<HiDownload className="mr-2 h-5 w-5" />
-									Export All Playthroughs
+									Export All Villages
 								</Button>
-								<p className="mt-1 text-sm text-gray-500">
+								<p className="mt-1 text-sm text-white/60">
 									Download a backup file of all your saved playthroughs.
 								</p>
 							</div>
@@ -154,7 +153,7 @@ export default function Settings() {
 								</div>
 								<div className="flex flex-col gap-2">
 									<FileInput ref={fileInputRef} accept=".json" />
-									<p className="text-sm text-gray-500">
+									<p className="text-sm text-white/60">
 										Upload a previously exported file (.json)
 									</p>
 									<Button color="purple" onClick={handleImportData}>
@@ -186,19 +185,19 @@ export default function Settings() {
 					</Card>
 
 					<Card>
-						{/* CHANGE_ME: Update the About section with your app's details */}
-						<h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+						<h2 className="mb-4 text-2xl font-bold text-white">
 							About
 						</h2>
-						<div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+						<div className="space-y-2 text-sm text-white/70">
 							<p>
-								<strong className="text-gray-900 dark:text-white">
-									YOUR_APP_NAME
+								<strong className="text-white">
+									Clash of Clans Tracker
 								</strong>
 							</p>
 							<p>
-								A progress tracking tool for YOUR_GAME. All data is stored locally
-								in your browser.
+								A progress tracking tool for Clash of Clans. Track upgrades,
+								achievements, and more across multiple accounts. All data is stored
+								locally in your browser.
 							</p>
 						</div>
 					</Card>

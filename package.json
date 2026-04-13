@@ -1,14 +1,14 @@
 {
-    "name": "tracker-template",
-    "version": "1.1.0",
-    "description": "A Next.js template for building game progress tracker apps",
+    "name": "clash-of-clans-tracker",
+    "version": "1.0.0",
+    "description": "A Clash of Clans progress tracker, manage multiple accounts and track upgrades, achievements and more",
     "keywords": [
+        "clash-of-clans",
         "game-tracker",
         "nextjs",
-        "react",
-        "template"
+        "react"
     ],
-    "author": "",
+    "author": "Christopher Pezza",
     "license": "MIT",
     "private": true,
     "engines": {
@@ -20,9 +20,12 @@
         "start": "next start",
         "lint": "eslint .",
         "format": "prettier . --write",
-        "format:check": "prettier . --check"
+        "format:check": "prettier . --check",
+        "postinstall": "bash scripts/copy-game-assets.sh"
     },
     "dependencies": {
+        "clash-of-clans-api": "^0.6.4",
+        "clash-of-clans-data": "^0.1.0",
         "flowbite-react": "^0.12.17",
         "next": "^16.2.2",
         "react": "^19.2.4",

@@ -47,15 +47,15 @@ export default function PlaythroughListPage() {
 			<div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div>
 					<h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-						My Playthroughs
+						My Villages
 					</h1>
 					<p className="mt-1 text-gray-600 dark:text-gray-400">
-						Manage your playthroughs and track your progress
+						Manage your villages and track your progress
 					</p>
 				</div>
-				<Button onClick={() => setIsCreateModalOpen(true)} color="blue">
+				<Button onClick={() => setIsCreateModalOpen(true)} color="action">
 					<HiPlus className="mr-2 h-5 w-5" />
-					New Playthrough
+					New Village
 				</Button>
 			</div>
 
@@ -64,7 +64,7 @@ export default function PlaythroughListPage() {
 					<div className="relative flex-1">
 						<TextInput
 							icon={HiSearch}
-							placeholder="Search playthroughs..."
+							placeholder="Search villages..."
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
 						/>
@@ -77,7 +77,7 @@ export default function PlaythroughListPage() {
 								onClick={() => setSortOption(opt)}
 								className={`rounded-lg px-3 py-1.5 text-sm transition-colors ${
 									sortOption === opt
-										? "bg-blue-600 text-white"
+										? "bg-primary text-white"
 										: "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
 								}`}
 							>
@@ -95,38 +95,38 @@ export default function PlaythroughListPage() {
 			{playthroughs.length > 0 && searchQuery && (
 				<p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
 					Showing{" "}
-					<Badge color="blue" className="inline-flex">
+					<Badge color="action" className="inline-flex">
 						{filtered.length}
 					</Badge>{" "}
-					of {playthroughs.length} playthroughs
+					of {playthroughs.length} villages
 				</p>
 			)}
 
 			{playthroughs.length === 0 ? (
 				<Card className="py-16 text-center">
 					<div className="mx-auto max-w-md">
-						<h2 className="mb-4 text-xl font-medium text-gray-700 dark:text-gray-300">
-							No Playthroughs Yet
+						<h2 className="mb-4 text-xl font-medium text-white">
+							No Villages Yet
 						</h2>
-						<p className="mb-6 text-gray-600 dark:text-gray-400">
-							Create your first playthrough to start tracking your progress!
+						<p className="mb-6 text-white/70">
+							Create your first village to start tracking your progress!
 						</p>
 						<div className="flex justify-center">
 							<Button
 								onClick={() => setIsCreateModalOpen(true)}
-								color="blue"
+								color="action"
 								size="lg"
 							>
 								<HiPlus className="mr-2 h-5 w-5" />
-								Create Your First Playthrough
+								Create Your First Village
 							</Button>
 						</div>
 					</div>
 				</Card>
 			) : filtered.length === 0 ? (
 				<Card className="py-12 text-center">
-					<p className="text-gray-500 dark:text-gray-400">
-						No playthroughs match &quot;{searchQuery}&quot;
+					<p className="text-white/70">
+						No villages match &quot;{searchQuery}&quot;
 					</p>
 				</Card>
 			) : (

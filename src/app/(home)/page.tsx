@@ -12,26 +12,23 @@ import {
 	HiShieldCheck,
 } from "react-icons/hi";
 
-// CHANGE_ME: Update all placeholder content below with your app's details.
-// Search for "YOUR_" and "CHANGE_ME" to find all tokens that need replacing.
-
-const APP_NAME = "YOUR_APP_NAME";
-const APP_TAGLINE = "Track Your Game Progress";
+const APP_NAME = "Clash of Clans Tracker";
+const APP_TAGLINE = "Track Your Clash of Clans Progress";
 const APP_DESCRIPTION =
-	"The ultimate companion app for YOUR_GAME. Manage multiple playthroughs and track your progress with ease.";
+	"The ultimate companion app for Clash of Clans. Manage multiple accounts and track your upgrades, achievements, and progress with ease.";
 
 const FEATURES = [
 	{
 		icon: HiClipboardList,
-		title: "Multiple Playthroughs",
+		title: "Multiple Villages",
 		description:
-			"Create and manage unlimited playthroughs. Track different strategies and runs separately.",
+			"Create and manage unlimited villages. Track different accounts and bases separately.",
 	},
 	{
 		icon: HiCheckCircle,
 		title: "Progress Tracking",
 		description:
-			"Track exactly what you've completed, collected, or unlocked across every playthrough.",
+			"Track exactly what you've completed, collected, or unlocked across every village.",
 	},
 	{
 		icon: HiChartBar,
@@ -57,19 +54,18 @@ const FEATURES = [
 	},
 ];
 
-// CHANGE_ME: Update FAQ with app-specific questions and answers
 const FAQS = [
 	{
 		question: `What is ${APP_NAME}?`,
-		answer: `${APP_NAME} is a progress tracking tool for YOUR_GAME. It helps you manage multiple playthroughs and track your progress all in one place.`,
+		answer: `${APP_NAME} is a progress tracking tool for Clash of Clans. It helps you manage multiple accounts and track your upgrades, achievements, and overall progress all in one place.`,
 	},
 	{
 		question: "How does it store my data?",
 		answer: "All your data is stored locally in your browser using localStorage. Your progress is private and doesn't require any server or account. You can export and import data as JSON files for backup.",
 	},
 	{
-		question: "Can I track multiple playthroughs?",
-		answer: "Yes! Create and manage multiple playthroughs, each with its own progress. Switch between them using the sidebar dropdown.",
+		question: "Can I track multiple villages?",
+		answer: "Yes! Create and manage multiple villages, each with its own progress. Switch between them using the sidebar dropdown.",
 	},
 	{
 		question: "Is this app free to use?",
@@ -81,7 +77,7 @@ export default function Home() {
 	const [openFaq, setOpenFaq] = useState<number | null>(null);
 
 	return (
-		<div className="bg-white dark:bg-gray-900">
+		<div className="bg-highlight dark:bg-gray-900">
 			<main>
 				{/* Hero */}
 				<div className="relative isolate overflow-hidden pt-14 pb-16 sm:pb-20">
@@ -110,7 +106,7 @@ export default function Home() {
 									<Button
 										as={Link}
 										href="/playthrough/list"
-										color="blue"
+										color="action"
 										size="lg"
 									>
 										Get Started
@@ -143,7 +139,7 @@ export default function Home() {
 				<div className="mt-8 sm:mt-16" id="features">
 					<div className="mx-auto max-w-7xl px-6 lg:px-8">
 						<div className="mx-auto max-w-2xl sm:text-center">
-							<h2 className="text-base/7 font-semibold text-blue-600 dark:text-blue-400">
+							<h2 className="text-base/7 font-semibold text-accent dark:text-accent/80">
 								Everything you need
 							</h2>
 							<p className="mt-2 text-4xl font-semibold tracking-tight text-balance text-gray-900 sm:text-5xl dark:text-white">
@@ -156,7 +152,7 @@ export default function Home() {
 							{FEATURES.map(({ icon: Icon, title, description }) => (
 								<div key={title} className="relative pl-9">
 									<dt className="inline font-semibold text-gray-900 dark:text-white">
-										<Icon className="absolute top-1 left-1 size-5 text-blue-600 dark:text-blue-400" />
+										<Icon className="absolute top-1 left-1 size-5 text-accent dark:text-accent/80" />
 										{title}
 									</dt>
 									<dd> {description}</dd>
@@ -242,8 +238,7 @@ export default function Home() {
 								{APP_NAME}
 							</p>
 							<p className="text-sm/6 text-gray-600 dark:text-gray-400">
-								{/* CHANGE_ME: Update footer tagline */}
-								Track your game progress with ease.
+									Track your Clash of Clans progress with ease.
 							</p>
 						</div>
 						<div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
@@ -257,7 +252,7 @@ export default function Home() {
 											href="/playthrough/list"
 											className="text-sm/6 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
 										>
-											Playthroughs
+											Villages
 										</Link>
 									</li>
 									<li>
@@ -275,10 +270,9 @@ export default function Home() {
 									Disclaimer
 								</h3>
 								<p className="mt-6 text-xs/5 text-gray-600 dark:text-gray-400">
-									{/* CHANGE_ME: Update disclaimer with your game's name */}
-									This application is not affiliated with or endorsed by the game
-									or its developers. All trademarks are property of their
-									respective owners.
+									This application is not affiliated with or endorsed by Supercell.
+									Clash of Clans is a trademark of Supercell. All trademarks are
+									property of their respective owners.
 								</p>
 							</div>
 						</div>

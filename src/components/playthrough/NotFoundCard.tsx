@@ -14,9 +14,9 @@ export default function NotFoundCard({
 	return (
 		<div className="flex items-center justify-center p-8">
 			<Card className="max-w-md text-center">
-				<h2 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h2>
-				<p className="text-gray-600 dark:text-gray-400">{message}</p>
-				<Button as={Link} href="/" color="blue">
+				<h2 className="text-xl font-semibold text-white">{title}</h2>
+				<p className="text-white/70">{message}</p>
+				<Button as={Link} href="/" color="action">
 					<HiHome className="mr-2 h-5 w-5" />
 					Go Home
 				</Button>

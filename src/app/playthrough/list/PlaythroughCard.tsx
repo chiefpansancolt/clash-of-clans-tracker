@@ -28,14 +28,14 @@ export default function PlaythroughCard({ playthrough }: PlaythroughCardProps) {
 
 	return (
 		<>
-			<Card className={`relative ${isActive ? "ring-2 ring-blue-500" : ""}`}>
+			<Card className={`relative ${isActive ? "ring-2 ring-primary" : ""}`}>
 				<div className="flex items-start justify-between gap-2">
 					<div className="min-w-0 flex-1">
-						<h3 className="truncate text-lg font-semibold text-gray-900 dark:text-white">
+						<h3 className="truncate text-lg font-semibold text-white">
 							{playthrough.name}
 						</h3>
 						{isActive && (
-							<Badge color="blue" className="mt-1 w-fit">
+							<Badge color="action" className="mt-1 w-fit">
 								Active
 							</Badge>
 						)}
@@ -45,7 +45,7 @@ export default function PlaythroughCard({ playthrough }: PlaythroughCardProps) {
 							size="xs"
 							color="gray"
 							onClick={() => setIsEditOpen(true)}
-							title="Edit playthrough"
+							title="Edit village"
 						>
 							<HiPencil className="h-4 w-4" />
 						</Button>
@@ -53,7 +53,7 @@ export default function PlaythroughCard({ playthrough }: PlaythroughCardProps) {
 							size="xs"
 							color="red"
 							onClick={() => setIsDeleteOpen(true)}
-							title="Delete playthrough"
+							title="Delete village"
 						>
 							<HiTrash className="h-4 w-4" />
 						</Button>
@@ -61,19 +61,19 @@ export default function PlaythroughCard({ playthrough }: PlaythroughCardProps) {
 				</div>
 
 				{playthrough.description && (
-					<p className="line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+					<p className="line-clamp-2 text-sm text-white/70">
 						{playthrough.description}
 					</p>
 				)}
 
-				<div className="mt-2 space-y-1 text-xs text-gray-500 dark:text-gray-400">
+				<div className="mt-2 space-y-1 text-xs text-white/60">
 					<p>Created: {formatDate(playthrough.createdAt)}</p>
 					<p>Last modified: {formatDate(playthrough.lastModified)}</p>
 				</div>
 
 				{!isActive && (
 					<Button
-						color="blue"
+						color="action"
 						size="sm"
 						className="mt-2 w-full"
 						onClick={() => setActivePlaythrough(playthrough.id)}

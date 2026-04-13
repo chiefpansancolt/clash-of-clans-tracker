@@ -15,7 +15,7 @@ const CustomToast = ({ closeToast, data }: CustomToastProps) => {
 	const bgColorMap: Record<string, string> = {
 		success: "bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200",
 		error: "bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200",
-		info: "bg-blue-100 text-blue-500 dark:bg-blue-700 dark:text-blue-200",
+		info: "bg-primary/20 text-primary dark:bg-primary/30 dark:text-white",
 		warning: "bg-orange-100 text-orange-500 dark:bg-orange-700 dark:text-orange-200",
 	};
 
