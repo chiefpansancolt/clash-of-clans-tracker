@@ -9,15 +9,19 @@ import { createDefaultVillageData } from "@/lib/utils/villageHelpers";
 const PlaythroughContext = createContext<PlaythroughContextType | undefined>(undefined);
 
 export function PlaythroughProvider({ children }: { children: React.ReactNode }) {
-	const [appData, setAppData] = useState<AppData>(() => storageService.load());
+	const [appData, setAppData] = useState<AppData>({ playthroughs: [], activePlaythroughId: null });
 	const isLoadedRef = useRef(false);
 
-	// Auto-save to localStorage on every state change (skip initial mount)
+	// Load from localStorage after mount (avoids SSR/client hydration mismatch)
+	useEffect(() => {
+		setAppData(storageService.load());
+		isLoadedRef.current = true;
+	}, []);
+
+	// Auto-save to localStorage on every state change after initial load
 	useEffect(() => {
 		if (isLoadedRef.current) {
 			storageService.save(appData);
-		} else {
-			isLoadedRef.current = true;
 		}
 	}, [appData]);
 
