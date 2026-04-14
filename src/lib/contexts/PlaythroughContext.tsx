@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 import type { AppData, Playthrough } from "@/types/app";
 import type { PlaythroughContextType } from "@/types/contexts";
 import { storageService } from "@/service/storage";
+import { createDefaultVillageData } from "@/lib/utils/villageHelpers";
 
 const PlaythroughContext = createContext<PlaythroughContextType | undefined>(undefined);
 
@@ -36,9 +37,7 @@ export function PlaythroughProvider({ children }: { children: React.ReactNode })
 			id: crypto.randomUUID(),
 			createdAt: now,
 			lastModified: now,
-			// CHANGE_ME: Add default game-specific data here
-			// e.g., data: { completedQuests: [], unlockedItems: {} }
-			data: playthrough.data ?? {},
+			data: playthrough.data ?? createDefaultVillageData(),
 		};
 
 		setAppData((prev) => {

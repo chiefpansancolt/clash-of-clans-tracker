@@ -12,8 +12,8 @@ importers:
         specifier: ^0.6.4
         version: 0.6.4
       clash-of-clans-data:
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.2.0
+        version: 0.2.0
       flowbite-react:
         specifier: ^0.12.17
         version: 0.12.17(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tailwindcss@4.2.2)
@@ -29,6 +29,12 @@ importers:
       react-toastify:
         specifier: ^11.0.5
         version: 11.0.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      request:
+        specifier: ^2.88.2
+        version: 2.88.2
+      request-promise:
+        specifier: ^4.2.6
+        version: 4.2.6(request@2.88.2)
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3
@@ -1130,8 +1136,8 @@ packages:
   clash-of-clans-api@0.6.4:
     resolution: {integrity: sha512-VWG0Wuu5SgNgf9Nk6Gkl4mnpuPJ2lhBI4QWBMjw7euQRXKmAmE3sBv/pqBMQa2CnC0bZKLS+pBbafjL71Kpujw==}
 
-  clash-of-clans-data@0.1.0:
-    resolution: {integrity: sha512-Mlklez++ZkIgUPWgKMadRhU19FNSxwThuKVOASvcQMSBEvxL5+ee97seW7Zfk/H+8aa71ssqm5Ybir2HyMp8vw==}
+  clash-of-clans-data@0.2.0:
+    resolution: {integrity: sha512-MeuQ1hwcy8jmCFIoCT8xC+gmJLpIHxoH9w2o/t41bAYBvs9+88f1jvRPFYm7efMg7+F+END02STtCtpli+vHSg==}
     engines: {node: '>=24'}
 
   client-only@0.0.1:
@@ -3539,7 +3545,7 @@ snapshots:
       request: 2.88.2
       request-promise: 4.2.6(request@2.88.2)
 
-  clash-of-clans-data@0.1.0: {}
+  clash-of-clans-data@0.2.0: {}
 
   client-only@0.0.1: {}
 

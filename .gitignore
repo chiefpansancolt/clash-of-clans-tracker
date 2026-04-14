@@ -41,3 +41,4 @@ next-env.d.ts
 # flowbite
 .flowbite-react/
 public/images/
+tmp/
