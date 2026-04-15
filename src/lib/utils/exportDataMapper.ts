@@ -20,6 +20,11 @@ interface ExportEntry {
   cnt?: number; // count of this entry at this level
   timer?: number; // remaining upgrade seconds
   helper_recurrent?: boolean; // builder boost active
+  // Crafting Station entries embed crafted defense types with module levels
+  types?: Array<{
+    data: number; // crafted defense dataId
+    modules: Array<{ data: number; lvl?: number }>;
+  }>;
 }
 
 export interface ExportData {
@@ -107,6 +112,7 @@ function buildDataIdMap(): Map<number, DataItem> {
     "army-buildings/hero-banner",
     "resource-buildings/clan-castle",
     "other/helper-hut",
+    "other/bobs-hut",
   ];
   for (const rel of extraArmyFiles) {
     try {
@@ -120,6 +126,7 @@ function buildDataIdMap(): Map<number, DataItem> {
 
   // Builder base
   register(b.defenses().get(), "builder");
+  register(b.traps().get(), "builder");
   register(b.resourceBuildings().get(), "builder");
   register(b.armyBuildings().get(), "builder");
   register(b.walls().get(), "builder");
@@ -128,6 +135,14 @@ function buildDataIdMap(): Map<number, DataItem> {
 
   const bhRaw = b.builderHall().first() as unknown as { dataId?: number; id: string; name: string } | undefined;
   if (bhRaw?.dataId) map.set(bhRaw.dataId, { id: bhRaw.id, name: bhRaw.name, category: "builder-hall", base: "builder" });
+
+  // Crafted defenses — register by their type dataId
+  for (const raw of h.craftedDefenses().get()) {
+    const item = raw as unknown as { dataId?: number; id: string; name: string };
+    if (item.dataId !== undefined) {
+      map.set(item.dataId, { id: item.id, name: item.name, category: "crafted-defense", base: "home" });
+    }
+  }
 
   return map;
 }
@@ -235,6 +250,32 @@ function extractHallLevel(
   return 0;
 }
 
+// ── Crafted defenses ─────────────────────────────────────────────────────────
+
+function extractCraftedDefenses(
+  entries: ExportEntry[],
+  dataMap: Map<number, DataItem>
+): Record<string, { modules: [number, number, number] }> {
+  const result: Record<string, { modules: [number, number, number] }> = {};
+
+  for (const entry of entries) {
+    if (!entry.types) continue;
+    for (const type of entry.types) {
+      const item = dataMap.get(type.data);
+      if (!item || item.category !== "crafted-defense") continue;
+      result[item.id] = {
+        modules: [
+          type.modules[0]?.lvl ?? 0,
+          type.modules[1]?.lvl ?? 0,
+          type.modules[2]?.lvl ?? 0,
+        ],
+      };
+    }
+  }
+
+  return result;
+}
+
 // ── Default district ──────────────────────────────────────────────────────────
 
 function defaultDistrict() {
@@ -275,6 +316,7 @@ export function mapExportDataToVillageData(data: ExportData): VillageData {
     resourceBuildings: entriesToBuildingRecord(allHomeBuildings, dataMap, "home", "resource"),
     armyBuildings: entriesToBuildingRecord(allHomeBuildings, dataMap, "home", "army"),
     walls: entriesToWalls(allHomeBuildings, dataMap, "home"),
+    craftedDefenses: extractCraftedDefenses(allHomeBuildings, dataMap),
   };
 
   const allBuilderBuildings = [...(data.buildings2 ?? [])];
@@ -289,8 +331,10 @@ export function mapExportDataToVillageData(data: ExportData): VillageData {
     troops: entriesToTrackedItems(data.units2 ?? [], dataMap),
     heroes: entriesToTrackedHeroes(data.heroes2 ?? [], dataMap),
     defenses: entriesToBuildingRecord(allBuilderBuildings, dataMap, "builder", "defense"),
+    traps: entriesToBuildingRecord(data.traps2 ?? [], dataMap, "builder", "trap"),
     resourceBuildings: entriesToBuildingRecord(allBuilderBuildings, dataMap, "builder", "resource"),
     armyBuildings: entriesToBuildingRecord(allBuilderBuildings, dataMap, "builder", "army"),
+    walls: {},
   };
 
   const clanCapital: ClanCapitalData = {
@@ -312,7 +356,7 @@ export function mapExportDataToVillageData(data: ExportData): VillageData {
     donations: 0,
     donationsReceived: 0,
     warPreference: "in",
-    role: "",
+    clan: undefined,
     homeVillage,
     builderBase,
     clanCapital,

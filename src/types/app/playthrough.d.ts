@@ -6,6 +6,12 @@ export interface Playthrough {
   description?: string;
   createdAt: string; // ISO 8601
   lastModified: string; // ISO 8601
+  /** ISO 8601 — set when TH level is assigned/changed; used for "Days at TH" counter */
+  thChangedAt?: string;
+  /** ISO 8601 — set when BH level is assigned/changed; used for "Days at BH" counter */
+  bhChangedAt?: string;
+  /** Whether the user has opted into tracking Clan Capital */
+  clanCapitalEnabled?: boolean;
   data: VillageData;
 }
 

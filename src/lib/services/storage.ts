@@ -1,4 +1,5 @@
 import type { AppData, Playthrough } from "@/types/app";
+import type { HomeVillageData, BuilderBaseData } from "@/types/app/game";
 
 const STORAGE_KEY = "clash-of-clans-tracker";
 
@@ -7,9 +8,40 @@ const defaultData: AppData = {
   activePlaythroughId: null,
 };
 
+/**
+ * Fills in missing fields on stored data so old records are always safe to use.
+ * Add an entry here any time a new required field is added to the data model.
+ */
+function migrateHomeVillage(hv: HomeVillageData): HomeVillageData {
+  return {
+    ...hv,
+    craftedDefenses: hv.craftedDefenses ?? {},
+  };
+}
+
+function migrateBuilderBase(bb: BuilderBaseData): BuilderBaseData {
+  return {
+    ...bb,
+    traps: bb.traps ?? {},
+    walls: bb.walls ?? {},
+  };
+}
+
+function migratePlaythrough(p: Playthrough): Playthrough {
+  if (!p.data) return p;
+  return {
+    ...p,
+    data: {
+      ...p.data,
+      homeVillage: migrateHomeVillage(p.data.homeVillage),
+      builderBase: migrateBuilderBase(p.data.builderBase),
+    },
+  };
+}
+
 export const storageService = {
   /**
-   * Load data from localStorage
+   * Load data from localStorage, migrating any old records to the current schema.
    */
   load(): AppData {
     if (typeof window === "undefined") return defaultData;
@@ -18,7 +50,11 @@ export const storageService = {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (!stored) return defaultData;
 
-      return JSON.parse(stored) as AppData;
+      const parsed = JSON.parse(stored) as AppData;
+      return {
+        ...parsed,
+        playthroughs: (parsed.playthroughs ?? []).map(migratePlaythrough),
+      };
     } catch (error) {
       console.error("Error loading data from localStorage:", error);
       return defaultData;

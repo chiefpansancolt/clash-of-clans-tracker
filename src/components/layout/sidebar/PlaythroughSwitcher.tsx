@@ -31,7 +31,7 @@ export function PlaythroughSwitcher() {
 									{activePlaythrough?.name || "None Selected"}
 								</span>
 							</div>
-							<LuChevronsUpDown className="size-4 shrink-0 text-white/60" />
+							<LuChevronsUpDown className="size-4 shrink-0 text-white/80" />
 						</button>
 					)}
 				>

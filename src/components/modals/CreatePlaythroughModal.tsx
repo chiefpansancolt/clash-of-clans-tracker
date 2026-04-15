@@ -47,6 +47,10 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 	const [townHallLevel, setTownHallLevel] = useState(1);
 	const [builderHallLevel, setBuilderHallLevel] = useState(1);
 
+	// Hall upgrade dates
+	const [thChangedAt, setThChangedAt] = useState("");
+	const [bhChangedAt, setBhChangedAt] = useState("");
+
 	// Import — API
 	const [playerTag, setPlayerTag] = useState("");
 	const [fetching, setFetching] = useState(false);
@@ -134,6 +138,8 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 		addPlaythrough({
 			name: name.trim(),
 			description: description.trim() || undefined,
+			thChangedAt: thChangedAt ? new Date(thChangedAt + "T00:00:00.000Z").toISOString() : undefined,
+			bhChangedAt: bhChangedAt ? new Date(bhChangedAt + "T00:00:00.000Z").toISOString() : undefined,
 			data: buildVillageData(),
 		});
 		handleClose();
@@ -156,6 +162,8 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 		setDescription("");
 		setTownHallLevel(1);
 		setBuilderHallLevel(1);
+		setThChangedAt("");
+		setBhChangedAt("");
 		setPlayerTag("");
 		setFetchError("");
 		setFetchedPlayer(null);
@@ -182,13 +190,13 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 							className={`flex items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors ${
 								mode === "fresh"
 									? "border-primary bg-primary text-white"
-									: "border-gray-200 bg-white text-gray-600 hover:border-primary/40 hover:bg-primary/5 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+									: "cursor-pointer border-gray-200 bg-white text-gray-600 hover:border-secondary hover:bg-secondary/10 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
 							}`}
 						>
 							<HiSparkles className="h-5 w-5 shrink-0" />
 							<div>
 								<div className="font-medium">Fresh Start</div>
-								<div className={`text-xs ${mode === "fresh" ? "text-white/70" : "text-gray-400"}`}>
+								<div className={`text-xs ${mode === "fresh" ? "text-white/80" : "text-gray-400"}`}>
 									Start with empty data
 								</div>
 							</div>
@@ -199,13 +207,13 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 							className={`flex items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors ${
 								mode === "import"
 									? "border-primary bg-primary text-white"
-									: "border-gray-200 bg-white text-gray-600 hover:border-primary/40 hover:bg-primary/5 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+									: "cursor-pointer border-gray-200 bg-white text-gray-600 hover:border-secondary hover:bg-secondary/10 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
 							}`}
 						>
 							<HiCloudDownload className="h-5 w-5 shrink-0" />
 							<div>
 								<div className="font-medium">Import</div>
-								<div className={`text-xs ${mode === "import" ? "text-white/70" : "text-gray-400"}`}>
+								<div className={`text-xs ${mode === "import" ? "text-white/80" : "text-gray-400"}`}>
 									API + optional building JSON
 								</div>
 							</div>
@@ -349,6 +357,32 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 							</div>
 						</div>
 					)}
+
+					{/* Hall upgrade dates — always shown */}
+					<div className="grid grid-cols-2 gap-4">
+						<div>
+							<div className="mb-2 block">
+								<Label htmlFor="th-changed-at">Town Hall Upgraded</Label>
+							</div>
+							<TextInput
+								id="th-changed-at"
+								type="date"
+								value={thChangedAt}
+								onChange={(e) => setThChangedAt(e.target.value)}
+							/>
+						</div>
+						<div>
+							<div className="mb-2 block">
+								<Label htmlFor="bh-changed-at">Builder Hall Upgraded</Label>
+							</div>
+							<TextInput
+								id="bh-changed-at"
+								type="date"
+								value={bhChangedAt}
+								onChange={(e) => setBhChangedAt(e.target.value)}
+							/>
+						</div>
+					</div>
 
 					{/* Description — always shown */}
 					<div>

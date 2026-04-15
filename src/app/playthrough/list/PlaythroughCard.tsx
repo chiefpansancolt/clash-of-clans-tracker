@@ -61,12 +61,12 @@ export default function PlaythroughCard({ playthrough }: PlaythroughCardProps) {
 				</div>
 
 				{playthrough.description && (
-					<p className="line-clamp-2 text-sm text-white/70">
+					<p className="line-clamp-2 text-sm text-white/80">
 						{playthrough.description}
 					</p>
 				)}
 
-				<div className="mt-2 space-y-1 text-xs text-white/60">
+				<div className="mt-2 space-y-1 text-xs text-white/80">
 					<p>Created: {formatDate(playthrough.createdAt)}</p>
 					<p>Last modified: {formatDate(playthrough.lastModified)}</p>
 				</div>

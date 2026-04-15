@@ -83,6 +83,7 @@ export function mapPlayerApiToVillageData(player: PlayerApiResponse): VillageDat
     resourceBuildings: {},
     armyBuildings: {},
     walls: {},
+    craftedDefenses: {},
   };
 
   const builderBase: BuilderBaseData = {
@@ -93,8 +94,10 @@ export function mapPlayerApiToVillageData(player: PlayerApiResponse): VillageDat
     troops: builderTroops,
     heroes: builderHeroes,
     defenses: {},
+    traps: {},
     resourceBuildings: {},
     armyBuildings: {},
+    walls: {},
   };
 
   const clanCapital: ClanCapitalData = {
@@ -124,7 +127,14 @@ export function mapPlayerApiToVillageData(player: PlayerApiResponse): VillageDat
     donations: player.donations,
     donationsReceived: player.donationsReceived,
     warPreference: (player.warPreference ?? "in") as "in" | "out",
-    role: (player.role ?? "") as VillageData["role"],
+    clan: player.clan
+      ? {
+          tag: player.clan.tag,
+          name: player.clan.name,
+          clanLevel: player.clan.clanLevel,
+          role: (player.role ?? "") as "leader" | "coLeader" | "elder" | "member" | "",
+        }
+      : undefined,
     homeVillage,
     builderBase,
     clanCapital,
@@ -158,13 +168,16 @@ export function mergeWithBuildingData(apiData: VillageData, buildingJson: Villag
       resourceBuildings: buildingJson.homeVillage.resourceBuildings,
       armyBuildings: buildingJson.homeVillage.armyBuildings,
       walls: buildingJson.homeVillage.walls,
+      craftedDefenses: buildingJson.homeVillage.craftedDefenses,
       heroes: mergedHomeHeroes,
     },
     builderBase: {
       ...apiData.builderBase,
       defenses: buildingJson.builderBase.defenses,
+      traps: buildingJson.builderBase.traps,
       resourceBuildings: buildingJson.builderBase.resourceBuildings,
       armyBuildings: buildingJson.builderBase.armyBuildings,
+      walls: buildingJson.builderBase.walls,
     },
     clanCapital: {
       ...apiData.clanCapital,

@@ -157,11 +157,26 @@ export const customTheme: CustomFlowbiteTheme = createTheme({
   dropdown: {
     inlineWrapper: "cursor-pointer",
   },
+  tooltip: {
+    base: "absolute z-[60] inline-block rounded-lg px-3 py-2 text-sm font-medium shadow-sm",
+    arrow: {
+      base: "absolute z-[60] h-2 w-2 rotate-45",
+    },
+    content: "relative z-[70]",
+  },
   modal: {
+    content: {
+      inner: "relative flex max-h-[90dvh] flex-col rounded-lg bg-highlight shadow dark:bg-highlight",
+    },
     header: {
+      base: "flex items-start justify-between rounded-t border-b border-secondary/80 px-5 py-4",
+      title: "text-xl font-bold text-gray-900",
       close: {
-        base: "cursor-pointer",
+        base: "cursor-pointer ms-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900",
       },
+    },
+    body: {
+      base: "flex-1 overflow-auto p-5",
     },
   },
   select: {

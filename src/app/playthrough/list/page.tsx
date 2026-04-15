@@ -108,7 +108,7 @@ export default function PlaythroughListPage() {
 						<h2 className="mb-4 text-xl font-medium text-white">
 							No Villages Yet
 						</h2>
-						<p className="mb-6 text-white/70">
+						<p className="mb-6 text-white/80">
 							Create your first village to start tracking your progress!
 						</p>
 						<div className="flex justify-center">
@@ -125,7 +125,7 @@ export default function PlaythroughListPage() {
 				</Card>
 			) : filtered.length === 0 ? (
 				<Card className="py-12 text-center">
-					<p className="text-white/70">
+					<p className="text-white/80">
 						No villages match &quot;{searchQuery}&quot;
 					</p>
 				</Card>

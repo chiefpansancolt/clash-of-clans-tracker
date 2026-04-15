@@ -14,6 +14,7 @@ export function PlaythroughProvider({ children }: { children: React.ReactNode })
 
 	// Load from localStorage after mount (avoids SSR/client hydration mismatch)
 	useEffect(() => {
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setAppData(storageService.load());
 		isLoadedRef.current = true;
 	}, []);

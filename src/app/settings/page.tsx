@@ -141,7 +141,7 @@ export default function Settings() {
 									<HiDownload className="mr-2 h-5 w-5" />
 									Export All Villages
 								</Button>
-								<p className="mt-1 text-sm text-white/60">
+								<p className="mt-1 text-sm text-white/80">
 									Download a backup file of all your saved playthroughs.
 								</p>
 							</div>
@@ -153,7 +153,7 @@ export default function Settings() {
 								</div>
 								<div className="flex flex-col gap-2">
 									<FileInput ref={fileInputRef} accept=".json" />
-									<p className="text-sm text-white/60">
+									<p className="text-sm text-white/80">
 										Upload a previously exported file (.json)
 									</p>
 									<Button color="purple" onClick={handleImportData}>
@@ -188,7 +188,7 @@ export default function Settings() {
 						<h2 className="mb-4 text-2xl font-bold text-white">
 							About
 						</h2>
-						<div className="space-y-2 text-sm text-white/70">
+						<div className="space-y-2 text-sm text-white/80">
 							<p>
 								<strong className="text-white">
 									Clash of Clans Tracker

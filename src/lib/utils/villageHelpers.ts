@@ -40,6 +40,7 @@ export function createDefaultHomeVillage(townHallLevel = 1): HomeVillageData {
     resourceBuildings: {},
     armyBuildings: {},
     walls: {},
+    craftedDefenses: {},
   };
 }
 
@@ -53,8 +54,10 @@ export function createDefaultBuilderBase(builderHallLevel = 1): BuilderBaseData 
     troops: makeTrackedItems(b.troops().get()),
     heroes: makeTrackedHeroes(b.heroes().get()),
     defenses: {},
+    traps: {},
     resourceBuildings: {},
     armyBuildings: {},
+    walls: {},
   };
 }
 
@@ -83,7 +86,7 @@ export function createDefaultVillageData(
     donations: 0,
     donationsReceived: 0,
     warPreference: "in",
-    role: "",
+    clan: undefined,
     homeVillage: createDefaultHomeVillage(townHallLevel),
     builderBase: createDefaultBuilderBase(builderHallLevel),
     clanCapital: createDefaultClanCapital(),

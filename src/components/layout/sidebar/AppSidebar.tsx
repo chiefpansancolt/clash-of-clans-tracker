@@ -3,7 +3,7 @@
 import { Sidebar, SidebarItem, SidebarItemGroup, SidebarItems } from "flowbite-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HiCog, HiHome, HiViewGrid } from "react-icons/hi";
+import { HiChartPie, HiCog, HiHome, HiViewGrid } from "react-icons/hi";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { useUI } from "@/lib/contexts/UIContext";
 import { PlaythroughSwitcher } from "./PlaythroughSwitcher";
@@ -46,34 +46,17 @@ export function AppSidebar() {
 									Villages
 								</SidebarItem>
 
-								{/* CHANGE_ME: Add game-specific sidebar items here */}
-								{/* Example:
 								{activePlaythrough && (
-									<>
-										<SidebarItem
-											as={Link}
-											href="/dashboard"
-											icon={HiChartPie}
-											active={pathname === "/dashboard"}
-											onClick={() => setSidebarOpen(false)}
-										>
-											Dashboard
-										</SidebarItem>
-										<SidebarItem
-											as={Link}
-											href="/tracking"
-											icon={HiClipboardList}
-											active={pathname === "/tracking"}
-											onClick={() => setSidebarOpen(false)}
-										>
-											Tracking
-										</SidebarItem>
-									</>
+									<SidebarItem
+										as={Link}
+										href="/dashboard"
+										icon={HiChartPie}
+										active={pathname === "/dashboard"}
+										onClick={() => setSidebarOpen(false)}
+									>
+										Dashboard
+									</SidebarItem>
 								)}
-								*/}
-
-								{/* Suppress unused variable warning during development */}
-								{activePlaythrough && null}
 							</SidebarItemGroup>
 						</SidebarItems>
 					</div>
@@ -86,7 +69,7 @@ export function AppSidebar() {
 									onClick={() => setSidebarOpen(false)}
 									className={`flex cursor-pointer items-center justify-center rounded-lg p-2 text-sm font-normal text-white hover:bg-white/10 dark:text-white dark:hover:bg-white/10 ${pathname === "/settings" ? "bg-white/20 dark:bg-white/10" : ""}`}
 								>
-									<HiCog className="h-6 w-6 shrink-0 text-white/70 transition duration-75" />
+									<HiCog className="h-6 w-6 shrink-0 text-white/80 transition duration-75" />
 									<span className="flex-1 px-3 whitespace-nowrap">Settings</span>
 								</Link>
 							</li>

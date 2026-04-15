@@ -61,6 +61,7 @@ export interface PlayerApiResponse {
   bestBuilderBaseTrophies?: number;
   role?: string;
   warPreference?: string;
+  clan?: { tag: string; name: string; clanLevel: number };
   donations: number;
   donationsReceived: number;
   clanCapitalContributions?: number;

@@ -10,6 +10,7 @@ export interface UpgradeState {
 export interface BuildingInstance {
   level: number; // current completed level (0 = not yet built)
   upgrade?: UpgradeState; // present only while upgrading
+  superchargeLevel?: number; // TH17+ supercharge tier (0 = none, 1/2/3 = tier)
 }
 
 // Key = clash-of-clans-data id (e.g. "cannon"), value = instances
@@ -51,6 +52,13 @@ export interface TrackedAchievement {
   village: string; // "home" | "builderBase" | "clanCapital"
 }
 
+// ── Crafted Defenses ─────────────────────────────────────────────────────────
+
+/** Module levels for a single crafted defense (3 independent modules). */
+export interface CraftedDefenseData {
+  modules: [number, number, number]; // upgrade level of each module (0 = not upgraded)
+}
+
 // ── Home Village ──────────────────────────────────────────────────────────────
 
 export interface HomeVillageData {
@@ -78,6 +86,9 @@ export interface HomeVillageData {
 
   // Walls: level (as string key) → count of wall segments at that level
   walls: Record<string, number>;
+
+  // Crafted defenses (TH18 Crafting Station) — keyed by defense id e.g. "roaster"
+  craftedDefenses: Record<string, CraftedDefenseData>;
 }
 
 // ── Builder Base ──────────────────────────────────────────────────────────────
@@ -92,8 +103,10 @@ export interface BuilderBaseData {
   heroes: TrackedHero[]; // Battle Machine, Battle Copter
 
   defenses: BuildingRecord;
+  traps: BuildingRecord;
   resourceBuildings: BuildingRecord;
   armyBuildings: BuildingRecord;
+  walls: Record<string, number>; // level (string) → count of segments at that level
 }
 
 // ── Clan Capital ──────────────────────────────────────────────────────────────
@@ -116,6 +129,15 @@ export interface ClanCapitalData {
   goblinMines: ClanCapitalDistrictData;
 }
 
+// ── Clan ──────────────────────────────────────────────────────────────────────
+
+export interface ClanData {
+  tag: string;
+  name: string;
+  clanLevel: number;
+  role: "leader" | "coLeader" | "elder" | "member" | "";
+}
+
 // ── Top-level VillageData ─────────────────────────────────────────────────────
 
 export interface VillageData {
@@ -126,7 +148,7 @@ export interface VillageData {
   donations: number;
   donationsReceived: number;
   warPreference: "in" | "out";
-  role: "leader" | "coLeader" | "elder" | "member" | "";
+  clan?: ClanData;
 
   homeVillage: HomeVillageData;
   builderBase: BuilderBaseData;
