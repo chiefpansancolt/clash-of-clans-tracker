@@ -9,6 +9,7 @@ interface AppItem {
   label: string;
   image: string;
   href: string;
+  disabled?: boolean;
 }
 
 const APP_ITEMS: AppItem[] = [
@@ -22,37 +23,41 @@ const APP_ITEMS: AppItem[] = [
     id: "mass-edit-builder",
     label: "Mass Edit Builder Base",
     image: "/images/builder/builder-hall/normal/level-10.png",
-    href: "#",
+    href: "/mass-edit/builder",
   },
   {
     id: "mass-edit-capital",
     label: "Mass Edit Clan Capital",
     image: "/images/clan-capital/halls/capital-hall/normal/level-10.png",
-    href: "#",
+    href: "/mass-edit/capital",
   },
   {
     id: "clan-mgmt",
     label: "Clan Mgmt",
     image: "/images/clan/badges/level-20.png",
     href: "#",
+    disabled: true,
   },
   {
     id: "potion-boosts",
     label: "Potion Boosts",
     image: "/images/magic-items/potions/builder-potion.png",
     href: "#",
+    disabled: true,
   },
   {
     id: "snack-boosts",
     label: "Snack Boosts",
     image: "/images/magic-items/snacks/builder-bite.png",
     href: "#",
+    disabled: true,
   },
   {
     id: "helpers",
     label: "Helpers",
     image: "/images/other/avatar-prospector.png",
     href: "#",
+    disabled: true,
   },
 ];
 
@@ -71,7 +76,10 @@ export function WaffleMenu() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
-  const itemClass = "flex cursor-pointer flex-col items-center gap-1.5 rounded-lg px-2 py-3 text-center transition-colors hover:bg-secondary/10";
+  const activeItemClass =
+    "flex flex-col items-center gap-1.5 rounded-lg px-2 py-3 text-center transition-colors hover:bg-white/10 cursor-pointer";
+  const disabledItemClass =
+    "flex flex-col items-center gap-1.5 rounded-lg px-2 py-3 text-center opacity-40 cursor-not-allowed";
 
   return (
     <div ref={containerRef} className="relative">
@@ -87,39 +95,37 @@ export function WaffleMenu() {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-72 rounded-xl border border-secondary/80 bg-highlight shadow-xl">
+        <div className="absolute right-0 top-full z-50 mt-2 w-72 rounded-xl border border-secondary/80 bg-primary shadow-xl">
           {/* Header */}
           <div className="border-b border-secondary/80 px-4 py-2.5">
-            <span className="text-xs font-bold uppercase tracking-widest text-secondary">Apps</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-accent">Apps</span>
           </div>
 
           {/* Grid */}
           <div className="grid grid-cols-3 gap-1 p-3">
             {APP_ITEMS.map((item) =>
-              item.href !== "#" ? (
+              item.disabled ? (
+                <div key={item.id} className={disabledItemClass} aria-disabled="true">
+                  <img src={item.image} alt={item.label} className="h-10 object-contain" />
+                  <span className="text-[11px] font-medium leading-tight text-white/80">
+                    {item.label}
+                  </span>
+                  <span className="text-[9px] font-bold uppercase tracking-wide text-accent/80">
+                    Soon
+                  </span>
+                </div>
+              ) : (
                 <Link
                   key={item.id}
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className={itemClass}
+                  className={activeItemClass}
                 >
                   <img src={item.image} alt={item.label} className="h-10 object-contain" />
-                  <span className="text-[11px] font-medium leading-tight text-gray-800">
+                  <span className="text-[11px] font-medium leading-tight text-white/80">
                     {item.label}
                   </span>
                 </Link>
-              ) : (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className={itemClass}
-                >
-                  <img src={item.image} alt={item.label} className="h-10 object-contain" />
-                  <span className="text-[11px] font-medium leading-tight text-gray-800">
-                    {item.label}
-                  </span>
-                </button>
               )
             )}
           </div>

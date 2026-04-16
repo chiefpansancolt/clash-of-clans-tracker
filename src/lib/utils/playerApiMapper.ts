@@ -1,5 +1,6 @@
 import { home } from "clash-of-clans-data";
 
+import { createDefaultClanCapital } from "@/lib/utils/villageHelpers";
 import type { PlayerApiResponse } from "@/types/app";
 import type {
   BuilderBaseData,
@@ -11,9 +12,6 @@ import type {
   VillageData,
 } from "@/types/app/game";
 
-function defaultDistrict() {
-  return { hallLevel: 0, buildings: {} };
-}
 
 /**
  * Maps a Clash of Clans Player API response to VillageData.
@@ -101,15 +99,8 @@ export function mapPlayerApiToVillageData(player: PlayerApiResponse): VillageDat
   };
 
   const clanCapital: ClanCapitalData = {
+    ...createDefaultClanCapital(),
     clanCapitalContributions: player.clanCapitalContributions ?? 0,
-    capitalPeak: defaultDistrict(),
-    barbarianCamp: defaultDistrict(),
-    wizardValley: defaultDistrict(),
-    buildersWorkshop: defaultDistrict(),
-    dragonCliffs: defaultDistrict(),
-    golemQuarry: defaultDistrict(),
-    skeletonPark: defaultDistrict(),
-    goblinMines: defaultDistrict(),
   };
 
   const achievements = (player.achievements ?? []).map((a) => ({

@@ -12,9 +12,11 @@ interface SliderRowProps {
   indent?: boolean;
   /** Force-disable regardless of maxLevel (e.g. supercharge before max level) */
   disabled?: boolean;
+  /** Suppress locked styling when 0 doesn't mean "not built" (e.g. wall counts) */
+  neverLocked?: boolean;
 }
 
-export function SliderRow({ label, imageUrl, currentLevel, maxLevel, onChange, indent = false, disabled = false }: SliderRowProps) {
+export function SliderRow({ label, imageUrl, currentLevel, maxLevel, onChange, indent = false, disabled = false, neverLocked = false }: SliderRowProps) {
   const [inputValue, setInputValue] = useState(String(currentLevel));
 
   // Sync text input when slider (or external state) changes
@@ -22,7 +24,7 @@ export function SliderRow({ label, imageUrl, currentLevel, maxLevel, onChange, i
     setInputValue(String(currentLevel));
   }, [currentLevel]);
 
-  const isLocked = currentLevel === 0;
+  const isLocked = !neverLocked && currentLevel === 0;
   const isMaxed = maxLevel > 0 && currentLevel >= maxLevel;
   const isDisabled = maxLevel === 0 || disabled;
 
@@ -53,8 +55,8 @@ export function SliderRow({ label, imageUrl, currentLevel, maxLevel, onChange, i
         indent
           ? "ml-6 border-l-2 border-accent/80 bg-accent/5"
           : isLocked
-          ? "bg-gray-100"
-          : "bg-white hover:bg-gray-50"
+          ? "bg-secondary/10"
+          : "bg-highlight hover:bg-secondary/10"
       } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
     >
       {/* Image */}
@@ -77,7 +79,7 @@ export function SliderRow({ label, imageUrl, currentLevel, maxLevel, onChange, i
       {/* Label */}
       <span
         className={`w-44 shrink-0 truncate text-sm font-medium ${
-          indent ? "text-secondary" : isLocked ? "text-gray-400" : "text-gray-800"
+          indent ? "text-secondary" : isLocked ? "text-secondary/60" : "text-gray-900"
         }`}
       >
         {indent && <img src="/images/other/supercharge.png" alt="Supercharge" className="inline-block h-4 w-4 mr-1 object-contain" />}

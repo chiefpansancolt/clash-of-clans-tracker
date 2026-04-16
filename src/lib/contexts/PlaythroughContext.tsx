@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import type { AppData, Playthrough } from "@/types/app";
 import type { PlaythroughContextType } from "@/types/contexts";
 import { storageService } from "@/service/storage";
@@ -10,21 +10,32 @@ const PlaythroughContext = createContext<PlaythroughContextType | undefined>(und
 
 export function PlaythroughProvider({ children }: { children: React.ReactNode }) {
 	const [appData, setAppData] = useState<AppData>({ playthroughs: [], activePlaythroughId: null });
-	const isLoadedRef = useRef(false);
+	const [isLoaded, setIsLoaded] = useState(false);
+	const [loadError, setLoadError] = useState<Error | null>(null);
+
+	// Throw during render so React propagates it to the nearest error boundary.
+	// (Errors thrown in useEffect don't reach error boundaries on their own.)
+	if (loadError) throw loadError;
 
 	// Load from localStorage after mount (avoids SSR/client hydration mismatch)
 	useEffect(() => {
-		// eslint-disable-next-line react-hooks/set-state-in-effect
-		setAppData(storageService.load());
-		isLoadedRef.current = true;
+		try {
+			// Both state updates are batched into one re-render, so the save effect
+			// below only fires once both appData and isLoaded reflect the loaded state.
+			setAppData(storageService.load());
+			setIsLoaded(true);
+		} catch (err) {
+			setLoadError(err instanceof Error ? err : new Error(String(err)));
+		}
 	}, []);
 
-	// Auto-save to localStorage on every state change after initial load
+	// Auto-save to localStorage on every state change after initial load.
+	// Because isLoaded and appData are set together in the same effect above,
+	// this never fires with the initial empty appData — only with real data.
 	useEffect(() => {
-		if (isLoadedRef.current) {
-			storageService.save(appData);
-		}
-	}, [appData]);
+		if (!isLoaded) return;
+		storageService.save(appData);
+	}, [appData, isLoaded]);
 
 	const activePlaythrough =
 		appData.playthroughs.find((p) => p.id === appData.activePlaythroughId) || null;
@@ -96,6 +107,7 @@ export function PlaythroughProvider({ children }: { children: React.ReactNode })
 			value={{
 				playthroughs: appData.playthroughs,
 				activePlaythrough,
+				isLoaded,
 				setActivePlaythrough,
 				addPlaythrough,
 				updatePlaythrough,

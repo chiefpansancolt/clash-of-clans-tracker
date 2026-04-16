@@ -28,7 +28,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
 				stacked
 				className={"mt-14 lg:mt-0 lg:mr-24"}
 				toastClassName={
-					"shadow-md rounded-lg text-gray-500 bg-white dark:text-gray-400 dark:bg-gray-800 p-0"
+					"shadow-md rounded-lg bg-secondary p-0"
 				}
 			/>
 		</ThemeProvider>

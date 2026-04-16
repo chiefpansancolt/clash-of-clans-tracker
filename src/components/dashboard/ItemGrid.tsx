@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Tooltip } from "flowbite-react";
-import { HiClock } from "react-icons/hi";
+import { HiClock, HiLockClosed } from "react-icons/hi";
 import type { TrackedItem } from "@/types/app/game";
 
 interface ItemGridProps {
@@ -63,6 +63,11 @@ function ItemCell({
         >
           {isLocked ? "—" : item.level}
         </span>
+
+        {/* Lock overlay — bottom-right, only when locked */}
+        {isLocked && (
+          <HiLockClosed className="absolute bottom-0.5 right-0.5 h-3 w-3 text-white/80" />
+        )}
 
         {/* Upgrading indicator — top-right */}
         {isUpgrading && (

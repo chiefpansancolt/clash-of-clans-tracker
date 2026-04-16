@@ -11,12 +11,13 @@ import {
 	HiUpload,
 } from "react-icons/hi";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
+import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 
 export default function Settings() {
 	const { playthroughs, exportData, importData, clearAllData } = usePlaythrough();
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const [confirmReset, setConfirmReset] = useState(false);
+	const [resetModalOpen, setResetModalOpen] = useState(false);
 	const [resetSuccess, setResetSuccess] = useState(false);
 	const [importStatus, setImportStatus] = useState<{
 		show: boolean;
@@ -75,19 +76,21 @@ export default function Settings() {
 		reader.readAsText(file);
 	};
 
-	const handleResetData = () => {
-		if (!confirmReset) {
-			setConfirmReset(true);
-			return;
-		}
-
+	const handleResetConfirm = () => {
 		clearAllData();
 		setResetSuccess(true);
-		setConfirmReset(false);
 		setTimeout(() => setResetSuccess(false), 3000);
 	};
 
 	return (
+		<>
+		<DeleteConfirmModal
+			isOpen={resetModalOpen}
+			onClose={() => setResetModalOpen(false)}
+			onConfirm={handleResetConfirm}
+			title="Reset All Data"
+			message="This will permanently delete all villages and cannot be undone. Make sure you have exported a backup first."
+		/>
 		<section className="min-h-screen bg-highlight p-8 dark:bg-gray-900">
 			<div className="mx-auto">
 				<div className="mb-8">
@@ -135,7 +138,7 @@ export default function Settings() {
 							{/* Export */}
 							<div>
 								<div className="mb-2">
-									<Label>Export Data</Label>
+									<Label className="text-white/80">Export Data</Label>
 								</div>
 								<Button onClick={handleExportData} className="w-full">
 									<HiDownload className="mr-2 h-5 w-5" />
@@ -149,7 +152,7 @@ export default function Settings() {
 							{/* Import */}
 							<div>
 								<div className="mb-2">
-									<Label>Import Data</Label>
+									<Label className="text-white/80">Import Data</Label>
 								</div>
 								<div className="flex flex-col gap-2">
 									<FileInput ref={fileInputRef} accept=".json" />
@@ -166,16 +169,16 @@ export default function Settings() {
 							{/* Reset */}
 							<div>
 								<div className="mb-2">
-									<Label className="text-red-500">Reset All Data</Label>
+									<Label className="text-red-400">Reset All Data</Label>
 									{resetSuccess && (
 										<span className="ml-2 text-sm text-green-500">
 											Data reset successfully
 										</span>
 									)}
 								</div>
-								<Button color="red" onClick={handleResetData} className="w-full">
+								<Button color="red" onClick={() => setResetModalOpen(true)} className="w-full">
 									<HiTrash className="mr-2 h-5 w-5" />
-									{confirmReset ? "Confirm Reset" : "Reset All Data"}
+									Reset All Data
 								</Button>
 								<p className="mt-1 text-sm text-red-500">
 									Warning: This will delete all playthroughs and cannot be undone.
@@ -204,5 +207,6 @@ export default function Settings() {
 				</div>
 			</div>
 		</section>
+		</>
 	);
 }

@@ -1,5 +1,6 @@
 import { builder, home } from "clash-of-clans-data";
 
+import { createDefaultClanCapital } from "@/lib/utils/villageHelpers";
 import type {
   BuilderBaseData,
   BuildingInstance,
@@ -276,11 +277,6 @@ function extractCraftedDefenses(
   return result;
 }
 
-// ── Default district ──────────────────────────────────────────────────────────
-
-function defaultDistrict() {
-  return { hallLevel: 0, buildings: {} };
-}
 
 // ── Public mapper ─────────────────────────────────────────────────────────────
 
@@ -337,17 +333,7 @@ export function mapExportDataToVillageData(data: ExportData): VillageData {
     walls: {},
   };
 
-  const clanCapital: ClanCapitalData = {
-    clanCapitalContributions: 0,
-    capitalPeak: defaultDistrict(),
-    barbarianCamp: defaultDistrict(),
-    wizardValley: defaultDistrict(),
-    buildersWorkshop: defaultDistrict(),
-    dragonCliffs: defaultDistrict(),
-    golemQuarry: defaultDistrict(),
-    skeletonPark: defaultDistrict(),
-    goblinMines: defaultDistrict(),
-  };
+  const clanCapital: ClanCapitalData = createDefaultClanCapital();
 
   return {
     playerTag: data.tag ?? "",

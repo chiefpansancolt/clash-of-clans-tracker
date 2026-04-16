@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Tooltip } from "flowbite-react";
-import { HiClock } from "react-icons/hi";
+import { HiClock, HiLockClosed } from "react-icons/hi";
 import type { TrackedEquipment, TrackedHero } from "@/types/app/game";
 
 interface HeroCardProps {
@@ -86,6 +86,11 @@ export function HeroCard({ hero, heroIconUrl, maxHeroLevel, getEquipmentData }: 
         >
           {hero.level}
         </span>
+
+        {/* Lock overlay — bottom-right, only when locked */}
+        {isLocked && (
+          <HiLockClosed className="absolute bottom-0.5 right-0.5 h-3.5 w-3.5 text-white/80" />
+        )}
 
         {/* Upgrading indicator */}
         {isUpgrading && (

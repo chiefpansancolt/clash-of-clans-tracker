@@ -1,4 +1,4 @@
-import { builder, home } from "clash-of-clans-data";
+import { builder, clanCapital as clanCapitalData, home } from "clash-of-clans-data";
 
 import type {
   BuilderBaseData,
@@ -62,16 +62,20 @@ export function createDefaultBuilderBase(builderHallLevel = 1): BuilderBaseData 
 }
 
 export function createDefaultClanCapital(): ClanCapitalData {
+  const cc = clanCapitalData() as any;
   return {
     clanCapitalContributions: 0,
     capitalPeak: defaultDistrict(),
     barbarianCamp: defaultDistrict(),
     wizardValley: defaultDistrict(),
+    balloonLagoon: defaultDistrict(),
     buildersWorkshop: defaultDistrict(),
     dragonCliffs: defaultDistrict(),
     golemQuarry: defaultDistrict(),
     skeletonPark: defaultDistrict(),
     goblinMines: defaultDistrict(),
+    troops: makeTrackedItems(cc.troops().get()),
+    spells: makeTrackedItems(cc.spells().get()),
   };
 }
 

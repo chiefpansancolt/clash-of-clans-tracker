@@ -10,7 +10,7 @@ function progressColor(pct: number): string {
   if (pct >= 100) return "bg-green-500";
   if (pct >= 80)  return "bg-blue-400";
   if (pct >= 60)  return "bg-accent";
-  return "bg-red-500";
+  return "bg-orange-400";
 }
 
 export function ProgressCard({ label, result, sub }: ProgressCardProps) {

@@ -114,6 +114,7 @@ export interface BuilderBaseData {
 export interface ClanCapitalDistrictData {
   hallLevel: number; // Capital Hall level or District Hall level
   buildings: CapitalBuildingRecord; // buildings in this district (no upgrade times)
+  walls?: Record<string, number>; // wall level (as string) → count of wall segments
 }
 
 export interface ClanCapitalData {
@@ -122,11 +123,15 @@ export interface ClanCapitalData {
   capitalPeak: ClanCapitalDistrictData;
   barbarianCamp: ClanCapitalDistrictData;
   wizardValley: ClanCapitalDistrictData;
+  balloonLagoon: ClanCapitalDistrictData;
   buildersWorkshop: ClanCapitalDistrictData;
   dragonCliffs: ClanCapitalDistrictData;
   golemQuarry: ClanCapitalDistrictData;
   skeletonPark: ClanCapitalDistrictData;
   goblinMines: ClanCapitalDistrictData;
+
+  troops: TrackedItem[];
+  spells: TrackedItem[];
 }
 
 // ── Clan ──────────────────────────────────────────────────────────────────────

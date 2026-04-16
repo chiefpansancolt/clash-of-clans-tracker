@@ -4,10 +4,11 @@ import { ProgressCard } from "./ProgressCard";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
 import type { ProgressResult } from "@/lib/utils/progressHelpers";
 
-const DISTRICTS: { key: keyof Omit<ClanCapitalData, "clanCapitalContributions">; label: string }[] = [
+const DISTRICTS: { key: keyof Omit<ClanCapitalData, "clanCapitalContributions" | "troops" | "spells">; label: string }[] = [
   { key: "capitalPeak", label: "Capital Peak" },
   { key: "barbarianCamp", label: "Barbarian Camp" },
   { key: "wizardValley", label: "Wizard Valley" },
+  { key: "balloonLagoon", label: "Balloon Lagoon" },
   { key: "buildersWorkshop", label: "Builder's Workshop" },
   { key: "dragonCliffs", label: "Dragon Cliffs" },
   { key: "golemQuarry", label: "Golem Quarry" },

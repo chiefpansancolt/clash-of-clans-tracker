@@ -3,6 +3,7 @@ import { Playthrough } from "@/types/app";
 export interface PlaythroughContextType {
   playthroughs: Playthrough[];
   activePlaythrough: Playthrough | null;
+  isLoaded: boolean;
   setActivePlaythrough: (id: string | null) => void;
   addPlaythrough: (
     playthrough: Omit<Playthrough, "id" | "createdAt" | "lastModified">,

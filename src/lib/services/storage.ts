@@ -46,19 +46,16 @@ export const storageService = {
   load(): AppData {
     if (typeof window === "undefined") return defaultData;
 
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (!stored) return defaultData;
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) return defaultData;
 
-      const parsed = JSON.parse(stored) as AppData;
-      return {
-        ...parsed,
-        playthroughs: (parsed.playthroughs ?? []).map(migratePlaythrough),
-      };
-    } catch (error) {
-      console.error("Error loading data from localStorage:", error);
-      return defaultData;
-    }
+    // Let parse/migration errors throw — the caller (PlaythroughContext) will
+    // surface them as a React error rather than silently wiping all data.
+    const parsed = JSON.parse(stored) as AppData;
+    return {
+      ...parsed,
+      playthroughs: (parsed.playthroughs ?? []).map(migratePlaythrough),
+    };
   },
 
   /**

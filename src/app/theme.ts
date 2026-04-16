@@ -209,4 +209,12 @@ export const customTheme: CustomFlowbiteTheme = createTheme({
       },
     },
   },
+  toast: {
+    root: {
+      base: "flex w-full max-w-xs items-center rounded-lg bg-secondary p-4 text-white/80 shadow",
+    },
+    toggle: {
+      base: "-m-1.5 ml-auto inline-flex h-8 w-8 cursor-pointer rounded-lg bg-transparent p-1.5 text-white/80 hover:bg-white/10 hover:text-white focus:ring-2 focus:ring-white/30",
+    },
+  },
 });
