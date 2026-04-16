@@ -68,7 +68,7 @@ export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps)
   const petsProg = calcPetsProgress(hv.pets, thLevel);
   const wallsProg = calcWallsProgress(hv.walls, thLevel);
   const superchargeProg = calcSuperchargeProgress(hv, thLevel);
-  const craftedProg = calcCraftedDefensesProgress(hv);
+  const craftedProg = calcCraftedDefensesProgress(hv, thLevel);
   const { maxLevel: maxWallLevel, totalAtTH: totalWalls } = getHomeWallData(thLevel);
   const wallSub = totalWalls > 0 ? `${totalWalls} walls · max Lv ${maxWallLevel}` : "No wall data";
 

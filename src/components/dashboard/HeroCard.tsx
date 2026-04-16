@@ -55,14 +55,15 @@ function EquipChip({
 
 export function HeroCard({ hero, heroIconUrl, maxHeroLevel, getEquipmentData }: HeroCardProps) {
   const [imgError, setImgError] = useState(false);
-  const isMaxed = maxHeroLevel > 0 && hero.level >= maxHeroLevel;
+  const isLocked = hero.level === 0;
+  const isMaxed = !isLocked && maxHeroLevel > 0 && hero.level >= maxHeroLevel;
   const isUpgrading = !!hero.upgrade;
   const badgeBg = isMaxed ? "bg-green-500 text-white" : "bg-accent text-primary";
 
   return (
-    <div className="flex w-27 shrink-0 flex-col items-center rounded-lg border border-accent/80 bg-primary px-2 pt-2.5 pb-2">
+    <div className={`flex w-27 shrink-0 flex-col items-center rounded-lg border bg-primary px-2 pt-2.5 pb-2 ${isLocked ? "border-white/20 opacity-40" : "border-accent/80"}`}>
       {/* Hero icon */}
-      <div className="relative h-16 w-16 overflow-hidden rounded-lg ring-2 ring-accent/80">
+      <div className={`relative h-16 w-16 overflow-hidden rounded-lg ring-2 ${isLocked ? "ring-white/20" : "ring-accent/80"}`}>
         {!imgError && heroIconUrl ? (
           <Image
             src={heroIconUrl}

@@ -200,7 +200,9 @@ export function getMaxHeroHallLevel(thLevel: number): number {
 
 // ── Crafted Defenses ─────────────────────────────────────────────────────────
 
-export function calcCraftedDefensesProgress(hv: HomeVillageData): ProgressResult {
+export function calcCraftedDefensesProgress(hv: HomeVillageData, thLevel: number): ProgressResult {
+  if (thLevel < 18) return toResult(0, 0);
+
   type RawCraftedDefense = { id: string; modules: Array<{ upgrades: unknown[] }> };
   const crafted = (_home.craftedDefenses().current().get() as RawCraftedDefense[]);
 
@@ -226,13 +228,17 @@ type RawBuildingData = {
   availablePerTownHall: Array<{ townHallLevel: number; count: number }>;
 };
 
-function getCountAtTH(
-  availablePerTownHall: Array<{ townHallLevel: number; count: number }>,
+export function getCountAtTH(
+  availablePerTownHall: Array<{ townHallLevel: number; count: number; countAfterMerges?: number }>,
   thLevel: number
 ): number {
   let count = 0;
   for (const entry of availablePerTownHall) {
-    if (entry.townHallLevel <= thLevel) count = entry.count;
+    if (entry.townHallLevel <= thLevel) {
+      // When countAfterMerges is present (even 0), use it — 0 means all instances
+      // have been merged away into a separate building (e.g. Ricochet Cannon).
+      count = entry.countAfterMerges !== undefined ? entry.countAfterMerges : entry.count;
+    }
   }
   return count;
 }

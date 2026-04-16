@@ -22,6 +22,7 @@ import {
 	HiSparkles,
 } from "react-icons/hi";
 import { fetchPlayerByTag } from "@/app/actions/fetchPlayer";
+import { useApiCooldown } from "@/lib/hooks/useApiCooldown";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { isExportDataFormat, mapExportDataToVillageData } from "@/lib/utils/exportDataMapper";
 import { mapPlayerApiToVillageData, mergeWithBuildingData } from "@/lib/utils/playerApiMapper";
@@ -57,6 +58,7 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 	const [fetchError, setFetchError] = useState("");
 	const [fetchedPlayer, setFetchedPlayer] = useState<PlayerApiResponse | null>(null);
 	const [apiData, setApiData] = useState<VillageData | null>(null);
+	const { secondsLeft, isOnCooldown, startCooldown, handleError } = useApiCooldown();
 
 	// Import — building JSON supplement
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -81,10 +83,11 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 		setFetching(false);
 
 		if (!result.success) {
-			setFetchError(result.error);
+			setFetchError(handleError(result.error));
 			return;
 		}
 
+		startCooldown();
 		setFetchedPlayer(result.player);
 		setApiData(mapPlayerApiToVillageData(result.player));
 		if (!name.trim()) setName(result.player.name);
@@ -298,9 +301,10 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 									/>
 									<Button
 										onClick={handleFetchPlayer}
-										disabled={!playerTag.trim() || fetching}
+										disabled={!playerTag.trim() || fetching || isOnCooldown}
+										className="min-w-16"
 									>
-										{fetching ? <Spinner size="sm" /> : "Fetch"}
+										{fetching ? <Spinner size="sm" /> : isOnCooldown ? `${secondsLeft}s` : "Fetch"}
 									</Button>
 								</div>
 								{fetchError && (

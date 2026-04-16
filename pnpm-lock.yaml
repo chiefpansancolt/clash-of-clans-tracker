@@ -12,8 +12,8 @@ importers:
         specifier: ^0.6.4
         version: 0.6.4
       clash-of-clans-data:
-        specifier: 0.8.0
-        version: 0.8.0
+        specifier: 0.9.0
+        version: 0.9.0
       flowbite-react:
         specifier: ^0.12.17
         version: 0.12.17(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tailwindcss@4.2.2)
@@ -1136,8 +1136,8 @@ packages:
   clash-of-clans-api@0.6.4:
     resolution: {integrity: sha512-VWG0Wuu5SgNgf9Nk6Gkl4mnpuPJ2lhBI4QWBMjw7euQRXKmAmE3sBv/pqBMQa2CnC0bZKLS+pBbafjL71Kpujw==}
 
-  clash-of-clans-data@0.8.0:
-    resolution: {integrity: sha512-tJTR/1fQoU2AH2IV3yKx+BVPWPcP5sBejh8jpr0hChOWkDx8coxYDc2CwidpYGBBMT/7PL2KW7+XSMVWceiI4g==}
+  clash-of-clans-data@0.9.0:
+    resolution: {integrity: sha512-BTi2EsVlfdLslgf/Z60MvePQWneWb9b6Y9lMl3DvABnrb4vATCMHZ+dsLCcN5Ra9lYarXF05z4wad0XkJBZ8cg==}
     engines: {node: '>=24'}
 
   client-only@0.0.1:
@@ -3545,7 +3545,7 @@ snapshots:
       request: 2.88.2
       request-promise: 4.2.6(request@2.88.2)
 
-  clash-of-clans-data@0.8.0: {}
+  clash-of-clans-data@0.9.0: {}
 
   client-only@0.0.1: {}
 

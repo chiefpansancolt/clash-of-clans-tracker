@@ -16,6 +16,7 @@ import {
 import { useRef, useState } from "react";
 import { HiExclamationCircle, HiRefresh } from "react-icons/hi";
 import { fetchPlayerByTag } from "@/app/actions/fetchPlayer";
+import { useApiCooldown } from "@/lib/hooks/useApiCooldown";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { isExportDataFormat, mapExportDataToVillageData } from "@/lib/utils/exportDataMapper";
 import { mapPlayerApiToVillageData, mergeWithBuildingData } from "@/lib/utils/playerApiMapper";
@@ -51,6 +52,7 @@ export function EditPlaythroughModal({
 	const [fetchError, setFetchError] = useState("");
 	const [fetchedPlayer, setFetchedPlayer] = useState<PlayerApiResponse | null>(null);
 	const [refreshedData, setRefreshedData] = useState<VillageData | null>(null);
+	const { secondsLeft, isOnCooldown, startCooldown, handleError } = useApiCooldown();
 
 	// Building JSON supplement
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -69,10 +71,11 @@ export function EditPlaythroughModal({
 		setFetching(false);
 
 		if (!result.success) {
-			setFetchError(result.error);
+			setFetchError(handleError(result.error));
 			return;
 		}
 
+		startCooldown();
 		setFetchedPlayer(result.player);
 		setRefreshedData(mapPlayerApiToVillageData(result.player));
 	};
@@ -187,8 +190,8 @@ export function EditPlaythroughModal({
 								onKeyDown={(e) => e.key === "Enter" && handleFetchPlayer()}
 								className="flex-1"
 							/>
-							<Button onClick={handleFetchPlayer} disabled={!playerTag.trim() || fetching}>
-								{fetching ? <Spinner size="sm" /> : <HiRefresh className="h-4 w-4" />}
+							<Button onClick={handleFetchPlayer} disabled={!playerTag.trim() || fetching || isOnCooldown} className="min-w-16">
+								{fetching ? <Spinner size="sm" /> : isOnCooldown ? `${secondsLeft}s` : <HiRefresh className="h-4 w-4" />}
 							</Button>
 						</div>
 						{fetchError && (

@@ -51,6 +51,8 @@ const RESOURCE_ICONS = {
   gold:       "images/other/gold.png",
   elixir:     "images/other/elixir.png",
   darkElixir: "images/other/dark-elixir.png",
+  goldB:      "images/other/gold-b.png",
+  elixirB:    "images/other/elixir-b.png",
   shinyOre:   "images/other/ore/shiny-ore.png",
   glowyOre:   "images/other/ore/glowy-ore.png",
   starryOre:  "images/other/ore/starry-ore.png",
@@ -192,7 +194,8 @@ function BuilderLeagueContent({ league }: { league: BuilderLeagueData }) {
         {league.starBonus && (
           <ModalSection title="Star bonus reward">
             <div className="px-3 py-2 space-y-1.5">
-              <ResourceLine icon="gold" label="Gold" value={league.starBonus.reward} />
+              <ResourceLine icon="goldB" label="Gold" value={league.starBonus.reward} />
+              <ResourceLine icon="elixirB" label="Elixir" value={league.starBonus.reward} />
             </div>
           </ModalSection>
         )}
@@ -205,13 +208,13 @@ function BuilderLeagueContent({ league }: { league: BuilderLeagueData }) {
               <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">Stars</span>
               <div className="flex items-center gap-1">
                 <div className="relative h-3.5 w-3.5 shrink-0">
-                  <Image src={toPublicImageUrl(RESOURCE_ICONS.gold)} alt="Gold" fill sizes="14px" className="object-contain" />
+                  <Image src={toPublicImageUrl(RESOURCE_ICONS.goldB)} alt="Gold" fill sizes="14px" className="object-contain" />
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">Attacker</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="relative h-3.5 w-3.5 shrink-0">
-                  <Image src={toPublicImageUrl(RESOURCE_ICONS.elixir)} alt="Elixir" fill sizes="14px" className="object-contain" />
+                  <Image src={toPublicImageUrl(RESOURCE_ICONS.elixirB)} alt="Elixir" fill sizes="14px" className="object-contain" />
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">Defender</span>
               </div>
