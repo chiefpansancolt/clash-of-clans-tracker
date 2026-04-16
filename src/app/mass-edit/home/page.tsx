@@ -351,7 +351,6 @@ export default function MassEditHomePage() {
     if (!isDirty) return;
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
-      e.returnValue = "";
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     const originalPushState = window.history.pushState.bind(window.history);
@@ -468,7 +467,6 @@ export default function MassEditHomePage() {
     });
     setIsDirty(false);
     successToast({ message: "Home Village saved!" });
-    router.push("/dashboard");
   }
 
   // ── Walls summary ─────────────────────────────────────────────────────────────

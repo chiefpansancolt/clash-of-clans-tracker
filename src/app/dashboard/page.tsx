@@ -36,7 +36,7 @@ export default function DashboardPage() {
       <PlayerHeader playthrough={activePlaythrough} achievementsProgress={achievementsProgress} />
       <HomeVillageSection hv={data.homeVillage} playthrough={activePlaythrough} />
       <BuilderBaseSection bb={data.builderBase} playthrough={activePlaythrough} />
-      {activePlaythrough.clanCapitalEnabled && (
+      {data.clanCapital.capitalPeak.hallLevel > 0 && (
         <ClanCapitalSection data={data.clanCapital} />
       )}
     </div>

@@ -82,6 +82,15 @@ export function PlayerHeader({ playthrough, achievementsProgress }: PlayerHeader
               <span className="text-white/80">Best</span>
             </span>
           )}
+          {data.clanCapital.clanCapitalContributions > 0 && (
+            <span className="flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-1 text-xs">
+              <span className="relative h-4 w-4 shrink-0">
+                <Image src={toPublicImageUrl("images/other/gold-c.png")} alt="Capital Gold" fill sizes="16px" className="object-contain" />
+              </span>
+              <span className="font-bold text-accent">{data.clanCapital.clanCapitalContributions.toLocaleString()}</span>
+              <span className="text-white/80">Contributions</span>
+            </span>
+          )}
         </div>
       </div>
 

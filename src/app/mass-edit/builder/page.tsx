@@ -284,7 +284,6 @@ export default function MassEditBuilderPage() {
     if (!isDirty) return;
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
-      e.returnValue = "";
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     const originalPushState = window.history.pushState.bind(window.history);
@@ -373,7 +372,6 @@ export default function MassEditBuilderPage() {
     });
     setIsDirty(false);
     successToast({ message: "Builder Base saved!" });
-    router.push("/dashboard");
   }
 
   // ── Walls summary ─────────────────────────────────────────────────────────────

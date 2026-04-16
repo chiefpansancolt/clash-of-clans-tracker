@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, TabItem, Tabs } from "flowbite-react";
-import { successToast } from "@/lib/notifications";
+import { successToast, errorToast } from "@/lib/notifications";
 
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { SliderRow } from "@/components/mass-edit/SliderRow";
@@ -206,6 +206,89 @@ function BuildingList({
   );
 }
 
+// ── Grouped building list (for the Buildings sub-tab) ─────────────────────────
+// Barracks and spell factories are collapsed into two unified sections;
+// other army buildings (Army Camp, Spell Storage) render individually.
+
+function GroupedBuildingList({
+  districtId,
+  buildings,
+  buildingLevels,
+  onBuildingChange,
+}: {
+  districtId: string;
+  buildings: BuildingEditData[];
+  buildingLevels: LevelMap;
+  onBuildingChange: (key: string, val: number) => void;
+}) {
+  if (buildings.length === 0) {
+    return (
+      <p className="py-6 text-center text-sm text-gray-400">
+        Nothing available at this hall level.
+      </p>
+    );
+  }
+
+  const barracks = buildings.filter((b) => b.id.includes("barracks"));
+  const factories = buildings.filter((b) => b.id.includes("factory"));
+  const other = buildings.filter((b) => !b.id.includes("barracks") && !b.id.includes("factory"));
+
+  function renderGroup(group: BuildingEditData[], groupLabel: string) {
+    if (group.length === 0) return null;
+    return (
+      <div className="mt-6 first:mt-0">
+        <SectionHeader>{groupLabel}</SectionHeader>
+        <div className="grid grid-cols-1 gap-1 lg:grid-cols-2">
+          {group.map((b) =>
+            Array.from({ length: b.instanceCount }, (_, i) => {
+              const instanceKey = `${districtId}-${b.id}-${i}`;
+              return (
+                <SliderRow
+                  key={instanceKey}
+                  label={b.name}
+                  imageUrl={b.imageUrl}
+                  currentLevel={buildingLevels[instanceKey] ?? 0}
+                  maxLevel={b.maxLevel}
+                  onChange={(val) => onBuildingChange(instanceKey, val)}
+                />
+              );
+            })
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {other.map((b) => (
+        <div key={b.id} className="mt-6 first:mt-0">
+          <SectionHeader>
+            {b.name}{b.instanceCount > 1 ? ` × ${b.instanceCount}` : ""}
+          </SectionHeader>
+          <div className="grid grid-cols-1 gap-1 lg:grid-cols-2">
+            {Array.from({ length: b.instanceCount }, (_, i) => {
+              const instanceKey = `${districtId}-${b.id}-${i}`;
+              return (
+                <SliderRow
+                  key={i}
+                  label={b.instanceCount > 1 ? `${b.name} #${i + 1}` : b.name}
+                  imageUrl={b.imageUrl}
+                  currentLevel={buildingLevels[instanceKey] ?? 0}
+                  maxLevel={b.maxLevel}
+                  onChange={(val) => onBuildingChange(instanceKey, val)}
+                />
+              );
+            })}
+          </div>
+        </div>
+      ))}
+      {renderGroup(barracks, "Barracks")}
+      {renderGroup(factories, "Spell Factories")}
+    </div>
+  );
+}
+
 function WallsPanel({
   wallInfo,
   wallLevelCounts,
@@ -373,12 +456,21 @@ function DistrictBuildingTab({
                   }
                 }}
               />
-              <BuildingList
-                districtId={districtId}
-                buildings={activeBuildings}
-                buildingLevels={buildingLevels}
-                onBuildingChange={onBuildingChange}
-              />
+              {activeTab === "buildings" ? (
+                <GroupedBuildingList
+                  districtId={districtId}
+                  buildings={activeBuildings}
+                  buildingLevels={buildingLevels}
+                  onBuildingChange={onBuildingChange}
+                />
+              ) : (
+                <BuildingList
+                  districtId={districtId}
+                  buildings={activeBuildings}
+                  buildingLevels={buildingLevels}
+                  onBuildingChange={onBuildingChange}
+                />
+              )}
             </>
           )}
         </>
@@ -486,8 +578,16 @@ export default function MassEditCapitalPage() {
     [capitalHallDraft, ...DISTRICTS.map((d) => districtHallDrafts[d.id])]
   );
 
-  const troopData = useMemo(() => getCapitalTroops(), []);
-  const spellData = useMemo(() => getCapitalSpells(), []);
+  const troopData = useMemo(
+    () => getCapitalTroops(districtHallDrafts),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [...DISTRICTS.map((d) => districtHallDrafts[d.id])]
+  );
+  const spellData = useMemo(
+    () => getCapitalSpells(districtHallDrafts),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [...DISTRICTS.map((d) => districtHallDrafts[d.id])]
+  );
 
   // ── Edit state ───────────────────────────────────────────────────────────────
   const [buildingLevels, setBuildingLevels] = useState<LevelMap>({});
@@ -563,7 +663,6 @@ export default function MassEditCapitalPage() {
     if (!isDirty) return;
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
-      e.returnValue = "";
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     const originalPushState = window.history.pushState.bind(window.history);
@@ -639,6 +738,29 @@ export default function MassEditCapitalPage() {
   // ── Save ─────────────────────────────────────────────────────────────────────
   function handleSave() {
     if (!activePlaythrough) return;
+
+    // Wall over-allocation check
+    const wallErrors: string[] = [];
+    const wallChecks: Array<{ label: string; info: CapitalWallInfo; counts: Record<string, number> }> = [
+      { label: "Capital Hall", info: capitalPeakWallInfo, counts: wallCounts["capitalPeak"] ?? {} },
+      ...DISTRICTS.map((d) => ({
+        label: d.label,
+        info: districtWallInfos[d.id] ?? { maxLevel: 0, totalCount: 0, levels: [] },
+        counts: wallCounts[d.id] ?? {},
+      })),
+    ];
+    for (const { label, info, counts } of wallChecks) {
+      if (info.totalCount === 0) continue;
+      const allocated = Object.values(counts).reduce((s, c) => s + c, 0);
+      if (allocated > info.totalCount) {
+        wallErrors.push(`${label}: ${allocated} allocated, only ${info.totalCount} available`);
+      }
+    }
+    if (wallErrors.length > 0) {
+      errorToast({ message: `Wall counts exceed total:\n${wallErrors.join("\n")}` });
+      return;
+    }
+
     const cap = activePlaythrough.data.clanCapital;
 
     function rebuildDistrictBuildings(
@@ -692,7 +814,6 @@ export default function MassEditCapitalPage() {
     });
     setIsDirty(false);
     successToast({ message: "Clan Capital saved!" });
-    router.push("/dashboard");
   }
 
   if (!activePlaythrough || !cc) return null;

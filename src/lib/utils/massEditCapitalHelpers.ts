@@ -151,10 +151,14 @@ export function getDistrictTraps(districtId: string, dhLevel: number): BuildingE
 
 // ── District army buildings ───────────────────────────────────────────────────
 
-/** Barracks, spell factories, and army camp per district. */
+/** Army camp, barracks, and spell factories per district. */
 export function getDistrictArmyBuildings(districtId: string, dhLevel: number): BuildingEditData[] {
   if (dhLevel === 0) return [];
-  const raw = _cap.armyBuildings().get() as RawCapBuilding[];
+  const raw = [
+    ...(_cap.armyBuildings().get() as RawCapBuilding[]),
+    ...(_cap.armyBuildings().barracks().get() as RawCapBuilding[]),
+    ...(_cap.armyBuildings().spellFactories().get() as RawCapBuilding[]),
+  ];
   const result: BuildingEditData[] = [];
 
   for (const b of raw) {
@@ -173,6 +177,20 @@ export function getDistrictArmyBuildings(districtId: string, dhLevel: number): B
   }
 
   return result;
+}
+
+// ── District unlock levels ────────────────────────────────────────────────────
+
+/**
+ * Returns the Capital Hall level required to unlock each district.
+ * Derived from districtHall level-1 `capitalHallRequired` data.
+ * `capitalPeak` is always 1.
+ */
+export function getDistrictUnlockLevels(): Record<string, number> {
+  type RawDH = { levels: Array<{ capitalHallRequired?: Record<string, number> }> };
+  const raw = _cap.districtHall().get() as RawDH[];
+  const reqs = raw[0]?.levels[0]?.capitalHallRequired ?? {};
+  return { capitalPeak: 1, ...reqs };
 }
 
 // ── Max hall level helpers ────────────────────────────────────────────────────
@@ -253,35 +271,101 @@ export function getDistrictWalls(districtId: string, dhLevel: number): CapitalWa
   };
 }
 
+// ── Troop / spell → district maps (derived from barracks/factory data) ────────
+
+type RawBarracks = {
+  troopUnlocked?: string;
+  availablePerDistrict?: Array<{ district: string }>;
+};
+type RawSpellFactory = {
+  spellUnlocked?: string;
+  availablePerDistrict?: Array<{ district: string }>;
+};
+
+function buildTroopDistrictMap(): Record<string, string> {
+  const barracks = _cap.armyBuildings().barracks().get() as RawBarracks[];
+  const map: Record<string, string> = {};
+  for (const b of barracks) {
+    if (b.troopUnlocked && b.availablePerDistrict?.[0]?.district) {
+      map[b.troopUnlocked] = b.availablePerDistrict[0].district;
+    }
+  }
+  return map;
+}
+
+function buildSpellDistrictMap(): Record<string, string> {
+  const factories = _cap.armyBuildings().spellFactories().get() as RawSpellFactory[];
+  const map: Record<string, string> = {};
+  for (const f of factories) {
+    if (f.spellUnlocked && f.availablePerDistrict?.[0]?.district) {
+      map[f.spellUnlocked] = f.availablePerDistrict[0].district;
+    }
+  }
+  return map;
+}
+
+const TROOP_DISTRICT_MAP = buildTroopDistrictMap();
+const SPELL_DISTRICT_MAP = buildSpellDistrictMap();
+
 // ── Capital troops ────────────────────────────────────────────────────────────
 
-export function getCapitalTroops(): ItemEditData[] {
+/**
+ * Returns only the troops available at the current district hall levels,
+ * with maxLevel capped to what the troop's home district can actually reach.
+ */
+export function getCapitalTroops(districtHallLevels: Record<string, number>): ItemEditData[] {
   type RawTroop = {
     name: string;
     levels: Array<{ level: number; districtHallRequired?: number }>;
     images?: { icon?: string };
   };
-  const SKIP_TROOP_IDS = new Set(["hog-rider"]);
-  const raw = (_cap.troops().get() as RawTroop[]).filter((t) => !SKIP_TROOP_IDS.has((t as any).id));
-  return raw.map((t) => ({
-    name: t.name,
-    maxLevel: t.levels[t.levels.length - 1]?.level ?? t.levels.length,
-    imageUrl: t.images?.icon ? toPublicImageUrl(t.images.icon) : "",
-  }));
+  const troopsObj = _cap.troops();
+  const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(troopsObj)).filter(
+    (m) => m !== "constructor"
+  );
+  const result: ItemEditData[] = [];
+  for (const method of methods) {
+    const t: RawTroop = troopsObj[method]().data[0];
+    const district = TROOP_DISTRICT_MAP[t.name];
+    const dhLevel = district ? (districtHallLevels[district] ?? 0) : 0;
+    const eligible = t.levels.filter((l) => (l.districtHallRequired ?? 0) <= dhLevel);
+    if (eligible.length === 0) continue;
+    result.push({
+      name: t.name,
+      maxLevel: eligible[eligible.length - 1].level,
+      imageUrl: t.images?.icon ? toPublicImageUrl(t.images.icon) : "",
+    });
+  }
+  return result;
 }
 
 // ── Capital spells ────────────────────────────────────────────────────────────
 
-export function getCapitalSpells(): ItemEditData[] {
+/**
+ * Returns only the spells available at the current district hall levels,
+ * with maxLevel capped to what the spell's home district can actually reach.
+ */
+export function getCapitalSpells(districtHallLevels: Record<string, number>): ItemEditData[] {
   type RawSpell = {
     name: string;
     levels: Array<{ level: number; districtHallRequired?: number; images?: { normal?: string } }>;
   };
-  const raw = _cap.spells().get() as RawSpell[];
-  return raw.map((s) => ({
-    name: s.name,
-    maxLevel: s.levels[s.levels.length - 1]?.level ?? s.levels.length,
-    // Spells have no top-level icon; use first level's normal image
-    imageUrl: s.levels[0]?.images?.normal ? toPublicImageUrl(s.levels[0].images!.normal!) : "",
-  }));
+  const spellsObj = _cap.spells();
+  const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(spellsObj)).filter(
+    (m) => m !== "constructor"
+  );
+  const result: ItemEditData[] = [];
+  for (const method of methods) {
+    const s: RawSpell = spellsObj[method]().data[0];
+    const district = SPELL_DISTRICT_MAP[s.name];
+    const dhLevel = district ? (districtHallLevels[district] ?? 0) : 0;
+    const eligible = s.levels.filter((l) => (l.districtHallRequired ?? 0) <= dhLevel);
+    if (eligible.length === 0) continue;
+    result.push({
+      name: s.name,
+      maxLevel: eligible[eligible.length - 1].level,
+      imageUrl: eligible[0]?.images?.normal ? toPublicImageUrl(eligible[0].images!.normal!) : "",
+    });
+  }
+  return result;
 }
