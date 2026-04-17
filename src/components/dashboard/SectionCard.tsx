@@ -1,8 +1,4 @@
-interface SectionCardProps {
-  title: string;
-  children: React.ReactNode;
-  className?: string;
-}
+import type { SectionCardProps } from "@/types/components/dashboard";
 
 export function SectionCard({ title, children, className = "" }: SectionCardProps) {
   return (

@@ -83,3 +83,5 @@ export interface AppData {
   playthroughs: Playthrough[];
   activePlaythroughId: string | null;
 }
+
+export type SortOption = "lastModified" | "name" | "createdAt";

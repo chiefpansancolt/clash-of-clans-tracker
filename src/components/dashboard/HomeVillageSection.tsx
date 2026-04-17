@@ -3,8 +3,6 @@
 import Image from "next/image";
 import { useState } from "react";
 import { home, rankedBattles } from "clash-of-clans-data";
-import type { HomeVillageData } from "@/types/app/game";
-import type { Playthrough } from "@/types/app/playthrough";
 import { LeagueRewardsModal, type HomeLeagueData, type HomeLeagueLoot } from "./LeagueRewardsModal";
 import { SectionCard } from "./SectionCard";
 import { ProgressCard } from "./ProgressCard";
@@ -48,10 +46,7 @@ const _heroes = _h.heroes().get() as RawItem[];
 const _equip = _h.heroEquipment().get() as RawItem[];
 const _leagues = rankedBattles();
 
-interface HomeVillageSectionProps {
-  hv: HomeVillageData;
-  playthrough: Playthrough;
-}
+import type { HomeVillageSectionProps } from "@/types/components/dashboard";
 
 export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps) {
   const thLevel = hv.townHallLevel;

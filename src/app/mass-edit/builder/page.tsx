@@ -4,9 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, TabItem, Tabs } from "flowbite-react";
 import { successToast } from "@/lib/notifications";
+import { massEditTabsTheme } from "@/lib/constants/massEditTheme";
 
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { SliderRow } from "@/components/mass-edit/SliderRow";
+import { BuildingTab } from "@/components/mass-edit/builder/BuildingTab";
+import { ItemTab } from "@/components/mass-edit/ItemTab";
 import {
   getBuilderDefensesAtBH,
   getBuilderArmyBuildingsAtBH,
@@ -20,198 +23,8 @@ import type {
   BuildingEditData,
   ItemEditData,
 } from "@/lib/utils/massEditHelpers";
+import type { LevelMap } from "@/types/app/massEdit";
 import type { BuilderBaseData, BuildingInstance, BuildingRecord, TrackedItem } from "@/types/app/game";
-
-// ── Types ──────────────────────────────────────────────────────────────────────
-
-type LevelMap = Record<string, number>;
-
-// ── Flowbite Tabs theme ────────────────────────────────────────────────────────
-
-const tabsTheme = {
-  base: "flex flex-col h-full overflow-hidden",
-  tablist: {
-    base: "shrink-0 flex flex-nowrap overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-secondary/80 bg-highlight px-4 py-3",
-    variant: {
-      pills: "gap-1",
-    },
-    tabitem: {
-      base: "shrink-0 flex items-center justify-center rounded-lg px-3 py-2 text-xs font-semibold first:ml-0 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40",
-      variant: {
-        pills: {
-          base: "",
-          active: {
-            on: "bg-primary text-white",
-            off: "bg-secondary/10 text-gray-900 hover:bg-secondary/20",
-          },
-        },
-      },
-    },
-  },
-  tabitemcontainer: {
-    base: "flex-1 overflow-y-auto px-4",
-    variant: { pills: "" },
-  },
-  tabpanel: "py-4",
-};
-
-// ── Section header ─────────────────────────────────────────────────────────────
-
-function SectionHeader({ children }: { children: React.ReactNode }) {
-  return (
-    <h3 className="mb-1.5 border-b border-secondary/80 pb-1 text-[11px] font-bold uppercase tracking-widest text-gray-900">
-      {children}
-    </h3>
-  );
-}
-
-// ── Bulk action bar ────────────────────────────────────────────────────────────
-
-function BulkActions({ onMaxAll, onResetAll }: { onMaxAll: () => void; onResetAll: () => void }) {
-  return (
-    <div className="mb-3 flex items-center justify-end gap-2">
-      <button
-        type="button"
-        onClick={onResetAll}
-        className="cursor-pointer rounded-md border border-secondary/80 px-2.5 py-1 text-[11px] font-semibold text-gray-500 transition-colors hover:bg-secondary/10 hover:text-gray-700"
-      >
-        Reset All
-      </button>
-      <button
-        type="button"
-        onClick={onMaxAll}
-        className="cursor-pointer rounded-md border border-secondary/80 bg-secondary/10 px-2.5 py-1 text-[11px] font-semibold text-gray-700 transition-colors hover:bg-secondary/20"
-      >
-        Max All
-      </button>
-    </div>
-  );
-}
-
-// ── Building rows ──────────────────────────────────────────────────────────────
-
-function BuildingTab({
-  buildings,
-  buildingLevels,
-  onBuildingChange,
-  sectionsInColumns = false,
-}: {
-  buildings: BuildingEditData[];
-  buildingLevels: LevelMap;
-  onBuildingChange: (key: string, val: number) => void;
-  sectionsInColumns?: boolean;
-}) {
-  if (buildings.length === 0) {
-    return <p className="py-6 text-center text-sm text-gray-400">No buildings available at this Builder Hall level.</p>;
-  }
-
-  function handleMaxAll() {
-    for (const b of buildings) {
-      for (let i = 0; i < b.instanceCount; i++) {
-        onBuildingChange(`${b.id}-${i}`, b.maxLevel);
-      }
-    }
-  }
-  function handleResetAll() {
-    for (const b of buildings) {
-      for (let i = 0; i < b.instanceCount; i++) {
-        onBuildingChange(`${b.id}-${i}`, 0);
-      }
-    }
-  }
-
-  function renderInstances(b: BuildingEditData) {
-    return Array.from({ length: b.instanceCount }, (_, i) => {
-      const instanceKey = `${b.id}-${i}`;
-      return (
-        <SliderRow
-          key={i}
-          label={b.instanceCount > 1 ? `${b.name} #${i + 1}` : b.name}
-          imageUrl={b.imageUrl}
-          currentLevel={buildingLevels[instanceKey] ?? 0}
-          maxLevel={b.maxLevel}
-          onChange={(val) => onBuildingChange(instanceKey, val)}
-        />
-      );
-    });
-  }
-
-  if (sectionsInColumns) {
-    return (
-      <>
-        <BulkActions onMaxAll={handleMaxAll} onResetAll={handleResetAll} />
-        <div className="grid grid-cols-1 gap-x-4 gap-y-6 lg:grid-cols-2">
-          {buildings.map((b) => (
-            <div key={b.id}>
-              <SectionHeader>
-                {b.name}{b.instanceCount > 1 ? ` × ${b.instanceCount}` : ""}
-              </SectionHeader>
-              <div className="space-y-1">{renderInstances(b)}</div>
-            </div>
-          ))}
-        </div>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <BulkActions onMaxAll={handleMaxAll} onResetAll={handleResetAll} />
-      <div>
-        {buildings.map((b) => (
-          <div key={b.id} className="mt-6 first:mt-0">
-            <SectionHeader>
-              {b.name} × {b.instanceCount}
-            </SectionHeader>
-            <div className="grid grid-cols-1 gap-1 lg:grid-cols-2">
-              {renderInstances(b)}
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-}
-
-// ── Flat item rows ─────────────────────────────────────────────────────────────
-
-function ItemTab({
-  items,
-  levelMap,
-  onChange,
-  emptyMsg,
-}: {
-  items: ItemEditData[];
-  levelMap: LevelMap;
-  onChange: (name: string, val: number) => void;
-  emptyMsg?: string;
-}) {
-  if (items.length === 0) {
-    return <p className="py-6 text-center text-sm text-gray-400">{emptyMsg ?? "Nothing available at this Builder Hall level."}</p>;
-  }
-  return (
-    <>
-      <BulkActions
-        onMaxAll={() => items.forEach((item) => onChange(item.name, item.maxLevel))}
-        onResetAll={() => items.forEach((item) => onChange(item.name, 0))}
-      />
-      <div className="grid grid-cols-1 gap-1 lg:grid-cols-2">
-        {items.map((item) => (
-          <SliderRow
-            key={item.name}
-            label={item.name}
-            imageUrl={item.imageUrl}
-            currentLevel={levelMap[item.name] ?? 0}
-            maxLevel={item.maxLevel}
-            onChange={(val) => onChange(item.name, val)}
-          />
-        ))}
-      </div>
-    </>
-  );
-}
-
-// ── Main page component ────────────────────────────────────────────────────────
 
 export default function MassEditBuilderPage() {
   const { activePlaythrough, updatePlaythrough, isLoaded } = usePlaythrough();
@@ -224,23 +37,20 @@ export default function MassEditBuilderPage() {
 
   const bhLevel = activePlaythrough?.data.builderBase.builderHallLevel ?? 1;
 
-  // ── Game data ────────────────────────────────────────────────────────────────
-  const defenseData  = useMemo(() => getBuilderDefensesAtBH(bhLevel),       [bhLevel]);
-  const armyData     = useMemo(() => getBuilderArmyBuildingsAtBH(bhLevel),  [bhLevel]);
-  const resourceData = useMemo(() => getBuilderResourceBuildingsAtBH(bhLevel), [bhLevel]);
-  const trapData     = useMemo(() => getBuilderTrapsAtBH(bhLevel),          [bhLevel]);
-  const troopData    = useMemo(() => getBuilderTroopsAtBH(bhLevel),         [bhLevel]);
-  const heroData     = useMemo(() => getBuilderHeroesAtBH(bhLevel),         [bhLevel]);
-  const wallInfo     = useMemo(() => getBuilderWallLevelsAtBH(bhLevel),     [bhLevel]);
+  const defenseData  = useMemo(() => getBuilderDefensesAtBH(bhLevel),          [bhLevel]);
+  const armyData     = useMemo(() => getBuilderArmyBuildingsAtBH(bhLevel),      [bhLevel]);
+  const resourceData = useMemo(() => getBuilderResourceBuildingsAtBH(bhLevel),  [bhLevel]);
+  const trapData     = useMemo(() => getBuilderTrapsAtBH(bhLevel),              [bhLevel]);
+  const troopData    = useMemo(() => getBuilderTroopsAtBH(bhLevel),             [bhLevel]);
+  const heroData     = useMemo(() => getBuilderHeroesAtBH(bhLevel),             [bhLevel]);
+  const wallInfo     = useMemo(() => getBuilderWallLevelsAtBH(bhLevel),         [bhLevel]);
 
-  // ── Edit state ───────────────────────────────────────────────────────────────
   const [buildingLevels, setBuildingLevels] = useState<LevelMap>({});
   const [troopLevels,    setTroopLevels]    = useState<LevelMap>({});
   const [heroLevels,     setHeroLevels]     = useState<LevelMap>({});
   const [wallCounts,     setWallCounts]     = useState<LevelMap>({});
   const [isDirty,        setIsDirty]        = useState(false);
 
-  // ── Initialise ────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!activePlaythrough) return;
     const bb = activePlaythrough.data.builderBase;
@@ -279,7 +89,6 @@ export default function MassEditBuilderPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePlaythrough?.id]);
 
-  // ── Navigation guard ─────────────────────────────────────────────────────────
   useEffect(() => {
     if (!isDirty) return;
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -297,7 +106,6 @@ export default function MassEditBuilderPage() {
     };
   }, [isDirty]);
 
-  // ── Dirty setters ────────────────────────────────────────────────────────────
   function setBuilding(key: string, val: number) { setBuildingLevels((p) => ({ ...p, [key]: val })); setIsDirty(true); }
   function setTroop(name: string, val: number) { setTroopLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
   function setHero(name: string, val: number) { setHeroLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
@@ -313,7 +121,6 @@ export default function MassEditBuilderPage() {
     setIsDirty(true);
   }
 
-  // ── Save ─────────────────────────────────────────────────────────────────────
   function handleSave() {
     if (!activePlaythrough) return;
     const bb = activePlaythrough.data.builderBase;
@@ -374,7 +181,6 @@ export default function MassEditBuilderPage() {
     successToast({ message: "Builder Base saved!" });
   }
 
-  // ── Walls summary ─────────────────────────────────────────────────────────────
   const allocated = Object.values(wallCounts).reduce((s, c) => s + c, 0);
   const remaining = wallInfo.totalAtTH - allocated;
 
@@ -382,7 +188,6 @@ export default function MassEditBuilderPage() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      {/* Sticky page title */}
       <div className="shrink-0 bg-highlight px-4 py-3">
         <div className="flex items-baseline gap-3">
           <h1 className="text-xl font-extrabold text-gray-900">Mass Edit — Builder Base</h1>
@@ -395,11 +200,9 @@ export default function MassEditBuilderPage() {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="relative flex-1 overflow-hidden">
-        {/* Fade hint for horizontal tab overflow */}
         <div className="pointer-events-none absolute top-0 right-0 z-10 h-13 w-12 bg-linear-to-l from-highlight to-transparent" />
-        <Tabs variant="pills" theme={tabsTheme}>
+        <Tabs variant="pills" theme={massEditTabsTheme}>
 
           <TabItem title="Defenses">
             <BuildingTab
@@ -496,7 +299,6 @@ export default function MassEditBuilderPage() {
         </Tabs>
       </div>
 
-      {/* Save bar */}
       <div className="shrink-0 border-t border-secondary/80 bg-highlight px-4 py-3 flex items-center justify-end gap-3">
         <Button color="gray" onClick={() => router.back()}>
           Cancel

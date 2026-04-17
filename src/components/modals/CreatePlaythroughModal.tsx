@@ -70,8 +70,6 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 		name.trim().length > 0 &&
 		(mode === "fresh" || apiData !== null);
 
-	// ── Handlers ──────────────────────────────────────────────────────────────
-
 	const handleFetchPlayer = async () => {
 		if (!playerTag.trim()) return;
 		setFetching(true);
@@ -178,7 +176,7 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 		onClose();
 	};
 
-	// ── Render ────────────────────────────────────────────────────────────────
+
 
 	return (
 		<Modal show={isOpen} onClose={handleClose}>

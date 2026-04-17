@@ -4,14 +4,8 @@ import Image from "next/image";
 import { useState } from "react";
 import { Tooltip } from "flowbite-react";
 import { HiClock, HiLockClosed } from "react-icons/hi";
-import type { TrackedEquipment, TrackedHero } from "@/types/app/game";
-
-interface HeroCardProps {
-  hero: TrackedHero;
-  heroIconUrl: string;
-  maxHeroLevel: number;
-  getEquipmentData: (name: string) => { iconUrl: string; maxLevel: number } | undefined;
-}
+import type { TrackedEquipment } from "@/types/app/game";
+import type { HeroCardProps } from "@/types/components/dashboard";
 
 function EquipChip({
   eq,

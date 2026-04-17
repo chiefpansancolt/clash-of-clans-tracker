@@ -2,10 +2,7 @@ import { Button, Card } from "flowbite-react";
 import Link from "next/link";
 import { HiHome } from "react-icons/hi";
 
-interface NotFoundCardProps {
-	title?: string;
-	message?: string;
-}
+import type { NotFoundCardProps } from "@/types/components/playthrough";
 
 export default function NotFoundCard({
 	title = "Not Found",

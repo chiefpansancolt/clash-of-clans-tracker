@@ -5,14 +5,7 @@ import { useState } from "react";
 import { Tooltip } from "flowbite-react";
 import { HiClock, HiLockClosed } from "react-icons/hi";
 import type { TrackedItem } from "@/types/app/game";
-
-interface ItemGridProps {
-  items: TrackedItem[];
-  /** Lookup function: given item name (lowercase), return { iconUrl, maxLevel } */
-  getItemData: (name: string) => { iconUrl: string; maxLevel: number } | undefined;
-  /** Use smaller cells (siege machines, pets) */
-  small?: boolean;
-}
+import type { ItemGridProps } from "@/types/components/dashboard";
 
 function ItemCell({
   item,

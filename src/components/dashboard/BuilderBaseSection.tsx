@@ -3,8 +3,6 @@
 import Image from "next/image";
 import { useState } from "react";
 import { builder } from "clash-of-clans-data";
-import type { BuilderBaseData } from "@/types/app/game";
-import type { Playthrough } from "@/types/app/playthrough";
 import { LeagueRewardsModal, type BuilderLeagueData } from "./LeagueRewardsModal";
 import { SectionCard } from "./SectionCard";
 import { ProgressCard } from "./ProgressCard";
@@ -36,10 +34,7 @@ function getBuilderLeague(leagueName: string): RawLeague | undefined {
   return ((_b.leagues() as any).byName(normalized).get() as RawLeague[])?.[0];
 }
 
-interface BuilderBaseSectionProps {
-  bb: BuilderBaseData;
-  playthrough: Playthrough;
-}
+import type { BuilderBaseSectionProps } from "@/types/components/dashboard";
 
 export function BuilderBaseSection({ bb, playthrough }: BuilderBaseSectionProps) {
   const bhLevel = bb.builderHallLevel;

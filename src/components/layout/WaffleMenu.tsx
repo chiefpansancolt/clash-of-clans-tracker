@@ -3,14 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { HiViewGrid } from "react-icons/hi";
-
-interface AppItem {
-  id: string;
-  label: string;
-  image: string;
-  href: string;
-  disabled?: boolean;
-}
+import type { AppItem } from "@/types/components/layout";
 
 const APP_ITEMS: AppItem[] = [
   {
@@ -89,7 +82,6 @@ export function WaffleMenu() {
 
   return (
     <div ref={containerRef} className="relative">
-      {/* Trigger */}
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -99,15 +91,11 @@ export function WaffleMenu() {
         <HiViewGrid className="h-6 w-6" />
       </button>
 
-      {/* Dropdown */}
       {open && (
         <div className="absolute right-0 top-full z-50 mt-2 w-72 rounded-xl border border-secondary/80 bg-primary shadow-xl">
-          {/* Header */}
           <div className="border-b border-secondary/80 px-4 py-2.5">
             <span className="text-xs font-bold uppercase tracking-widest text-accent">Apps</span>
           </div>
-
-          {/* Grid */}
           <div className="grid grid-cols-3 gap-1 p-3">
             {APP_ITEMS.map((item) =>
               item.disabled ? (

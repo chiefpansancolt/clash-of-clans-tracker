@@ -6,7 +6,6 @@ const { ClashApi } = require("clash-of-clans-api");
 
 import type { PlayerApiResponse } from "@/types/app";
 
-// ── Rate limiter ───────────────────────────────────────────────────────────
 // Module-level singleton: survives across requests in the same server process.
 // Keyed by client IP → timestamp of last successful call.
 const _lastCall = new Map<string, number>();
@@ -35,8 +34,6 @@ async function getClientIp(): Promise<string> {
     return "unknown";
   }
 }
-
-// ── Action ─────────────────────────────────────────────────────────────────
 
 export async function fetchPlayerByTag(
   tag: string

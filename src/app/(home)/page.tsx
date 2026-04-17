@@ -9,6 +9,8 @@ import {
 	HiClipboardList,
 	HiDatabase,
 	HiDeviceMobile,
+	HiMinus,
+	HiPlus,
 	HiShieldCheck,
 } from "react-icons/hi";
 
@@ -184,34 +186,11 @@ export default function Home() {
 												{faq.question}
 											</span>
 											<span className="ml-6 flex h-7 items-center">
-												<svg
-													viewBox="0 0 24 24"
-													fill="none"
-													stroke="currentColor"
-													strokeWidth="1.5"
-													aria-hidden="true"
-													className={`size-6 ${openFaq === index ? "hidden" : ""}`}
-												>
-													<path
-														d="M12 6v12m6-6H6"
-														strokeLinecap="round"
-														strokeLinejoin="round"
-													/>
-												</svg>
-												<svg
-													viewBox="0 0 24 24"
-													fill="none"
-													stroke="currentColor"
-													strokeWidth="1.5"
-													aria-hidden="true"
-													className={`size-6 ${openFaq === index ? "" : "hidden"}`}
-												>
-													<path
-														d="M18 12H6"
-														strokeLinecap="round"
-														strokeLinejoin="round"
-													/>
-												</svg>
+												{openFaq === index ? (
+													<HiMinus className="size-6" aria-hidden="true" />
+												) : (
+													<HiPlus className="size-6" aria-hidden="true" />
+												)}
 											</span>
 										</button>
 									</dt>

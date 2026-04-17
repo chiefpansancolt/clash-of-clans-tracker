@@ -31,7 +31,6 @@ const DISTRICTS: { key: keyof Omit<ClanCapitalData, "clanCapitalContributions" |
   { key: "goblinMines",      id: "goblinMines",      label: "Goblin Mines"       },
 ];
 
-// ── Progress helpers ──────────────────────────────────────────────────────────
 
 function computeDistrictProgress(
   district: ClanCapitalDistrictData,
@@ -70,7 +69,6 @@ function progressColor(pct: number): string {
   return "bg-orange-400";
 }
 
-// ── District card ─────────────────────────────────────────────────────────────
 
 function DistrictCard({
   label,
@@ -150,11 +148,7 @@ function DistrictCard({
   );
 }
 
-// ── Main section ──────────────────────────────────────────────────────────────
-
-interface ClanCapitalSectionProps {
-  data: ClanCapitalData;
-}
+import type { ClanCapitalSectionProps } from "@/types/components/dashboard";
 
 export function ClanCapitalSection({ data }: ClanCapitalSectionProps) {
   const capitalHallLevel = data.capitalPeak.hallLevel;
@@ -162,10 +156,8 @@ export function ClanCapitalSection({ data }: ClanCapitalSectionProps) {
     `images/clan-capital/halls/capital-hall/normal/level-${capitalHallLevel || 1}.png`
   );
 
-  // ── District unlock requirements ─────────────────────────────────────────────
   const unlockLevels = getDistrictUnlockLevels();
 
-  // ── District hall levels for gating ─────────────────────────────────────────
   const districtHallLevels = Object.fromEntries(
     DISTRICTS.filter((d) => d.id !== "capitalPeak").map((d) => [
       d.id,
@@ -173,7 +165,6 @@ export function ClanCapitalSection({ data }: ClanCapitalSectionProps) {
     ])
   );
 
-  // ── Districts stat ────────────────────────────────────────────────────────
   const activeDistricts = DISTRICTS.filter((d) => data[d.key].hallLevel > 0).length;
   const districtsProg: ProgressResult = {
     current: activeDistricts,
@@ -181,7 +172,6 @@ export function ClanCapitalSection({ data }: ClanCapitalSectionProps) {
     pct: Math.round((activeDistricts / DISTRICTS.length) * 100),
   };
 
-  // ── Troops stat ──────────────────────────────────────────────────────────
   const availableTroops = getCapitalTroops(districtHallLevels);
   const troopsMax = availableTroops.reduce((s, t) => s + t.maxLevel, 0);
   const troopsCurrent = availableTroops.reduce((s, t) => {
@@ -194,7 +184,6 @@ export function ClanCapitalSection({ data }: ClanCapitalSectionProps) {
     pct: troopsMax === 0 ? 0 : Math.round((troopsCurrent / troopsMax) * 100),
   };
 
-  // ── Spells stat ──────────────────────────────────────────────────────────
   const availableSpells = getCapitalSpells(districtHallLevels);
   const spellsMax = availableSpells.reduce((s, sp) => s + sp.maxLevel, 0);
   const spellsCurrent = availableSpells.reduce((s, sp) => {
@@ -207,7 +196,6 @@ export function ClanCapitalSection({ data }: ClanCapitalSectionProps) {
     pct: spellsMax === 0 ? 0 : Math.round((spellsCurrent / spellsMax) * 100),
   };
 
-  // ── Per-district completion ───────────────────────────────────────────────
   const capitalBuildings = [
     ...getCapitalPeakBuildings(capitalHallLevel),
     ...getCapitalPeakTraps(capitalHallLevel),
@@ -230,7 +218,6 @@ export function ClanCapitalSection({ data }: ClanCapitalSectionProps) {
 
   return (
     <section className="mb-8">
-      {/* Section header */}
       <div className="mb-3 flex items-center gap-3 rounded-xl border border-secondary/80 bg-primary px-4 py-3">
         <div className="relative h-10 w-10 shrink-0">
           <Image src={capitalImageUrl} alt="Clan Capital" fill sizes="40px" className="object-contain" />
@@ -241,14 +228,12 @@ export function ClanCapitalSection({ data }: ClanCapitalSectionProps) {
         </div>
       </div>
 
-      {/* Stat cards */}
       <div className="mb-4 grid grid-cols-3 gap-2">
         <ProgressCard label="Districts" result={districtsProg} sub={`${activeDistricts} / ${DISTRICTS.length} active`} />
         <ProgressCard label="Troops" result={troopsProg} sub={`${availableTroops.length} available`} />
         <ProgressCard label="Spells" result={spellsProg} sub={`${availableSpells.length} available`} />
       </div>
 
-      {/* District cards */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <DistrictCard
           label="Capital Peak"

@@ -6,8 +6,7 @@ import { HiPlus, HiSearch } from "react-icons/hi";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { CreatePlaythroughModal } from "@/comps/modals/CreatePlaythroughModal";
 import PlaythroughCard from "./PlaythroughCard";
-
-type SortOption = "lastModified" | "name" | "createdAt";
+import type { SortOption } from "@/types/app/playthrough";
 
 export default function PlaythroughListPage() {
 	const { playthroughs } = usePlaythrough();

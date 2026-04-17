@@ -11,6 +11,7 @@ import {
   formatCountdown,
 } from "@/lib/utils/dailyTimerHelpers";
 import type { AutoForgeData, DailiesData, DailyTimerData, ForgeResourceType, GoldPassData, HelpersData } from "@/types/app/playthrough";
+import type { AutoForgeChipProps, DailiesSectionProps, GoldPassItem, TimerChipProps } from "@/types/components/dashboard";
 
 function getCurrentMonthKey(): string {
   const now = new Date();
@@ -49,13 +50,6 @@ export const defaultDailies: DailiesData = {
 };
 
 
-interface TimerChipProps {
-  label: string;
-  imageUrl: string;
-  timer: DailyTimerData;
-  onCollect: (resetTime: string | null) => void;
-  onAdjust: (newResetTime: string) => void;
-}
 
 function TimerChip({ label, imageUrl, timer, onCollect, onAdjust }: TimerChipProps) {
   const available = isAvailable(timer);
@@ -227,9 +221,6 @@ function Divider() {
 
 const GP_BASE = "images/season-pass/pass-items/";
 
-type GoldPassItem =
-  | { type: "pct"; label: string; image: string; value: 0 | 10 | 15 | 20 }
-  | { type: "bool"; label: string; image: string; unlocked: boolean };
 
 function GoldPassDisplay({ goldPass }: { goldPass: GoldPassData }) {
   const col1: GoldPassItem[] = [
@@ -300,12 +291,6 @@ const RESOURCE_META: Record<ForgeResourceType, { label: string; image: string }>
   builderElixir: { label: "Builder Elixir",image: "images/other/elixir-b.png" },
 };
 
-interface AutoForgeChipProps {
-  autoForge: AutoForgeData;
-  builderBoostPct: 0 | 10 | 15 | 20;
-  onStart: (data: AutoForgeData) => void;
-  onStop: () => void;
-}
 
 function AutoForgeChip({ autoForge, builderBoostPct, onStart, onStop }: AutoForgeChipProps) {
   const msLeft = autoForge.endsAt ? Math.max(0, new Date(autoForge.endsAt).getTime() - Date.now()) : 0;
@@ -480,11 +465,6 @@ const DAILY_CHIPS: { key: "starBonus" | "capitalGold"; label: string; image: str
   { key: "starBonus",   label: "Star Bonus",    image: "images/season-pass/challenges/star-bonus.png" },
   { key: "capitalGold", label: "Capital Gold",  image: "images/other/gold-c.png" },
 ];
-
-interface DailiesSectionProps {
-  dailies: DailiesData;
-  playthroughId: string;
-}
 
 export function DailiesSection({ dailies, playthroughId }: DailiesSectionProps) {
   const { updatePlaythrough } = usePlaythrough();

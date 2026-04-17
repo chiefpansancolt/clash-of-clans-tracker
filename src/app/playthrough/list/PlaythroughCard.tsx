@@ -3,14 +3,10 @@
 import { Badge, Button, Card } from "flowbite-react";
 import { useState } from "react";
 import { HiPencil, HiTrash } from "react-icons/hi";
-import type { Playthrough } from "@/types/app";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { DeleteConfirmModal } from "@/comps/modals/DeleteConfirmModal";
 import { EditPlaythroughModal } from "@/comps/modals/EditPlaythroughModal";
-
-interface PlaythroughCardProps {
-	playthrough: Playthrough;
-}
+import type { PlaythroughCardProps } from "@/types/components/playthrough";
 
 export default function PlaythroughCard({ playthrough }: PlaythroughCardProps) {
 	const { activePlaythrough, setActivePlaythrough, deletePlaythrough } = usePlaythrough();

@@ -1,10 +1,4 @@
-import type { ProgressResult } from "@/lib/utils/progressHelpers";
-
-interface ProgressCardProps {
-  label: string;
-  result: ProgressResult;
-  sub?: string;
-}
+import type { ProgressCardProps } from "@/types/components/dashboard";
 
 function progressColor(pct: number): string {
   if (pct >= 100) return "bg-green-500";

@@ -1,13 +1,7 @@
 import Image from "next/image";
 import { clan as clanData } from "clash-of-clans-data";
-import type { Playthrough } from "@/types/app/playthrough";
-import type { ProgressResult } from "@/lib/utils/progressHelpers";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
-
-interface PlayerHeaderProps {
-  playthrough: Playthrough;
-  achievementsProgress: ProgressResult;
-}
+import type { PlayerHeaderProps } from "@/types/components/dashboard";
 
 // Module-level singleton
 const _clan = clanData();

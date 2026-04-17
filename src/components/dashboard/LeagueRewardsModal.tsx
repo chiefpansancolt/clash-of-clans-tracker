@@ -3,60 +3,15 @@
 import Image from "next/image";
 import { Modal, ModalBody, ModalHeader } from "flowbite-react";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
+import { RESOURCE_ICONS } from "@/lib/constants/leagueIcons";
+import type {
+  HomeLeagueData,
+  BuilderLeagueData,
+  LeagueModalData,
+  LeagueRewardsModalProps,
+} from "@/types/components/dashboard";
 
-// ── Types ──────────────────────────────────────────────────────────────────
-
-interface LootResources {
-  goldAndElixir: number | null;
-  darkElixir: number | null;
-}
-
-interface StarBonusResources extends LootResources {
-  shinyOre: number | null;
-  glowyOre: number | null;
-  starryOre: number | null;
-}
-
-export interface HomeLeagueLoot {
-  maxAvailableLoot: LootResources;
-  maxLeagueBonus: LootResources;
-  starBonus: StarBonusResources;
-}
-
-export interface HomeLeagueData {
-  type: "home";
-  name: string;
-  image: string;
-  attacksPerWeek: number | null;
-  percentPromoted: number | null;
-  percentDemoted: number | null;
-  loot: HomeLeagueLoot | null;
-}
-
-export interface BuilderLeagueData {
-  type: "builder";
-  name: string;
-  image: string;
-  trophyMin: number | null;
-  trophyMax: number | null;
-  starBonus: { starsRequired: number; reward: number } | null;
-  battleResults: Array<{ attackerGold: number; defenderElixir: number }>;
-}
-
-export type LeagueModalData = HomeLeagueData | BuilderLeagueData;
-
-// ── Resource icon helpers ──────────────────────────────────────────────────
-
-const RESOURCE_ICONS = {
-  gold:       "images/other/gold.png",
-  elixir:     "images/other/elixir.png",
-  darkElixir: "images/other/dark-elixir.png",
-  goldB:      "images/other/gold-b.png",
-  elixirB:    "images/other/elixir-b.png",
-  shinyOre:   "images/other/ore/shiny-ore.png",
-  glowyOre:   "images/other/ore/glowy-ore.png",
-  starryOre:  "images/other/ore/starry-ore.png",
-} as const;
+export type { HomeLeagueLoot, HomeLeagueData, BuilderLeagueData, LeagueModalData } from "@/types/components/dashboard";
 
 function ResourceLine({
   icon,
@@ -85,8 +40,6 @@ function ResourceLine({
     </div>
   );
 }
-
-// ── Shared UI ──────────────────────────────────────────────────────────────
 
 function ModalSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -120,8 +73,6 @@ function LootBlock({ title, ge, de }: { title: string; ge: number | null; de: nu
     </div>
   );
 }
-
-// ── Home league ────────────────────────────────────────────────────────────
 
 function HomeLeagueContent({ league }: { league: HomeLeagueData }) {
   const { loot } = league;
@@ -173,8 +124,6 @@ function HomeLeagueContent({ league }: { league: HomeLeagueData }) {
     </div>
   );
 }
-
-// ── Builder league ─────────────────────────────────────────────────────────
 
 function BuilderLeagueContent({ league }: { league: BuilderLeagueData }) {
   const trophyRange =
@@ -234,13 +183,6 @@ function BuilderLeagueContent({ league }: { league: BuilderLeagueData }) {
       )}
     </div>
   );
-}
-
-// ── Modal ──────────────────────────────────────────────────────────────────
-
-interface LeagueRewardsModalProps {
-  league: LeagueModalData | null;
-  onClose: () => void;
 }
 
 export function LeagueRewardsModal({ league, onClose }: LeagueRewardsModalProps) {
