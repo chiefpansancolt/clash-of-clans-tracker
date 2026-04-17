@@ -32,7 +32,7 @@ function ItemCell({
   return (
     <Tooltip content={tooltipContent} placement="top" style="dark">
       <div
-        className={`relative ${sizeClass} flex-shrink-0 cursor-default overflow-hidden rounded-lg border border-secondary/80 bg-primary ${isLocked ? "opacity-50 grayscale" : ""}`}
+        className={`relative ${sizeClass} shrink-0 cursor-default overflow-hidden rounded-lg border border-secondary/80 bg-primary ${isLocked ? "opacity-50 grayscale" : ""}`}
       >
         {!imgError && iconUrl ? (
           <Image
