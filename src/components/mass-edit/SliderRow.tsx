@@ -47,7 +47,6 @@ export function SliderRow({ label, imageUrl, currentLevel, maxLevel, onChange, i
           : "bg-highlight hover:bg-secondary/10"
       } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
     >
-      {/* Image */}
       {imageUrl ? (
         <img
           src={imageUrl}
@@ -64,7 +63,6 @@ export function SliderRow({ label, imageUrl, currentLevel, maxLevel, onChange, i
         </div>
       )}
 
-      {/* Label */}
       <span
         className={`w-44 shrink-0 truncate text-sm font-medium ${
           indent ? "text-secondary" : isLocked ? "text-secondary/60" : "text-gray-900"
@@ -74,7 +72,6 @@ export function SliderRow({ label, imageUrl, currentLevel, maxLevel, onChange, i
         {label}
       </span>
 
-      {/* Slider */}
       <input
         type="range"
         min={0}
@@ -89,7 +86,6 @@ export function SliderRow({ label, imageUrl, currentLevel, maxLevel, onChange, i
         aria-valuenow={currentLevel}
       />
 
-      {/* Number input + max */}
       <div className="flex items-center gap-1.5 shrink-0">
         <input
           type="number"

@@ -135,7 +135,6 @@ export default function Settings() {
 						</div>
 
 						<div className="space-y-6">
-							{/* Export */}
 							<div>
 								<div className="mb-2">
 									<Label className="text-white/80">Export Data</Label>
@@ -149,7 +148,6 @@ export default function Settings() {
 								</p>
 							</div>
 
-							{/* Import */}
 							<div>
 								<div className="mb-2">
 									<Label className="text-white/80">Import Data</Label>
@@ -166,7 +164,6 @@ export default function Settings() {
 								</div>
 							</div>
 
-							{/* Reset */}
 							<div>
 								<div className="mb-2">
 									<Label className="text-red-400">Reset All Data</Label>

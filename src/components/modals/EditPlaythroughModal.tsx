@@ -46,7 +46,6 @@ export function EditPlaythroughModal({
 	const [thChangedAt, setThChangedAt] = useState(toDateInputValue(currentPlaythrough.thChangedAt));
 	const [bhChangedAt, setBhChangedAt] = useState(toDateInputValue(currentPlaythrough.bhChangedAt));
 
-	// Player refresh
 	const [playerTag, setPlayerTag] = useState(currentPlaythrough.data.playerTag ?? "");
 	const [fetching, setFetching] = useState(false);
 	const [fetchError, setFetchError] = useState("");
@@ -54,7 +53,6 @@ export function EditPlaythroughModal({
 	const [refreshedData, setRefreshedData] = useState<VillageData | null>(null);
 	const { secondsLeft, isOnCooldown, startCooldown, handleError } = useApiCooldown();
 
-	// Building JSON supplement
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [jsonError, setJsonError] = useState("");
 	const [buildingData, setBuildingData] = useState<VillageData | null>(null);
@@ -156,7 +154,6 @@ export function EditPlaythroughModal({
 			<ModalHeader>Edit Village</ModalHeader>
 			<ModalBody>
 				<div className="space-y-4">
-					{/* Village name */}
 					<div>
 						<div className="mb-2 block">
 							<Label htmlFor="edit-playthrough-name">
@@ -173,7 +170,6 @@ export function EditPlaythroughModal({
 						/>
 					</div>
 
-					{/* Refresh player data */}
 					<div>
 						<p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
 							Refresh Player Data
@@ -210,7 +206,6 @@ export function EditPlaythroughModal({
 							</Alert>
 						)}
 
-						{/* Building JSON for merge */}
 						{refreshedData && (
 							<div className="mt-3">
 								<div className="mb-2 block">
@@ -237,7 +232,6 @@ export function EditPlaythroughModal({
 						)}
 					</div>
 
-					{/* Hall upgrade dates */}
 					<div className="grid grid-cols-2 gap-4">
 						<div>
 							<div className="mb-2 block">
@@ -263,7 +257,6 @@ export function EditPlaythroughModal({
 						</div>
 					</div>
 
-					{/* Description */}
 					<div>
 						<div className="mb-2 block">
 							<Label htmlFor="edit-playthrough-description">Description</Label>

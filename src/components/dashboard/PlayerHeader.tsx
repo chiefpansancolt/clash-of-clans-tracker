@@ -3,7 +3,6 @@ import { clan as clanData } from "clash-of-clans-data";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
 import type { PlayerHeaderProps } from "@/types/components/dashboard";
 
-// Module-level singleton
 const _clan = clanData();
 
 function getClanBannerUrl(clanLevel: number): string {
@@ -17,14 +16,12 @@ export function PlayerHeader({ playthrough, achievementsProgress }: PlayerHeader
   const thLevel = hv.townHallLevel;
   const thImageUrl = toPublicImageUrl(`images/home/town-hall/normal/level-${thLevel}.png`);
 
-  // SVG ring math for achievements
   const RADIUS = 28;
   const CIRC = 2 * Math.PI * RADIUS;
   const filled = (achievementsProgress.pct / 100) * CIRC;
 
   return (
     <div className="mb-5 flex items-center gap-4 rounded-xl border border-secondary/80 bg-linear-to-br from-primary to-[#0f2547] p-4">
-      {/* TH badge */}
       <div className="relative shrink-0">
         <div className="relative h-16 w-16">
           <Image
@@ -40,14 +37,12 @@ export function PlayerHeader({ playthrough, achievementsProgress }: PlayerHeader
         </span>
       </div>
 
-      {/* Player info */}
       <div className="flex-1 min-w-0">
         <div className="text-xl font-extrabold text-white leading-tight truncate">
           {playthrough.name}
         </div>
         <div className="text-xs font-semibold text-accent mt-0.5">{data.playerTag}</div>
 
-        {/* Stat chips */}
         <div className="mt-2 flex flex-wrap gap-2">
           {data.expLevel > 0 && (
             <span className="flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-1 text-xs">
@@ -88,9 +83,7 @@ export function PlayerHeader({ playthrough, achievementsProgress }: PlayerHeader
         </div>
       </div>
 
-      {/* Right side: Clan banner + Achievements ring */}
       <div className="flex shrink-0 items-center gap-4">
-        {/* Clan banner */}
         {data.clan && data.clan.clanLevel > 0 && (
           <div className="flex flex-col items-center gap-0.5">
             <div className="relative h-14 w-14">
@@ -114,7 +107,6 @@ export function PlayerHeader({ playthrough, achievementsProgress }: PlayerHeader
           </div>
         )}
 
-        {/* Achievements ring */}
         {achievementsProgress.max > 0 && (
           <div className="flex flex-col items-center gap-1">
             <div className="relative h-18 w-18">

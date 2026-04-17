@@ -11,8 +11,6 @@ import type { BuildingEditData, ItemEditData, WallLevelData } from "./massEditHe
 const _cap = clanCapital() as any;
 
 
-// ── Private types ─────────────────────────────────────────────────────────────
-
 type RawCapBuilding = {
   id: string;
   name: string;
@@ -25,8 +23,6 @@ type RawCapBuilding = {
   availablePerCapitalHall?: Array<{ capitalHallLevel: number; count: number }>;
   availablePerDistrict?: Array<{ district: string; countPerDistrictHall: number[] }>;
 };
-
-// ── Private helpers ───────────────────────────────────────────────────────────
 
 function countAtCapitalHall(
   availablePerCapitalHall: Array<{ capitalHallLevel: number; count: number }>,
@@ -50,8 +46,6 @@ function countAtDistrictHall(
   return entry.countPerDistrictHall[dhLevel - 1] ?? 0;
 }
 
-// ── Capital Peak buildings ────────────────────────────────────────────────────
-
 export function getCapitalPeakBuildings(capitalHallLevel: number): BuildingEditData[] {
   const raw = _cap.defenses().get() as RawCapBuilding[];
   const result: BuildingEditData[] = [];
@@ -73,8 +67,6 @@ export function getCapitalPeakBuildings(capitalHallLevel: number): BuildingEditD
 
   return result;
 }
-
-// ── District buildings ────────────────────────────────────────────────────────
 
 export function getDistrictBuildings(districtId: string, dhLevel: number): BuildingEditData[] {
   if (dhLevel === 0) return [];
@@ -99,8 +91,6 @@ export function getDistrictBuildings(districtId: string, dhLevel: number): Build
   return result;
 }
 
-// ── Capital Peak traps ────────────────────────────────────────────────────────
-
 export function getCapitalPeakTraps(capitalHallLevel: number): BuildingEditData[] {
   if (capitalHallLevel === 0) return [];
   const raw = _cap.traps().get() as RawCapBuilding[];
@@ -124,8 +114,6 @@ export function getCapitalPeakTraps(capitalHallLevel: number): BuildingEditData[
   return result;
 }
 
-// ── District traps ────────────────────────────────────────────────────────────
-
 export function getDistrictTraps(districtId: string, dhLevel: number): BuildingEditData[] {
   if (dhLevel === 0) return [];
   const raw = _cap.traps().get() as RawCapBuilding[];
@@ -148,8 +136,6 @@ export function getDistrictTraps(districtId: string, dhLevel: number): BuildingE
 
   return result;
 }
-
-// ── District army buildings ───────────────────────────────────────────────────
 
 /** Army camp, barracks, and spell factories per district. */
 export function getDistrictArmyBuildings(districtId: string, dhLevel: number): BuildingEditData[] {
@@ -179,8 +165,6 @@ export function getDistrictArmyBuildings(districtId: string, dhLevel: number): B
   return result;
 }
 
-// ── District unlock levels ────────────────────────────────────────────────────
-
 /**
  * Returns the Capital Hall level required to unlock each district.
  * Derived from districtHall level-1 `capitalHallRequired` data.
@@ -192,8 +176,6 @@ export function getDistrictUnlockLevels(): Record<string, number> {
   const reqs = raw[0]?.levels[0]?.capitalHallRequired ?? {};
   return { capitalPeak: 1, ...reqs };
 }
-
-// ── Max hall level helpers ────────────────────────────────────────────────────
 
 /** Highest Capital Hall level present in building data. */
 export function getMaxCapitalHallLevel(): number {
@@ -219,8 +201,6 @@ export function getMaxDistrictHallLevel(districtId: string): number {
   }
   return max || 5;
 }
-
-// ── Capital walls ─────────────────────────────────────────────────────────────
 
 export interface CapitalWallInfo {
   maxLevel: number;
@@ -271,8 +251,6 @@ export function getDistrictWalls(districtId: string, dhLevel: number): CapitalWa
   };
 }
 
-// ── Troop / spell → district maps (derived from barracks/factory data) ────────
-
 type RawBarracks = {
   troopUnlocked?: string;
   availablePerDistrict?: Array<{ district: string }>;
@@ -307,8 +285,6 @@ function buildSpellDistrictMap(): Record<string, string> {
 const TROOP_DISTRICT_MAP = buildTroopDistrictMap();
 const SPELL_DISTRICT_MAP = buildSpellDistrictMap();
 
-// ── Capital troops ────────────────────────────────────────────────────────────
-
 /**
  * Returns only the troops available at the current district hall levels,
  * with maxLevel capped to what the troop's home district can actually reach.
@@ -338,8 +314,6 @@ export function getCapitalTroops(districtHallLevels: Record<string, number>): It
   }
   return result;
 }
-
-// ── Capital spells ────────────────────────────────────────────────────────────
 
 /**
  * Returns only the spells available at the current district hall levels,

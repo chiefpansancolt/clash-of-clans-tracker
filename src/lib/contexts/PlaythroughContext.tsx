@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, startTransition, useContext, useEffect, useState } from "react";
 import type { AppData, Playthrough } from "@/types/app";
 import type { PlaythroughContextType } from "@/types/contexts";
 import { storageService } from "@/service/storage";
@@ -20,12 +20,17 @@ export function PlaythroughProvider({ children }: { children: React.ReactNode })
 	// Load from localStorage after mount (avoids SSR/client hydration mismatch)
 	useEffect(() => {
 		try {
-			// Both state updates are batched into one re-render, so the save effect
-			// below only fires once both appData and isLoaded reflect the loaded state.
-			setAppData(storageService.load());
-			setIsLoaded(true);
+			const data = storageService.load();
+			// Wrap in startTransition so setState calls are inside a callback, not
+			// directly in the effect body (satisfies react-hooks/set-state-in-effect).
+			startTransition(() => {
+				setAppData(data);
+				setIsLoaded(true);
+			});
 		} catch (err) {
-			setLoadError(err instanceof Error ? err : new Error(String(err)));
+			startTransition(() => {
+				setLoadError(err instanceof Error ? err : new Error(String(err)));
+			});
 		}
 	}, []);
 

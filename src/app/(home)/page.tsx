@@ -81,7 +81,6 @@ export default function Home() {
 	return (
 		<div className="bg-highlight dark:bg-gray-900">
 			<main>
-				{/* Hero */}
 				<div className="relative isolate overflow-hidden pt-14 pb-16 sm:pb-20">
 					<div
 						aria-hidden="true"
@@ -137,7 +136,6 @@ export default function Home() {
 					</div>
 				</div>
 
-				{/* Features */}
 				<div className="mt-8 sm:mt-16" id="features">
 					<div className="mx-auto max-w-7xl px-6 lg:px-8">
 						<div className="mx-auto max-w-2xl sm:text-center">
@@ -164,7 +162,6 @@ export default function Home() {
 					</div>
 				</div>
 
-				{/* FAQ */}
 				<div className="mx-auto mt-32 px-6 sm:mt-56 lg:px-8">
 					<div className="mx-auto max-w-4xl">
 						<h2 className="text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl dark:text-white">
@@ -208,7 +205,6 @@ export default function Home() {
 				</div>
 			</main>
 
-			{/* Footer */}
 			<footer className="mt-32">
 				<div className="mx-auto border-t border-gray-200 px-6 py-16 lg:px-8 dark:border-white/10">
 					<div className="xl:grid xl:grid-cols-3 xl:gap-8">

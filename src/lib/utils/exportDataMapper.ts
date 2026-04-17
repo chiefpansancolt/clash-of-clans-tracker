@@ -13,8 +13,6 @@ import type {
   VillageData,
 } from "@/types/app/game";
 
-// ── Raw export format ─────────────────────────────────────────────────────────
-
 interface ExportEntry {
   data: number; // numeric dataId
   lvl?: number;
@@ -46,8 +44,6 @@ export interface ExportData {
   units2?: ExportEntry[];
   heroes2?: ExportEntry[];
 }
-
-// ── dataId lookup map ─────────────────────────────────────────────────────────
 
 interface DataItem {
   id: string;
@@ -117,7 +113,6 @@ function buildDataIdMap(): Map<number, DataItem> {
   ];
   for (const rel of extraArmyFiles) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const raw = require(`clash-of-clans-data/data/home/${rel}.json`) as { dataId?: number; id: string; name: string };
       if (raw.dataId !== undefined && !map.has(raw.dataId)) {
         map.set(raw.dataId, { id: raw.id, name: raw.name, category: "army", base: "home" });
@@ -147,8 +142,6 @@ function buildDataIdMap(): Map<number, DataItem> {
 
   return map;
 }
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function toUpgradeState(entry: ExportEntry) {
   if (entry.timer === undefined) return undefined;
@@ -251,8 +244,6 @@ function extractHallLevel(
   return 0;
 }
 
-// ── Crafted defenses ─────────────────────────────────────────────────────────
-
 function extractCraftedDefenses(
   entries: ExportEntry[],
   dataMap: Map<number, DataItem>
@@ -277,8 +268,6 @@ function extractCraftedDefenses(
   return result;
 }
 
-
-// ── Public mapper ─────────────────────────────────────────────────────────────
 
 /**
  * Maps a raw Clash of Clans game export (exportData.json format) to VillageData.

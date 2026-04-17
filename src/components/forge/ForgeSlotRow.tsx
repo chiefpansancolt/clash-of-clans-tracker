@@ -27,17 +27,16 @@ export function ForgeSlotRow({
   onStop,
 }: ForgeSlotRowProps) {
   const isRunning = !!slot.endsAt;
-  const msLeft = slot.endsAt ? Math.max(0, new Date(slot.endsAt).getTime() - Date.now()) : 0;
-  const isDone = isRunning && msLeft === 0;
-
-  const [display, setDisplay] = useState(msLeft);
+  const [display, setDisplay] = useState(() =>
+    slot.endsAt ? Math.max(0, new Date(slot.endsAt).getTime() - Date.now()) : 0
+  );
+  const isDone = isRunning && display === 0;
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    if (!slot.endsAt) { setDisplay(0); return; }
+    if (!slot.endsAt) { return; }
     const remaining = Math.max(0, new Date(slot.endsAt).getTime() - Date.now());
-    setDisplay(remaining);
     if (remaining <= 0) return;
     intervalRef.current = setInterval(() => {
       const r = Math.max(0, new Date(slot.endsAt!).getTime() - Date.now());

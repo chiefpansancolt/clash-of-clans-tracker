@@ -39,20 +39,16 @@ const BH_LEVELS = Array.from({ length: 10 }, (_, i) => i + 1);
 export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughModalProps) {
 	const { addPlaythrough } = usePlaythrough();
 
-	// Shared
 	const [mode, setMode] = useState<CreationMode>("fresh");
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 
-	// Fresh start
 	const [townHallLevel, setTownHallLevel] = useState(1);
 	const [builderHallLevel, setBuilderHallLevel] = useState(1);
 
-	// Hall upgrade dates
 	const [thChangedAt, setThChangedAt] = useState("");
 	const [bhChangedAt, setBhChangedAt] = useState("");
 
-	// Import — API
 	const [playerTag, setPlayerTag] = useState("");
 	const [fetching, setFetching] = useState(false);
 	const [fetchError, setFetchError] = useState("");
@@ -60,7 +56,6 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 	const [apiData, setApiData] = useState<VillageData | null>(null);
 	const { secondsLeft, isOnCooldown, startCooldown, handleError } = useApiCooldown();
 
-	// Import — building JSON supplement
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [jsonError, setJsonError] = useState("");
 	const [buildingData, setBuildingData] = useState<VillageData | null>(null);
@@ -183,7 +178,6 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 			<ModalHeader>Create New Village</ModalHeader>
 			<ModalBody>
 				<div className="space-y-5">
-					{/* Mode selector */}
 					<div className="grid grid-cols-2 gap-3">
 						<button
 							type="button"
@@ -221,7 +215,6 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 						</button>
 					</div>
 
-					{/* Village name — always shown */}
 					<div>
 						<div className="mb-2 block">
 							<Label htmlFor="playthrough-name">
@@ -239,7 +232,6 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 						/>
 					</div>
 
-					{/* Fresh start options */}
 					{mode === "fresh" && (
 						<div className="grid grid-cols-2 gap-4">
 							<div>
@@ -277,10 +269,8 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 						</div>
 					)}
 
-					{/* Import options */}
 					{mode === "import" && (
 						<div className="space-y-4">
-							{/* Step 1 — API */}
 							<div>
 								<p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
 									Step 1 — Fetch player data
@@ -325,7 +315,6 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 								)}
 							</div>
 
-							{/* Step 2 — Building JSON */}
 							<div>
 								<p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
 									Step 2 — Building data (optional)
@@ -360,7 +349,6 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 						</div>
 					)}
 
-					{/* Hall upgrade dates — always shown */}
 					<div className="grid grid-cols-2 gap-4">
 						<div>
 							<div className="mb-2 block">
@@ -386,7 +374,6 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 						</div>
 					</div>
 
-					{/* Description — always shown */}
 					<div>
 						<div className="mb-2 block">
 							<Label htmlFor="playthrough-description">Description</Label>

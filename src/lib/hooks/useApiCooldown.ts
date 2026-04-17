@@ -34,14 +34,22 @@ export function useApiCooldown(): ApiCooldown {
     }, 1000);
   };
 
-  // On mount: if there's already an active cooldown, resume the countdown
+  // On mount: if there's already an active cooldown, resume the countdown.
+  // useState(getRemainingSeconds) already initialises secondsLeft correctly,
+  // so we only need to start the interval — no direct setState in the effect body.
   useEffect(() => {
-    const remaining = getRemainingSeconds();
-    if (remaining > 0) startTimer(remaining);
+    if (getRemainingSeconds() <= 0) return;
+    timerRef.current = setInterval(() => {
+      const remaining = getRemainingSeconds();
+      setSecondsLeft(remaining);
+      if (remaining <= 0 && timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }, 1000);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const startCooldown = (seconds = 60) => {

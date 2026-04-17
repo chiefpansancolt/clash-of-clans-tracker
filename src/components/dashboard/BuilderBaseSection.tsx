@@ -19,8 +19,6 @@ import {
 } from "@/lib/utils/progressHelpers";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
 
-// Module-level data — init once
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RawItem = { name: string; images: { icon?: string }; levels: any[] };
 type RawLeague = { name: string; image: string };
 const _b = builder();
@@ -30,7 +28,6 @@ const _heroes = _b.heroes().get() as unknown as RawItem[];
 function getBuilderLeague(leagueName: string): RawLeague | undefined {
   // API stores "Titanium League I"; package uses "Titanium I"
   const normalized = leagueName.replace(" League", "");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return ((_b.leagues() as any).byName(normalized).get() as RawLeague[])?.[0];
 }
 
@@ -43,7 +40,6 @@ export function BuilderBaseSection({ bb, playthrough }: BuilderBaseSectionProps)
 
   const [leagueModal, setLeagueModal] = useState<BuilderLeagueData | null>(null);
 
-  // Progress
   const structuresProg = calcBuilderStructuresProgress(bb, bhLevel);
   const trapsProg = calcBuilderTrapsProgress(bb, bhLevel);
   const labProg = calcBuilderLabProgress(bb, bhLevel);
@@ -52,7 +48,6 @@ export function BuilderBaseSection({ bb, playthrough }: BuilderBaseSectionProps)
   const { maxLevel: maxWallLevel, totalAtBH: totalWalls } = getBuilderWallData(bhLevel);
   const wallSub = totalWalls > 0 ? `${totalWalls} walls · max Lv ${maxWallLevel}` : "No wall data";
 
-  // Item display lookups
   const getTroopData = (name: string) => {
     const t = _troops.find((t) => t.name.toLowerCase() === name);
     if (!t) return undefined;
@@ -87,7 +82,6 @@ export function BuilderBaseSection({ bb, playthrough }: BuilderBaseSectionProps)
     <section className="mb-8">
       <LeagueRewardsModal league={leagueModal} onClose={() => setLeagueModal(null)} />
 
-      {/* Section header */}
       <div className="mb-3 flex items-center gap-3 rounded-xl border border-secondary/80 bg-primary px-4 py-3">
         <div className="relative h-10 w-10 shrink-0">
           <Image src={bhImageUrl} alt={`BH${bhLevel}`} fill sizes="40px" className="object-contain" />
@@ -119,7 +113,6 @@ export function BuilderBaseSection({ bb, playthrough }: BuilderBaseSectionProps)
         )}
       </div>
 
-      {/* Progress grid — 2-col */}
       {(structuresProg.max > 0 || labProg.max > 0 || heroesProg.max > 0 || wallsProg.max > 0) && (
         <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
           {structuresProg.max > 0 && (
@@ -140,7 +133,6 @@ export function BuilderBaseSection({ bb, playthrough }: BuilderBaseSectionProps)
         </div>
       )}
 
-      {/* Items — Troops (left) | Heroes (right) */}
       {(bb.troops.length > 0 || bb.heroes.length > 0) && (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {bb.troops.length > 0 && (

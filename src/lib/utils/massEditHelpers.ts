@@ -13,8 +13,6 @@ import { getCountAtTH, getHomeWallData, getMaxHeroHallLevel, regularTroopNames }
 // Module-level singleton — matches progressHelpers.ts pattern
 const _home = home() as any;
 
-// ── Shared raw types ──────────────────────────────────────────────────────────
-
 type RawLevel = {
   level: number;
   townHallRequired?: number;
@@ -28,8 +26,6 @@ type RawBuilding = {
   levels: RawLevel[];
   availablePerTownHall: Array<{ townHallLevel: number; count: number }>;
 };
-
-// ── Exported descriptor types ─────────────────────────────────────────────────
 
 export interface BuildingEditData {
   id: string;
@@ -76,8 +72,6 @@ export interface WallLevelData {
   imageUrl: string;
 }
 
-// ── Private helpers ───────────────────────────────────────────────────────────
-
 function buildingToEditData(b: RawBuilding, thLevel: number): BuildingEditData | null {
   const nonSCLevels = b.levels.filter(
     (l) => !l.supercharge && (l.townHallRequired ?? 0) <= thLevel
@@ -96,8 +90,6 @@ function buildingToEditData(b: RawBuilding, thLevel: number): BuildingEditData |
   return { id: b.id, name: b.name, maxLevel, instanceCount, imageUrl, superchargeTiers };
 }
 
-// ── Defenses ──────────────────────────────────────────────────────────────────
-
 export function getDefensesAtTH(thLevel: number): BuildingEditData[] {
   const raw = _home.defenses().get() as RawBuilding[];
   return raw.flatMap((b) => {
@@ -105,8 +97,6 @@ export function getDefensesAtTH(thLevel: number): BuildingEditData[] {
     return d ? [d] : [];
   });
 }
-
-// ── Army buildings ────────────────────────────────────────────────────────────
 
 const ARMY_BUILDING_FILES = [
   "army-camp",
@@ -125,7 +115,6 @@ export function getArmyBuildingsAtTH(thLevel: number): BuildingEditData[] {
   const result: BuildingEditData[] = [];
   for (const file of ARMY_BUILDING_FILES) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const b = require(`clash-of-clans-data/data/home/army-buildings/${file}.json`) as RawBuilding;
       const d = buildingToEditData(b, thLevel);
       if (d) result.push(d);
@@ -136,8 +125,6 @@ export function getArmyBuildingsAtTH(thLevel: number): BuildingEditData[] {
   return result;
 }
 
-// ── Resource buildings ────────────────────────────────────────────────────────
-
 export function getResourceBuildingsAtTH(thLevel: number): BuildingEditData[] {
   const raw = _home.resourceBuildings().get() as RawBuilding[];
   return raw.flatMap((b) => {
@@ -146,8 +133,6 @@ export function getResourceBuildingsAtTH(thLevel: number): BuildingEditData[] {
   });
 }
 
-// ── Traps ─────────────────────────────────────────────────────────────────────
-
 export function getTrapsAtTH(thLevel: number): BuildingEditData[] {
   const raw = _home.traps().get() as RawBuilding[];
   return raw.flatMap((b) => {
@@ -155,8 +140,6 @@ export function getTrapsAtTH(thLevel: number): BuildingEditData[] {
     return d ? [d] : [];
   });
 }
-
-// ── Guardians ─────────────────────────────────────────────────────────────────
 
 export function getGuardiansAtTH(thLevel: number): BuildingEditData[] {
   type RawGuardian = {
@@ -178,8 +161,6 @@ export function getGuardiansAtTH(thLevel: number): BuildingEditData[] {
   });
 }
 
-// ── Troops ────────────────────────────────────────────────────────────────────
-
 export function getTroopsAtTH(thLevel: number): ItemEditData[] {
   type RawTroop = {
     name: string;
@@ -198,8 +179,6 @@ export function getTroopsAtTH(thLevel: number): ItemEditData[] {
   });
 }
 
-// ── Spells ────────────────────────────────────────────────────────────────────
-
 export function getSpellsAtTH(thLevel: number): ItemEditData[] {
   type RawSpell = {
     name: string;
@@ -215,8 +194,6 @@ export function getSpellsAtTH(thLevel: number): ItemEditData[] {
     return [{ name: s.name, maxLevel, imageUrl }];
   });
 }
-
-// ── Siege machines ────────────────────────────────────────────────────────────
 
 export function getSiegeMachinesAtTH(thLevel: number): ItemEditData[] {
   type RawSiege = {
@@ -234,8 +211,6 @@ export function getSiegeMachinesAtTH(thLevel: number): ItemEditData[] {
   });
 }
 
-// ── Pets ──────────────────────────────────────────────────────────────────────
-
 export function getPetsAtTH(thLevel: number): ItemEditData[] {
   type RawPet = {
     name: string;
@@ -250,8 +225,6 @@ export function getPetsAtTH(thLevel: number): ItemEditData[] {
     return [{ name: p.name, maxLevel: p.levels[p.levels.length - 1].level, imageUrl }];
   });
 }
-
-// ── Heroes ────────────────────────────────────────────────────────────────────
 
 export function getHeroesAtTH(thLevel: number): HeroEditData[] {
   type RawHero = {
@@ -273,8 +246,6 @@ export function getHeroesAtTH(thLevel: number): HeroEditData[] {
   });
 }
 
-// ── Hero equipment ────────────────────────────────────────────────────────────
-
 export function getAllEquipment(): EquipEditData[] {
   type RawEquip = {
     name: string;
@@ -290,8 +261,6 @@ export function getAllEquipment(): EquipEditData[] {
     imageUrl: e.images?.icon ? toPublicImageUrl(e.images.icon) : "",
   }));
 }
-
-// ── Crafted defenses ──────────────────────────────────────────────────────────
 
 export function getCraftedDefenses(): CraftedDefenseEditData[] {
   type RawModule = { name: string; upgrades: unknown[] };
@@ -310,8 +279,6 @@ export function getCraftedDefenses(): CraftedDefenseEditData[] {
   }));
 }
 
-// ── Walls ─────────────────────────────────────────────────────────────────────
-
 export interface WallEditInfo {
   levels: WallLevelData[];
   totalAtTH: number;
@@ -321,7 +288,6 @@ export interface WallEditInfo {
 export function getWallLevelsAtTH(thLevel: number): WallEditInfo {
   const { maxLevel, totalAtTH } = getHomeWallData(thLevel);
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const wallData = require("clash-of-clans-data/data/home/walls/wall.json") as {
       levels: Array<{ level: number; townHallRequired: number; images?: { normal?: string } }>;
     };

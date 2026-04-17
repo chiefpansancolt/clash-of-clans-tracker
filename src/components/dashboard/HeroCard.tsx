@@ -35,7 +35,6 @@ function EquipChip({
             {eq.name.slice(0, 2).toUpperCase()}
           </div>
         )}
-        {/* Level badge — bottom-left */}
         <span
           className={`absolute bottom-0 left-0 min-w-3.5 rounded-tr rounded-bl px-0.5 text-center text-[8px] font-extrabold leading-none ${badgeBg}`}
           style={{ paddingTop: 1, paddingBottom: 1 }}
@@ -56,7 +55,6 @@ export function HeroCard({ hero, heroIconUrl, maxHeroLevel, getEquipmentData }: 
 
   return (
     <div className={`flex w-27 shrink-0 flex-col items-center rounded-lg border bg-primary px-2 pt-2.5 pb-2 ${isLocked ? "border-white/20 opacity-40" : "border-accent/80"}`}>
-      {/* Hero icon */}
       <div className={`relative h-16 w-16 overflow-hidden rounded-lg ring-2 ${isLocked ? "ring-white/20" : "ring-accent/80"}`}>
         {!imgError && heroIconUrl ? (
           <Image
@@ -73,7 +71,6 @@ export function HeroCard({ hero, heroIconUrl, maxHeroLevel, getEquipmentData }: 
           </div>
         )}
 
-        {/* Level badge — bottom-left */}
         <span
           className={`absolute bottom-0 left-0 min-w-5.5 rounded-tr rounded-bl px-1 text-center text-[11px] font-extrabold leading-none ${badgeBg}`}
           style={{ paddingTop: 2, paddingBottom: 2 }}
@@ -81,23 +78,19 @@ export function HeroCard({ hero, heroIconUrl, maxHeroLevel, getEquipmentData }: 
           {hero.level}
         </span>
 
-        {/* Lock overlay — bottom-right, only when locked */}
         {isLocked && (
           <HiLockClosed className="absolute bottom-0.5 right-0.5 h-3.5 w-3.5 text-white/80" />
         )}
 
-        {/* Upgrading indicator */}
         {isUpgrading && (
           <HiClock className="absolute top-0.5 right-0.5 h-3.5 w-3.5 text-action" />
         )}
       </div>
 
-      {/* Name */}
       <div className="mt-1.5 w-full truncate text-center text-[11px] font-semibold text-white">
         {hero.name.replace(" ", "\u00A0")}
       </div>
 
-      {/* Equipment row */}
       {hero.equipment.length > 0 && (
         <div className="mt-1.5 flex flex-wrap justify-center gap-0.5">
           {hero.equipment.map((eq) => (

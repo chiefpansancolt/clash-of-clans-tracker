@@ -41,8 +41,6 @@ function sumBuildingLevels(record: Record<string, Array<{ level: number }>>): nu
   return total;
 }
 
-// ── Structures ────────────────────────────────────────────────────────────────
-
 export function calcHomeStructuresProgress(hv: HomeVillageData, thLevel: number): ProgressResult {
   const max = _home.levelCountAtTownHall(thLevel).structures;
   const current =
@@ -71,8 +69,6 @@ export function calcBuilderTrapsProgress(bb: BuilderBaseData, bhLevel: number): 
   return toResult(sumBuildingLevels(bb.traps), max);
 }
 
-// ── Lab ───────────────────────────────────────────────────────────────────────
-
 export function calcHomeLabProgress(hv: HomeVillageData, thLevel: number): ProgressResult {
   const max = _home.levelCountAtTownHall(thLevel).lab;
   const regularTroops = hv.troops.filter((t) => regularTroopNames.has(t.name.toLowerCase()));
@@ -88,8 +84,6 @@ export function calcBuilderLabProgress(bb: BuilderBaseData, bhLevel: number): Pr
   return toResult(bb.troops.reduce((s, t) => s + t.level, 0), max);
 }
 
-// ── Heroes ────────────────────────────────────────────────────────────────────
-
 export function calcHomeHeroesProgress(heroes: TrackedHero[], thLevel: number): ProgressResult {
   const max = _home.levelCountAtTownHall(thLevel).heroes;
   return toResult(heroes.reduce((s, h) => s + h.level, 0), max);
@@ -99,8 +93,6 @@ export function calcBuilderHeroesProgress(heroes: TrackedHero[], bhLevel: number
   const max = _builder.levelCountAtBuilderHall(bhLevel).heroes;
   return toResult(heroes.reduce((s, h) => s + h.level, 0), max);
 }
-
-// ── Equipment ─────────────────────────────────────────────────────────────────
 
 export function calcEquipmentProgress(heroes: TrackedHero[]): ProgressResult {
   const allEquipment = heroes.flatMap((h) => h.equipment);
@@ -116,14 +108,10 @@ export function calcEquipmentProgress(heroes: TrackedHero[]): ProgressResult {
   return toResult(current, max);
 }
 
-// ── Pets ──────────────────────────────────────────────────────────────────────
-
 export function calcPetsProgress(pets: TrackedItem[], thLevel: number): ProgressResult {
   const max = _home.levelCountAtTownHall(thLevel).pets;
   return toResult(pets.reduce((s, p) => s + p.level, 0), max);
 }
-
-// ── Walls ─────────────────────────────────────────────────────────────────────
 
 export function calcWallsProgress(walls: Record<string, number>, thLevel: number): ProgressResult {
   const max = _home.levelCountAtTownHall(thLevel).walls;
@@ -146,7 +134,6 @@ export function calcBuilderWallsProgress(walls: Record<string, number>, bhLevel:
 /** Wall count and max level at TH — used for the progress card sub-label. */
 export function getHomeWallData(thLevel: number): { maxLevel: number; totalAtTH: number } {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const wallData = require("clash-of-clans-data/data/home/walls/wall.json") as {
       levels: Array<{ level: number; townHallRequired: number }>;
       availablePerTownHall: Array<{ townHallLevel: number; count: number }>;
@@ -166,7 +153,6 @@ export function getHomeWallData(thLevel: number): { maxLevel: number; totalAtTH:
 /** Wall count and max level at BH — used for the progress card sub-label. */
 export function getBuilderWallData(bhLevel: number): { maxLevel: number; totalAtBH: number } {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const wallData = require("clash-of-clans-data/data/builder/walls/wall.json") as {
       levels: Array<{ level: number; builderHallRequired?: number }>;
       availablePerBuilderHall: Array<{ builderHallLevel: number; count: number }>;
@@ -183,12 +169,9 @@ export function getBuilderWallData(bhLevel: number): { maxLevel: number; totalAt
   }
 }
 
-// ── Hero Hall ─────────────────────────────────────────────────────────────────
-
 /** Max Hero Hall level achievable at the given TH level — gates per-hero max levels. */
 export function getMaxHeroHallLevel(thLevel: number): number {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const raw = require("clash-of-clans-data/data/home/army-buildings/hero-hall.json") as {
       levels: Array<{ level: number; townHallRequired?: number }>;
     };
@@ -197,8 +180,6 @@ export function getMaxHeroHallLevel(thLevel: number): number {
     return 0;
   }
 }
-
-// ── Crafted Defenses ─────────────────────────────────────────────────────────
 
 export function calcCraftedDefensesProgress(hv: HomeVillageData, thLevel: number): ProgressResult {
   if (thLevel < 18) return toResult(0, 0);
@@ -219,8 +200,6 @@ export function calcCraftedDefensesProgress(hv: HomeVillageData, thLevel: number
 
   return toResult(current, max);
 }
-
-// ── Supercharge ───────────────────────────────────────────────────────────────
 
 type RawBuildingData = {
   id: string;
@@ -266,15 +245,11 @@ export function calcSuperchargeProgress(hv: HomeVillageData, thLevel: number): P
   return toResult(current, max);
 }
 
-// ── Achievements ──────────────────────────────────────────────────────────────
-
 export function calcAchievementsProgress(achievements: Array<{ stars: number }>): ProgressResult {
   const current = achievements.reduce((sum, a) => sum + a.stars, 0);
   const max = achievements.length * 3;
   return toResult(current, max);
 }
-
-// ── Days counter ──────────────────────────────────────────────────────────────
 
 export function calcDaysAt(changedAt: string | undefined): number {
   if (!changedAt) return 0;

@@ -49,7 +49,6 @@ function ItemCell({
           </div>
         )}
 
-        {/* Level badge — bottom-left */}
         <span
           className={`absolute bottom-0 left-0 min-w-4.5 rounded-tr rounded-bl px-0.5 text-center font-extrabold leading-none ${badgeFontClass} ${badgeBg}`}
           style={{ paddingTop: 2, paddingBottom: 2 }}
@@ -57,12 +56,10 @@ function ItemCell({
           {isLocked ? "—" : item.level}
         </span>
 
-        {/* Lock overlay — bottom-right, only when locked */}
         {isLocked && (
           <HiLockClosed className="absolute bottom-0.5 right-0.5 h-3 w-3 text-white/80" />
         )}
 
-        {/* Upgrading indicator — top-right */}
         {isUpgrading && (
           <HiClock className="absolute top-0.5 right-0.5 h-3 w-3 text-action" />
         )}

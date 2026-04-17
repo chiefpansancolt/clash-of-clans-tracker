@@ -26,7 +26,6 @@ export function CapitalGoldCard({ timer, thLevel, onCollect, onAdjust }: Capital
       if (intervalRef.current) clearInterval(intervalRef.current);
       return;
     }
-    setMsLeft(msUntilNextReset(timer.resetTime));
     intervalRef.current = setInterval(() => {
       const remaining = msUntilNextReset(timer.resetTime!);
       setMsLeft(remaining);

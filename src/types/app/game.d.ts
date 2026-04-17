@@ -1,11 +1,7 @@
-// ── Shared upgrade state ──────────────────────────────────────────────────────
-
 export interface UpgradeState {
   upgradeStartedAt: string; // ISO 8601 timestamp when upgrade began
   boostTimeSaved?: number; // total minutes saved by all boosts applied (additive)
 }
-
-// ── Building tracking ─────────────────────────────────────────────────────────
 
 export interface BuildingInstance {
   level: number; // current completed level (0 = not yet built)
@@ -19,15 +15,11 @@ export type BuildingRecord = Record<string, BuildingInstance[]>;
 // Capital buildings have no upgrade times
 export type CapitalBuildingRecord = Record<string, number[]>;
 
-// ── Troop / Spell / Siege / Pet ───────────────────────────────────────────────
-
 export interface TrackedItem {
   name: string; // API name e.g. "Barbarian", "Lightning Spell"
   level: number; // current completed level (0 = locked / not researched)
   upgrade?: UpgradeState; // present only while researching
 }
-
-// ── Heroes & Equipment ────────────────────────────────────────────────────────
 
 export interface TrackedEquipment {
   name: string;
@@ -42,8 +34,6 @@ export interface TrackedHero {
   equipment: TrackedEquipment[]; // currently equipped items
 }
 
-// ── Achievements ──────────────────────────────────────────────────────────────
-
 export interface TrackedAchievement {
   name: string;
   stars: number; // 0–3
@@ -52,14 +42,10 @@ export interface TrackedAchievement {
   village: string; // "home" | "builderBase" | "clanCapital"
 }
 
-// ── Crafted Defenses ─────────────────────────────────────────────────────────
-
 /** Module levels for a single crafted defense (3 independent modules). */
 export interface CraftedDefenseData {
   modules: [number, number, number]; // upgrade level of each module (0 = not upgraded)
 }
-
-// ── Home Village ──────────────────────────────────────────────────────────────
 
 export interface HomeVillageData {
   townHallLevel: number; // 1–18
@@ -91,8 +77,6 @@ export interface HomeVillageData {
   craftedDefenses: Record<string, CraftedDefenseData>;
 }
 
-// ── Builder Base ──────────────────────────────────────────────────────────────
-
 export interface BuilderBaseData {
   builderHallLevel: number; // 1–10
   builderBaseTrophies: number;
@@ -108,8 +92,6 @@ export interface BuilderBaseData {
   armyBuildings: BuildingRecord;
   walls: Record<string, number>; // level (string) → count of segments at that level
 }
-
-// ── Clan Capital ──────────────────────────────────────────────────────────────
 
 export interface ClanCapitalDistrictData {
   hallLevel: number; // Capital Hall level or District Hall level
@@ -134,16 +116,12 @@ export interface ClanCapitalData {
   spells: TrackedItem[];
 }
 
-// ── Clan ──────────────────────────────────────────────────────────────────────
-
 export interface ClanData {
   tag: string;
   name: string;
   clanLevel: number;
   role: "leader" | "coLeader" | "elder" | "member" | "";
 }
-
-// ── Top-level VillageData ─────────────────────────────────────────────────────
 
 export interface VillageData {
   // Cross-base player stats

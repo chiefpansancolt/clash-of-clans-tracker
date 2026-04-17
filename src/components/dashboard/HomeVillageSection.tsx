@@ -25,10 +25,7 @@ import {
 } from "@/lib/utils/progressHelpers";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
 
-// Module-level data — init once, reused across renders
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RawItem = { name: string; images: { icon?: string }; levels: any[] };
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RawTroop = RawItem & { levels: Array<{ researchCostResource?: string }> };
 const _h = home();
 const _troops = _h.troops().get() as RawTroop[];
@@ -54,7 +51,6 @@ export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps)
   const days = calcDaysAt(playthrough.thChangedAt);
   const maxHeroHallLevel = getMaxHeroHallLevel(thLevel);
 
-  // Progress
   const structuresProg = calcHomeStructuresProgress(hv, thLevel);
   const trapsProg = calcHomeTrapsProgress(hv, thLevel);
   const labProg = calcHomeLabProgress(hv, thLevel);
@@ -67,7 +63,6 @@ export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps)
   const { maxLevel: maxWallLevel, totalAtTH: totalWalls } = getHomeWallData(thLevel);
   const wallSub = totalWalls > 0 ? `${totalWalls} walls · max Lv ${maxWallLevel}` : "No wall data";
 
-  // Item display lookups — find in package data, apply icon URL helper
   const getTroopData = (name: string) => {
     const t = _troops.find((t) => t.name.toLowerCase() === name);
     if (!t) return undefined;
@@ -115,14 +110,12 @@ export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps)
 
   const getHomeLeagueData = (name: string): HomeLeagueData | null => {
     const refinedName = name.replace(" League", "");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const t = (_leagues.leagues() as any).byName(refinedName).data?.[0];
     if (!t) return null;
 
     // Loot is per-TH — require at build time so it's always fresh
     let loot: HomeLeagueLoot | null = null;
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const raw = require("clash-of-clans-data/data/ranked-battles/ranked-battles.json") as {
         lootByTownHall: Record<string, Array<{ leagueId: string; maxAvailableLoot: { goldAndElixir: number | null; darkElixir: number | null }; maxLeagueBonus: { goldAndElixir: number | null; darkElixir: number | null }; starBonus: { goldAndElixir: number | null; darkElixir: number | null; shinyOre: number | null; glowyOre: number | null; starryOre: number | null } }>>;
       };
@@ -153,7 +146,6 @@ export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps)
     <section className="mb-8">
       <LeagueRewardsModal league={leagueModal} onClose={() => setLeagueModal(null)} />
 
-      {/* Section header */}
       <div className="mb-3 flex items-center gap-3 rounded-xl border border-secondary/80 bg-primary px-4 py-3">
         <div className="relative h-10 w-10 shrink-0">
           <Image src={thImageUrl} alt={`TH${thLevel}`} fill sizes="40px" className="object-contain" />
@@ -184,7 +176,6 @@ export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps)
         )}
       </div>
 
-      {/* Progress grid */}
       <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
         {structuresProg.max > 0 && (
           <ProgressCard label="Structures" result={structuresProg} sub="Defenses · Army · Resource" />
