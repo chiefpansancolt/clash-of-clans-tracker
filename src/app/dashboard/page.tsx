@@ -8,6 +8,7 @@ import { PlayerHeader } from "@/comps/dashboard/PlayerHeader";
 import { HomeVillageSection } from "@/comps/dashboard/HomeVillageSection";
 import { BuilderBaseSection } from "@/comps/dashboard/BuilderBaseSection";
 import { ClanCapitalSection } from "@/comps/dashboard/ClanCapitalSection";
+import { DailiesSection, defaultDailies } from "@/comps/dashboard/DailiesSection";
 import { calcAchievementsProgress } from "@/lib/utils/progressHelpers";
 
 export default function DashboardPage() {
@@ -34,6 +35,10 @@ export default function DashboardPage() {
   return (
     <div className="p-4 md:p-6">
       <PlayerHeader playthrough={activePlaythrough} achievementsProgress={achievementsProgress} />
+      <DailiesSection
+        dailies={activePlaythrough.dailies ?? defaultDailies}
+        playthroughId={activePlaythrough.id}
+      />
       <HomeVillageSection hv={data.homeVillage} playthrough={activePlaythrough} />
       <BuilderBaseSection bb={data.builderBase} playthrough={activePlaythrough} />
       {data.clanCapital.capitalPeak.hallLevel > 0 && (
