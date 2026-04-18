@@ -1,6 +1,8 @@
 export interface UpgradeState {
   upgradeStartedAt: string; // ISO 8601 timestamp when upgrade began
-  boostTimeSaved?: number; // total minutes saved by all boosts applied (additive)
+  finishesAt: string;       // ISO 8601 — computed from package time at start
+  builderId: number;        // 1–7 (7 = goblin); for research queue: 1 = lab, 7 = goblin
+  boostTimeSaved?: number;  // total minutes saved by all boosts applied (additive)
 }
 
 export interface BuildingInstance {
@@ -75,6 +77,17 @@ export interface HomeVillageData {
 
   // Crafted defenses (TH18 Crafting Station) — keyed by defense id e.g. "roaster"
   craftedDefenses: Record<string, CraftedDefenseData>;
+
+  // Town Hall self-upgrade (e.g. TH17 → TH18)
+  townHallUpgrade?: UpgradeState;
+  // TH weapon level (Inferno Artillery on TH17: levels 1–5; 0 = no weapon / N/A)
+  townHallWeaponLevel?: number;
+  townHallWeaponUpgrade?: UpgradeState;
+
+  // Queue planning (pending upgrades not yet started)
+  builderQueues?: Record<string, import("@/types/app/queue").BuilderQueueItem[]>;
+  researchQueue?: Record<string, import("@/types/app/queue").ResearchQueueItem[]>;
+  petQueue?: import("@/types/app/queue").PetQueueItem[];
 }
 
 export interface BuilderBaseData {

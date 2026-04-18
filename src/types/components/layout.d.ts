@@ -4,4 +4,6 @@ export interface AppItem {
   image: string;
   href: string;
   disabled?: boolean;
+  lockedLabel?: string;
+  minTH?: number;
 }

@@ -138,15 +138,29 @@ export function mapPlayerApiToVillageData(player: PlayerApiResponse): VillageDat
  * The API data wins for all player stats, troops, spells, heroes, and achievements.
  * The JSON data provides building levels (defenses, traps, resource/army buildings,
  * walls, clan capital districts) which are not available from the Player API.
+ * Active upgrade states are preserved from the existing data when the item level
+ * has not changed (i.e. the upgrade is still in progress).
  */
 export function mergeWithBuildingData(apiData: VillageData, buildingJson: VillageData): VillageData {
+  function withUpgrades(apiItems: TrackedItem[], existingItems: TrackedItem[]): TrackedItem[] {
+    return apiItems.map((apiItem) => {
+      const existing = existingItems.find((e) => e.name === apiItem.name);
+      if (existing?.upgrade && existing.level === apiItem.level) {
+        return { ...apiItem, upgrade: existing.upgrade };
+      }
+      return apiItem;
+    });
+  }
+
   // Merge hero equipment: prefer the building JSON (has all equipment pieces from the export),
   // fall back to the API's equipped-only list if the export has none for that hero.
+  // Also preserve active hero upgrade states when level hasn't changed.
   const mergedHomeHeroes = apiData.homeVillage.heroes.map((apiHero) => {
     const exportHero = buildingJson.homeVillage.heroes.find((h) => h.name === apiHero.name);
     return {
       ...apiHero,
       equipment: exportHero?.equipment?.length ? exportHero.equipment : apiHero.equipment,
+      upgrade: exportHero?.upgrade && exportHero.level === apiHero.level ? exportHero.upgrade : undefined,
     };
   });
 
@@ -154,6 +168,10 @@ export function mergeWithBuildingData(apiData: VillageData, buildingJson: Villag
     ...apiData,
     homeVillage: {
       ...apiData.homeVillage,
+      troops: withUpgrades(apiData.homeVillage.troops, buildingJson.homeVillage.troops),
+      spells: withUpgrades(apiData.homeVillage.spells, buildingJson.homeVillage.spells),
+      siegeMachines: withUpgrades(apiData.homeVillage.siegeMachines, buildingJson.homeVillage.siegeMachines),
+      pets: withUpgrades(apiData.homeVillage.pets, buildingJson.homeVillage.pets),
       defenses: buildingJson.homeVillage.defenses,
       traps: buildingJson.homeVillage.traps,
       resourceBuildings: buildingJson.homeVillage.resourceBuildings,
@@ -161,6 +179,9 @@ export function mergeWithBuildingData(apiData: VillageData, buildingJson: Villag
       walls: buildingJson.homeVillage.walls,
       craftedDefenses: buildingJson.homeVillage.craftedDefenses,
       heroes: mergedHomeHeroes,
+      builderQueues: buildingJson.homeVillage.builderQueues,
+      researchQueue: buildingJson.homeVillage.researchQueue,
+      petQueue: buildingJson.homeVillage.petQueue,
     },
     builderBase: {
       ...apiData.builderBase,

@@ -69,6 +69,8 @@ export interface AutoForgeChipProps {
 export interface DailiesSectionProps {
   dailies: DailiesData;
   playthroughId: string;
+  thLevel: number;
+  helperHutLevel: number;
 }
 
 export interface PlayerHeaderProps {

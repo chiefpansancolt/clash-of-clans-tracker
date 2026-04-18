@@ -79,9 +79,15 @@ export interface Playthrough {
   data: VillageData;
 }
 
+export interface AppSettings {
+  goblinBuilderEnabled: boolean;
+  goblinResearchEnabled: boolean;
+}
+
 export interface AppData {
   playthroughs: Playthrough[];
   activePlaythroughId: string | null;
+  settings?: AppSettings;
 }
 
 export type SortOption = "lastModified" | "name" | "createdAt";

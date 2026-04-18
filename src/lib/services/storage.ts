@@ -1,22 +1,35 @@
-import type { AppData, Playthrough } from "@/types/app";
+import type { AppData, AppSettings, Playthrough } from "@/types/app";
 import type { HomeVillageData, BuilderBaseData } from "@/types/app/game";
 import type { DailiesData } from "@/types/app/playthrough";
 
 const STORAGE_KEY = "clash-of-clans-tracker";
 
+const defaultSettings: AppSettings = {
+  goblinBuilderEnabled: false,
+  goblinResearchEnabled: false,
+};
+
 const defaultData: AppData = {
   playthroughs: [],
   activePlaythroughId: null,
+  settings: defaultSettings,
 };
+
+export { defaultSettings };
 
 /**
  * Fills in missing fields on stored data so old records are always safe to use.
  * Add an entry here any time a new required field is added to the data model.
  */
 function migrateHomeVillage(hv: HomeVillageData): HomeVillageData {
+  const defaultWeaponLevel = hv.townHallLevel === 17 ? 1 : 0;
   return {
     ...hv,
     craftedDefenses: hv.craftedDefenses ?? {},
+    builderQueues: hv.builderQueues ?? {},
+    researchQueue: hv.researchQueue ?? {},
+    petQueue: hv.petQueue ?? [],
+    townHallWeaponLevel: hv.townHallWeaponLevel ?? defaultWeaponLevel,
   };
 }
 
@@ -110,6 +123,7 @@ export const storageService = {
     return {
       ...parsed,
       playthroughs: (parsed.playthroughs ?? []).map(migratePlaythrough),
+      settings: parsed.settings ? { ...defaultSettings, ...parsed.settings } : defaultSettings,
     };
   },
 
@@ -208,6 +222,15 @@ export const storageService = {
       data.activePlaythroughId = data.playthroughs[0]?.id || null;
     }
 
+    this.save(data);
+  },
+
+  /**
+   * Persist a settings patch to localStorage (direct write, bypasses Context)
+   */
+  saveSettings(patch: Partial<AppSettings>): void {
+    const data = this.load();
+    data.settings = { ...(data.settings ?? defaultSettings), ...patch };
     this.save(data);
   },
 

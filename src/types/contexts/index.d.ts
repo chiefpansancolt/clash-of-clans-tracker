@@ -1,15 +1,17 @@
-import { Playthrough } from "@/types/app";
+import { AppSettings, Playthrough } from "@/types/app";
 
 export interface PlaythroughContextType {
   playthroughs: Playthrough[];
   activePlaythrough: Playthrough | null;
   isLoaded: boolean;
+  appSettings: AppSettings;
   setActivePlaythrough: (id: string | null) => void;
   addPlaythrough: (
     playthrough: Omit<Playthrough, "id" | "createdAt" | "lastModified">,
   ) => void;
   updatePlaythrough: (id: string, updates: Partial<Playthrough>) => void;
   deletePlaythrough: (id: string) => void;
+  updateSettings: (patch: Partial<AppSettings>) => void;
   importData: (jsonString: string) => { success: boolean; error?: string };
   exportData: () => string;
   clearAllData: () => void;

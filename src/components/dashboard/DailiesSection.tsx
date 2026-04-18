@@ -460,8 +460,16 @@ const DAILY_CHIPS: { key: "starBonus" | "capitalGold"; label: string; image: str
   { key: "capitalGold", label: "Capital Gold",  image: "images/other/gold-c.png" },
 ];
 
-export function DailiesSection({ dailies, playthroughId }: DailiesSectionProps) {
+export function DailiesSection({ dailies, playthroughId, thLevel, helperHutLevel }: DailiesSectionProps) {
   const { updatePlaythrough } = usePlaythrough();
+
+  const showHelpers = helperHutLevel > 0;
+  const showStarBonus = thLevel >= 3;
+  const showCapitalGold = thLevel >= 6;
+  const showGoldPass = thLevel >= 7;
+  const hasDailyChips = showStarBonus || showCapitalGold;
+
+  if (!showHelpers && !hasDailyChips && !showGoldPass) return null;
 
   // Auto-reset Gold Pass if month has changed
   useEffect(() => {
@@ -511,69 +519,76 @@ export function DailiesSection({ dailies, playthroughId }: DailiesSectionProps) 
     <section className="mb-6">
       <div className="flex items-start gap-4 overflow-x-auto rounded-xl border border-secondary/80 bg-primary px-4 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
-        <div className="flex shrink-0 flex-col gap-2">
-          <span className="text-[9px] font-bold uppercase tracking-widest text-accent">Helpers</span>
-          <div className="flex gap-4">
-            {HELPER_CHIPS.map(({ key, label, image }) =>
-              key === "prospector" && !dailies.helpers.prospectorUnlocked ? (
-                <LockedChip key={key} label={label} imageUrl={toPublicImageUrl(image)} />
-              ) : (
+        {showHelpers && (
+          <>
+            <div className="flex shrink-0 flex-col gap-2">
+              <span className="text-[9px] font-bold uppercase tracking-widest text-accent">Helpers</span>
+              <div className="flex gap-4">
+                {HELPER_CHIPS.map(({ key, label, image }) =>
+                  key === "prospector" && !dailies.helpers.prospectorUnlocked ? (
+                    <LockedChip key={key} label={label} imageUrl={toPublicImageUrl(image)} />
+                  ) : (
+                    <TimerChip
+                      key={key}
+                      label={label}
+                      imageUrl={toPublicImageUrl(image)}
+                      timer={dailies.helpers[key]}
+                      onCollect={(rt) => handleHelperCollect(key, rt)}
+                      onAdjust={(rt) => updateHelper(key, { resetTime: rt })}
+                    />
+                  )
+                )}
+              </div>
+            </div>
+            {(hasDailyChips || showGoldPass) && <Divider />}
+          </>
+        )}
+
+        {hasDailyChips && (
+          <div className="flex shrink-0 flex-col gap-2">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-accent">Daily</span>
+            <div className="flex gap-4">
+              {DAILY_CHIPS.filter(({ key }) => (key === "starBonus" ? showStarBonus : showCapitalGold)).map(({ key, label, image }) => (
                 <TimerChip
                   key={key}
                   label={label}
                   imageUrl={toPublicImageUrl(image)}
-                  timer={dailies.helpers[key]}
-                  onCollect={(rt) => handleHelperCollect(key, rt)}
-                  onAdjust={(rt) => updateHelper(key, { resetTime: rt })}
+                  timer={dailies[key]}
+                  onCollect={(rt) => handleDailyCollect(key, rt)}
+                  onAdjust={(rt) => updateDaily(key, { resetTime: rt })}
                 />
-              )
-            )}
-          </div>
-        </div>
-
-        <Divider />
-
-        <div className="flex shrink-0 flex-col gap-2">
-          <span className="text-[9px] font-bold uppercase tracking-widest text-accent">Daily</span>
-          <div className="flex gap-4">
-            {DAILY_CHIPS.map(({ key, label, image }) => (
-              <TimerChip
-                key={key}
-                label={label}
-                imageUrl={toPublicImageUrl(image)}
-                timer={dailies[key]}
-                onCollect={(rt) => handleDailyCollect(key, rt)}
-                onAdjust={(rt) => updateDaily(key, { resetTime: rt })}
-              />
-            ))}
-          </div>
-        </div>
-
-        <Divider />
-
-        <div className="shrink-0">
-          <GoldPassDisplay goldPass={dailies.goldPass} />
-        </div>
-
-        {dailies.goldPass.autoForgeUnlocked && (
-          <>
-            <Divider />
-            <div className="shrink-0">
-              <AutoForgeChip
-                autoForge={dailies.autoForge}
-                builderBoostPct={dailies.goldPass.builderBoostPct}
-                onStart={(data) =>
-                  updatePlaythrough(playthroughId, {
-                    dailies: { ...dailies, autoForge: data },
-                  })
-                }
-                onStop={() =>
-                  updatePlaythrough(playthroughId, {
-                    dailies: { ...dailies, autoForge: { ...dailies.autoForge, endsAt: null } },
-                  })
-                }
-              />
+              ))}
             </div>
+          </div>
+        )}
+
+        {showGoldPass && (
+          <>
+            {(showHelpers || hasDailyChips) && <Divider />}
+            <div className="shrink-0">
+              <GoldPassDisplay goldPass={dailies.goldPass} />
+            </div>
+            {dailies.goldPass.autoForgeUnlocked && (
+              <>
+                <Divider />
+                <div className="shrink-0">
+                  <AutoForgeChip
+                    autoForge={dailies.autoForge}
+                    builderBoostPct={dailies.goldPass.builderBoostPct}
+                    onStart={(data) =>
+                      updatePlaythrough(playthroughId, {
+                        dailies: { ...dailies, autoForge: data },
+                      })
+                    }
+                    onStop={() =>
+                      updatePlaythrough(playthroughId, {
+                        dailies: { ...dailies, autoForge: { ...dailies.autoForge, endsAt: null } },
+                      })
+                    }
+                  />
+                </div>
+              </>
+            )}
           </>
         )}
 

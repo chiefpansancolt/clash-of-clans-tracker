@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, Badge, Button, Card, FileInput, Label } from "flowbite-react";
+import { Alert, Badge, Button, Card, FileInput, Label, ToggleSwitch } from "flowbite-react";
 import { useRef, useState } from "react";
 import {
 	HiCheckCircle,
@@ -14,7 +14,7 @@ import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 
 export default function Settings() {
-	const { playthroughs, exportData, importData, clearAllData } = usePlaythrough();
+	const { playthroughs, exportData, importData, clearAllData, appSettings, updateSettings } = usePlaythrough();
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [resetModalOpen, setResetModalOpen] = useState(false);
@@ -121,6 +121,36 @@ export default function Settings() {
 						{importStatus.message}
 					</Alert>
 				)}
+
+				<div className="mb-4">
+					<Card>
+						<h2 className="mb-4 text-xl font-bold text-white">Builder Settings</h2>
+						<div className="space-y-4">
+							<div className="flex items-start justify-between gap-4">
+								<div>
+									<p className="font-medium text-white">Goblin Builder</p>
+									<p className="text-sm text-white/80">Enables a 7th builder slot for buildings. Only available during limited in-game events.</p>
+								</div>
+								<ToggleSwitch
+									checked={appSettings.goblinBuilderEnabled}
+									onChange={(checked) => updateSettings({ goblinBuilderEnabled: checked })}
+									label=""
+								/>
+							</div>
+							<div className="flex items-start justify-between gap-4">
+								<div>
+									<p className="font-medium text-white">Goblin Researcher</p>
+									<p className="text-sm text-white/80">Enables a 2nd research slot in the lab. Only available during limited in-game events.</p>
+								</div>
+								<ToggleSwitch
+									checked={appSettings.goblinResearchEnabled}
+									onChange={(checked) => updateSettings({ goblinResearchEnabled: checked })}
+									label=""
+								/>
+							</div>
+						</div>
+					</Card>
+				</div>
 
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 					<Card>

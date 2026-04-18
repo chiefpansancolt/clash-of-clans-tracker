@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { HiViewGrid } from "react-icons/hi";
+import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import type { AppItem } from "@/types/components/layout";
 
 const APP_ITEMS: AppItem[] = [
@@ -17,12 +18,14 @@ const APP_ITEMS: AppItem[] = [
     label: "Mass Edit Builder Base",
     image: "/images/builder/builder-hall/normal/level-10.png",
     href: "/mass-edit/builder",
+    minTH: 6,
   },
   {
     id: "mass-edit-capital",
     label: "Mass Edit Clan Capital",
     image: "/images/clan-capital/halls/capital-hall/normal/level-10.png",
     href: "/mass-edit/capital",
+    minTH: 3,
   },
   {
     id: "clan-mgmt",
@@ -50,6 +53,7 @@ const APP_ITEMS: AppItem[] = [
     label: "Forge",
     image: "/images/season-pass/pass-items/perk-auto-forge.png",
     href: "/forge",
+    minTH: 6,
   },
   {
     id: "helpers",
@@ -61,6 +65,8 @@ const APP_ITEMS: AppItem[] = [
 ];
 
 export function WaffleMenu() {
+  const { activePlaythrough } = usePlaythrough();
+  const thLevel = activePlaythrough?.data.homeVillage.townHallLevel ?? 0;
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -97,15 +103,18 @@ export function WaffleMenu() {
             <span className="text-xs font-bold uppercase tracking-widest text-accent">Apps</span>
           </div>
           <div className="grid grid-cols-3 gap-1 p-3">
-            {APP_ITEMS.map((item) =>
-              item.disabled ? (
+            {APP_ITEMS.map((item) => {
+              const thLocked = item.minTH !== undefined && thLevel < item.minTH;
+              const isLocked = item.disabled || thLocked;
+              const lockLabel = thLocked ? `TH ${item.minTH}` : (item.lockedLabel ?? "Soon");
+              return isLocked ? (
                 <div key={item.id} className={disabledItemClass} aria-disabled="true">
                   <img src={item.image} alt={item.label} className="h-10 object-contain" />
                   <span className="text-[11px] font-medium leading-tight text-white/80">
                     {item.label}
                   </span>
                   <span className="text-[9px] font-bold uppercase tracking-wide text-accent/80">
-                    Soon
+                    {lockLabel}
                   </span>
                 </div>
               ) : (
@@ -120,8 +129,8 @@ export function WaffleMenu() {
                     {item.label}
                   </span>
                 </Link>
-              )
-            )}
+              );
+            })}
           </div>
         </div>
       )}

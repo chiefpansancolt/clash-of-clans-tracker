@@ -176,7 +176,7 @@ export default function Home() {
 											onClick={() =>
 												setOpenFaq(openFaq === index ? null : index)
 											}
-											className="flex w-full items-start justify-between text-left text-gray-900 dark:text-white"
+											className="flex w-full cursor-pointer items-start justify-between text-left text-gray-900 dark:text-white"
 											aria-expanded={openFaq === index}
 										>
 											<span className="text-base/7 font-semibold">

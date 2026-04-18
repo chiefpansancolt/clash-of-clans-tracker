@@ -145,8 +145,10 @@ function buildDataIdMap(): Map<number, DataItem> {
 
 function toUpgradeState(entry: ExportEntry) {
   if (entry.timer === undefined) return undefined;
-  // Use now as the start time (we only know remaining seconds, not start time)
-  return { upgradeStartedAt: new Date().toISOString() };
+  const now = new Date();
+  // entry.timer is remaining seconds; approximate start as now
+  const finishesAt = new Date(now.getTime() + (entry.timer ?? 0) * 1000).toISOString();
+  return { upgradeStartedAt: now.toISOString(), finishesAt, builderId: 1 };
 }
 
 function entriesToBuildingRecord(

@@ -182,10 +182,10 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 						<button
 							type="button"
 							onClick={() => handleModeSwitch("fresh")}
-							className={`flex items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors ${
+							className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors ${
 								mode === "fresh"
 									? "border-primary bg-primary text-white"
-									: "cursor-pointer border-gray-200 bg-white text-gray-600 hover:border-secondary hover:bg-secondary/10 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+									: "border-gray-200 bg-white text-gray-600 hover:border-secondary hover:bg-secondary/10 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
 							}`}
 						>
 							<HiSparkles className="h-5 w-5 shrink-0" />
@@ -199,10 +199,10 @@ export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughMod
 						<button
 							type="button"
 							onClick={() => handleModeSwitch("import")}
-							className={`flex items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors ${
+							className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors ${
 								mode === "import"
 									? "border-primary bg-primary text-white"
-									: "cursor-pointer border-gray-200 bg-white text-gray-600 hover:border-secondary hover:bg-secondary/10 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+									: "border-gray-200 bg-white text-gray-600 hover:border-secondary hover:bg-secondary/10 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
 							}`}
 						>
 							<HiCloudDownload className="h-5 w-5 shrink-0" />

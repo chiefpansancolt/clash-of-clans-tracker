@@ -1,7 +1,8 @@
 "use client";
 
 import React, { createContext, startTransition, useContext, useEffect, useState } from "react";
-import type { AppData, Playthrough } from "@/types/app";
+import type { AppData, AppSettings, Playthrough } from "@/types/app";
+import { defaultSettings } from "@/service/storage";
 import type { PlaythroughContextType } from "@/types/contexts";
 import { storageService } from "@/service/storage";
 import { createDefaultVillageData } from "@/lib/utils/villageHelpers";
@@ -9,7 +10,7 @@ import { createDefaultVillageData } from "@/lib/utils/villageHelpers";
 const PlaythroughContext = createContext<PlaythroughContextType | undefined>(undefined);
 
 export function PlaythroughProvider({ children }: { children: React.ReactNode }) {
-	const [appData, setAppData] = useState<AppData>({ playthroughs: [], activePlaythroughId: null });
+	const [appData, setAppData] = useState<AppData>({ playthroughs: [], activePlaythroughId: null, settings: defaultSettings });
 	const [isLoaded, setIsLoaded] = useState(false);
 	const [loadError, setLoadError] = useState<Error | null>(null);
 
@@ -102,8 +103,15 @@ export function PlaythroughProvider({ children }: { children: React.ReactNode })
 
 	const exportData = () => storageService.exportData();
 
+	const updateSettings = (patch: Partial<AppSettings>) => {
+		setAppData((prev) => ({
+			...prev,
+			settings: { ...(prev.settings ?? defaultSettings), ...patch },
+		}));
+	};
+
 	const clearAllData = () => {
-		setAppData({ playthroughs: [], activePlaythroughId: null });
+		setAppData({ playthroughs: [], activePlaythroughId: null, settings: defaultSettings });
 		storageService.clear();
 	};
 
@@ -113,10 +121,12 @@ export function PlaythroughProvider({ children }: { children: React.ReactNode })
 				playthroughs: appData.playthroughs,
 				activePlaythrough,
 				isLoaded,
+				appSettings: appData.settings ?? defaultSettings,
 				setActivePlaythrough,
 				addPlaythrough,
 				updatePlaythrough,
 				deletePlaythrough,
+				updateSettings,
 				importData,
 				exportData,
 				clearAllData,

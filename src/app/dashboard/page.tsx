@@ -31,6 +31,8 @@ export default function DashboardPage() {
 
   const { data } = activePlaythrough;
   const achievementsProgress = calcAchievementsProgress(data.achievements);
+  const thLevel = data.homeVillage.townHallLevel;
+  const helperHutLevel = data.homeVillage.armyBuildings["helper-hut"]?.[0]?.level ?? 0;
 
   return (
     <div className="p-4 md:p-6">
@@ -38,9 +40,13 @@ export default function DashboardPage() {
       <DailiesSection
         dailies={activePlaythrough.dailies ?? defaultDailies}
         playthroughId={activePlaythrough.id}
+        thLevel={thLevel}
+        helperHutLevel={helperHutLevel}
       />
       <HomeVillageSection hv={data.homeVillage} playthrough={activePlaythrough} />
-      <BuilderBaseSection bb={data.builderBase} playthrough={activePlaythrough} />
+      {data.homeVillage.townHallLevel >= 6 && (
+        <BuilderBaseSection bb={data.builderBase} playthrough={activePlaythrough} />
+      )}
       {data.clanCapital.capitalPeak.hallLevel > 0 && (
         <ClanCapitalSection data={data.clanCapital} />
       )}
