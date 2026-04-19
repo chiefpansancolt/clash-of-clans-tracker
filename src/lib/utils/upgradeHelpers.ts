@@ -601,10 +601,27 @@ export function getBuilderTimeline(
     if (hero.upgrade && isActiveUpgrade(hero.upgrade.finishesAt)) {
       activeByBuilder.set(hero.upgrade.builderId, {
         label: `${hero.name} ${hero.level}→${hero.level + 1}`,
-        imageUrl: "",
+        imageUrl: toPublicImageUrl(_heroMap.get(hero.name.toLowerCase().replace(/ /g, "-"))?.images?.icon),
         endsAt: new Date(hero.upgrade.finishesAt),
       });
     }
+  }
+
+  if (hv.townHallUpgrade && isActiveUpgrade(hv.townHallUpgrade.finishesAt)) {
+    activeByBuilder.set(hv.townHallUpgrade.builderId, {
+      label: `Town Hall ${hv.townHallLevel}→${hv.townHallLevel + 1}`,
+      imageUrl: getTownHallImageUrl(hv.townHallLevel + 1),
+      endsAt: new Date(hv.townHallUpgrade.finishesAt),
+    });
+  }
+
+  if (hv.townHallWeaponUpgrade && isActiveUpgrade(hv.townHallWeaponUpgrade.finishesAt)) {
+    const wl = hv.townHallWeaponLevel ?? 1;
+    activeByBuilder.set(hv.townHallWeaponUpgrade.builderId, {
+      label: `TH Weapon ${wl}→${wl + 1}`,
+      imageUrl: getTownHallWeaponUpgradeSteps(hv.townHallLevel, wl)[0]?.imageUrl ?? getTownHallImageUrl(hv.townHallLevel),
+      endsAt: new Date(hv.townHallWeaponUpgrade.finishesAt),
+    });
   }
 
   for (const slot of slots) {

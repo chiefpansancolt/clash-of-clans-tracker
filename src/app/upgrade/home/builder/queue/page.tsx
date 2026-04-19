@@ -69,16 +69,7 @@ import { AvailableBuilderUpgradesPanel } from "@/components/upgrade/queue/Availa
 import { ResourcePlannerModal } from "@/components/upgrade/queue/ResourcePlannerModal";
 import type { BuilderQueueItem } from "@/types/app/queue";
 import type { UpgradeStep } from "@/types/app/upgrade";
-
-interface ActiveUpgradeForSlot {
-  label: string;
-  imageUrl: string;
-  finishesAt: string;
-  level: number;
-  onFinish: () => void;
-  onCancel: () => void;
-  onAdjust: (finishesAt: string) => void;
-}
+import type { ActiveUpgradeForSlot } from "@/types/components/queue";
 
 export default function BuilderQueuePage() {
   const router = useRouter();
@@ -393,7 +384,7 @@ export default function BuilderQueuePage() {
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => setPlannerOpen(true)}
-              className="cursor-pointer rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-[12px] font-bold text-primary hover:bg-primary/20 transition-colors"
+              className="cursor-pointer rounded-lg border border-primary/80 bg-primary/10 px-3 py-1.5 text-[12px] font-bold text-primary hover:bg-primary/20 transition-colors"
             >
               📊 Resource Planner
             </button>

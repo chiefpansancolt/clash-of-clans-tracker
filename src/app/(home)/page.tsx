@@ -167,7 +167,7 @@ export default function Home() {
 						<h2 className="text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl dark:text-white">
 							Frequently asked questions
 						</h2>
-						<dl className="mt-16 divide-y divide-gray-900/10 dark:divide-white/10">
+						<dl className="mt-16 divide-y divide-gray-900/80 dark:divide-white/80">
 							{FAQS.map((faq, index) => (
 								<div key={index} className="py-6 first:pt-0 last:pb-0">
 									<dt>
@@ -206,7 +206,7 @@ export default function Home() {
 			</main>
 
 			<footer className="mt-32">
-				<div className="mx-auto border-t border-gray-200 px-6 py-16 lg:px-8 dark:border-white/10">
+				<div className="mx-auto border-t border-gray-200 px-6 py-16 lg:px-8 dark:border-white/80">
 					<div className="xl:grid xl:grid-cols-3 xl:gap-8">
 						<div className="space-y-8">
 							<p className="text-xl font-bold text-gray-900 dark:text-white">
@@ -252,7 +252,7 @@ export default function Home() {
 							</div>
 						</div>
 					</div>
-					<div className="mt-16 border-t border-gray-900/10 pt-8 sm:mt-20 lg:mt-24 dark:border-white/10">
+					<div className="mt-16 border-t border-gray-900/80 pt-8 sm:mt-20 lg:mt-24 dark:border-white/80">
 						<p className="text-xs/5 text-gray-500 dark:text-gray-400">
 							&copy; {new Date().getFullYear()} {APP_NAME}
 						</p>

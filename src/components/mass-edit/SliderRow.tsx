@@ -65,7 +65,7 @@ export function SliderRow({ label, imageUrl, currentLevel, maxLevel, onChange, i
 
       <span
         className={`w-44 shrink-0 truncate text-sm font-medium ${
-          indent ? "text-secondary" : isLocked ? "text-secondary/60" : "text-gray-900"
+          indent ? "text-secondary" : isLocked ? "text-secondary/80" : "text-gray-900"
         }`}
       >
         {indent && <img src="/images/other/supercharge.png" alt="Supercharge" className="inline-block h-4 w-4 mr-1 object-contain" />}

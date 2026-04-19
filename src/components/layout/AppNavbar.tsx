@@ -9,13 +9,13 @@ export function AppNavbar() {
 	const { sidebarOpen, toggleSidebar } = useUI();
 
 	return (
-		<Navbar fluid className="border-b border-primary/30 bg-primary">
+		<Navbar fluid className="border-b border-primary/80 bg-primary">
 			<div className="flex w-full items-center justify-between">
 				<div className="flex items-center gap-3">
 					<Button
 						onClick={toggleSidebar}
 						size="sm"
-						className="mr-4 border-white/30 bg-white/10 text-white hover:bg-white/20 md:hidden"
+						className="mr-4 border-white/80 bg-white/10 text-white hover:bg-white/20 md:hidden"
 					>
 						{sidebarOpen ? <HiX className="size-6" /> : <HiMenu className="size-6" />}
 						<span className="sr-only">Toggle sidebar</span>

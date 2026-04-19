@@ -19,22 +19,9 @@ import { RiLockLine, RiAddLine } from "react-icons/ri";
 import { formatTimeRemaining, formatFullNumber, formatBuildTime } from "@/lib/utils/upgradeHelpers";
 import { QueueItem } from "@/components/upgrade/queue/QueueItem";
 import type { PetQueueItem, QueueConflict } from "@/types/app/queue";
+import type { PetQueueCardProps, PetActiveUpgrade } from "@/types/components/queue";
 
-interface ActiveUpgrade {
-  label: string;
-  finishesAt: string;
-}
-
-interface Props {
-  queue: PetQueueItem[];
-  activeUpgrade?: ActiveUpgrade;
-  isBusy: boolean;
-  conflicts: QueueConflict[];
-  onQueueChange: (newQueue: PetQueueItem[]) => void;
-  onAddClick: () => void;
-}
-
-function ActiveItem({ upgrade }: { upgrade: ActiveUpgrade }) {
+function ActiveItem({ upgrade }: { upgrade: PetActiveUpgrade }) {
   const [countdown, setCountdown] = useState(() => formatTimeRemaining(upgrade.finishesAt));
 
   useEffect(() => {
@@ -55,7 +42,7 @@ function ActiveItem({ upgrade }: { upgrade: ActiveUpgrade }) {
   );
 }
 
-export function PetQueueCard({ queue, activeUpgrade, isBusy, conflicts, onQueueChange, onAddClick }: Props) {
+export function PetQueueCard({ queue, activeUpgrade, isBusy, conflicts, onQueueChange, onAddClick }: PetQueueCardProps) {
   const conflictIds = new Set(conflicts.map((c) => c.queueItemId));
   const conflictMap = new Map(conflicts.map((c) => [c.queueItemId, c.message]));
   const hasErrors = conflicts.length > 0;
@@ -102,7 +89,7 @@ export function PetQueueCard({ queue, activeUpgrade, isBusy, conflicts, onQueueC
         <span className="text-[12px] font-extrabold text-white">Pet House</span>
         <button
           onClick={onAddClick}
-          className="ml-auto flex items-center gap-1 rounded-md border border-accent/30 bg-accent/10 px-2 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/20 cursor-pointer"
+          className="ml-auto flex items-center gap-1 rounded-md border border-accent/80 bg-accent/10 px-2 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/20 cursor-pointer"
         >
           <RiAddLine size={11} />
           Add
@@ -116,7 +103,7 @@ export function PetQueueCard({ queue, activeUpgrade, isBusy, conflicts, onQueueC
           <p className="text-[11px] text-white/80">No pets queued</p>
           <button
             onClick={onAddClick}
-            className="rounded-lg border border-accent/30 bg-accent/10 px-4 py-1.5 text-[11px] font-bold text-accent hover:bg-accent/20 cursor-pointer"
+            className="rounded-lg border border-accent/80 bg-accent/10 px-4 py-1.5 text-[11px] font-bold text-accent hover:bg-accent/20 cursor-pointer"
           >
             + Add Pet Upgrade
           </button>
@@ -144,7 +131,7 @@ export function PetQueueCard({ queue, activeUpgrade, isBusy, conflicts, onQueueC
       )}
 
       {queue.length > 0 && (
-        <div className="flex flex-wrap gap-3 px-3 py-2 border-t border-secondary/25">
+        <div className="flex flex-wrap gap-3 px-3 py-2 border-t border-secondary/80">
           <div className="flex flex-col">
             <span className="text-[13px] font-extrabold text-accent">{totalDuration}</span>
             <span className="text-[9px] font-bold uppercase tracking-wide text-white/80">Total Time</span>

@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { formatBuildTime } from "@/lib/utils/upgradeHelpers";
-import type { BuilderSlot } from "@/types/app/upgrade";
 import type { TimelineBlock } from "@/types/app/queue";
+import type { QueueTimelineProps, HoveredBlock } from "@/types/components/queue";
 
 const ZOOM_OPTIONS = [
   { label: "1d", days: 1 },
@@ -11,18 +11,6 @@ const ZOOM_OPTIONS = [
   { label: "30d", days: 30 },
   { label: "90d", days: 90 },
 ] as const;
-
-interface Props {
-  timeline: Record<string, TimelineBlock[]>;
-  slots: BuilderSlot[];
-  conflictItemIds?: Set<string>;
-}
-
-interface HoveredBlock {
-  block: TimelineBlock;
-  x: number;
-  y: number;
-}
 
 function formatTime(date: Date) {
   return date.toLocaleString("en-US", {
@@ -59,7 +47,7 @@ function BlockTooltip({ block }: { block: TimelineBlock }) {
   );
 }
 
-export function QueueTimeline({ timeline, slots, conflictItemIds }: Props) {
+export function QueueTimeline({ timeline, slots, conflictItemIds }: QueueTimelineProps) {
   const [windowDays, setWindowDays] = useState(1);
   const [hovered, setHovered] = useState<HoveredBlock | null>(null);
 
@@ -151,7 +139,7 @@ export function QueueTimeline({ timeline, slots, conflictItemIds }: Props) {
             {timeMarkers.map((m) => (
               <span
                 key={m.label + m.pct}
-                className="absolute text-[9px] font-semibold text-white/30"
+                className="absolute text-[9px] font-semibold text-white/80"
                 style={{ left: `calc(90px + ${m.pct}%)`, transform: "translateX(-50%)" }}
               >
                 {m.label}

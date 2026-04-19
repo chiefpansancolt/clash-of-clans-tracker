@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { FaCheck, FaLock } from "react-icons/fa";
 import { useEffect, useRef, useState } from "react";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
@@ -105,9 +106,7 @@ function TimerChip({ label, imageUrl, timer, onCollect, onAdjust }: TimerChipPro
         <Image src={imageUrl} alt={label} fill sizes="40px" className="object-contain" />
         {available && (
           <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-green-500">
-            <svg viewBox="0 0 8 8" className="h-2 w-2 fill-white">
-              <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <FaCheck className="h-2 w-2 text-white" />
           </span>
         )}
       </div>
@@ -199,9 +198,7 @@ function LockedChip({ label, imageUrl }: { label: string; imageUrl: string }) {
       <div className="relative h-10 w-10">
         <Image src={imageUrl} alt={label} fill sizes="40px" className="object-contain grayscale" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <svg viewBox="0 0 16 16" className="h-5 w-5 drop-shadow" fill="white">
-            <path d="M11 7V5a3 3 0 0 0-6 0v2H4a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1ZM7 5a1 1 0 1 1 2 0v2H7V5Z" />
-          </svg>
+          <FaLock className="h-5 w-5 text-white drop-shadow" />
         </div>
       </div>
       <span className="text-[9px] font-bold uppercase tracking-wide text-white/80 text-center leading-tight">
@@ -250,13 +247,9 @@ function GoldPassDisplay({ goldPass }: { goldPass: GoldPassData }) {
         {item.type === "pct" ? (
           <span className="ml-auto text-[10px] font-extrabold text-accent shrink-0">{item.value}%</span>
         ) : item.unlocked ? (
-          <svg viewBox="0 0 8 8" className="ml-auto h-3 w-3 shrink-0">
-            <path d="M1 4l2 2 4-4" stroke="#f0b429" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <FaCheck className="ml-auto h-3 w-3 shrink-0 text-accent" />
         ) : (
-          <svg viewBox="0 0 16 16" className="ml-auto h-3 w-3 shrink-0 fill-white/80">
-            <path d="M11 7V5a3 3 0 0 0-6 0v2H4a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1ZM7 5a1 1 0 1 1 2 0v2H7V5Z" />
-          </svg>
+          <FaLock className="ml-auto h-3 w-3 shrink-0 text-white/80" />
         )}
       </div>
     );

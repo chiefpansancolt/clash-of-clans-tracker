@@ -23,7 +23,7 @@ export default function GlobalError({
           {error.message || "An unexpected error occurred while loading your data."}
         </p>
         {error.digest && (
-          <p className="mt-1 font-mono text-xs text-white/40">ref: {error.digest}</p>
+          <p className="mt-1 font-mono text-xs text-white/80">ref: {error.digest}</p>
         )}
       </div>
 

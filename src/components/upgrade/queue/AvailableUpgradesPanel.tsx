@@ -37,8 +37,15 @@ import {
   getTownHallMaxLevel,
 } from "@/lib/utils/upgradeHelpers";
 import type { HomeVillageData } from "@/types/app/game";
-import type { BuilderSlot } from "@/types/app/upgrade";
 import type { BuilderQueueItem, ResearchQueueItem, PetQueueItem } from "@/types/app/queue";
+import type {
+  AvailableBuilderItem,
+  AvailableResearchItem,
+  AvailablePetItem,
+  BuilderPanelProps,
+  ResearchPanelProps,
+  PetPanelProps,
+} from "@/types/components/queue";
 
 const RESOURCE_ICONS: Record<string, string> = {
   Gold: "/images/other/gold.png",
@@ -54,70 +61,6 @@ type PanelMode = "builder" | "research" | "pet";
 type BuilderCategory = "all" | "defenses" | "guardians" | "armyBuildings" | "resourceBuildings" | "traps" | "heroes" | "townHall" | "craftedDefenses" | "supercharges";
 type ResearchCategory = "all" | "troops" | "spells" | "siegeMachines";
 
-interface AvailableBuilderItem {
-  buildingId: string;
-  instanceIndex: number;
-  name: string;
-  imageUrl: string;
-  category: BuilderQueueItem["category"];
-  currentLevel: number;
-  nextLevel: number;
-  cost: number;
-  costResource: string;
-  durationMs: number;
-  isGuardian?: boolean;
-  isCrafted?: boolean;
-  isSupercharge?: boolean;
-}
-
-interface AvailableResearchItem {
-  name: string;
-  imageUrl: string;
-  category: ResearchQueueItem["category"];
-  currentLevel: number;
-  nextLevel: number;
-  cost: number;
-  costResource: string;
-  durationMs: number;
-  isUnlock: boolean;
-}
-
-interface AvailablePetItem {
-  name: string;
-  imageUrl: string;
-  currentLevel: number;
-  nextLevel: number;
-  cost: number;
-  costResource: string;
-  durationMs: number;
-}
-
-interface BuilderPanelProps {
-  hv: HomeVillageData;
-  slots: BuilderSlot[];
-  targetSlotId?: number;
-  builderBoostPct?: 0 | 10 | 15 | 20;
-  onAdd: (item: BuilderQueueItem, slotId: number) => void;
-  onClose: () => void;
-}
-
-interface ResearchPanelProps {
-  hv: HomeVillageData;
-  slots: BuilderSlot[];
-  targetSlotId?: number;
-  researchBoostPct?: 0 | 10 | 15 | 20;
-  onAdd: (item: ResearchQueueItem, slotId: number) => void;
-  onUnlock: (name: string, category: ResearchQueueItem["category"]) => void;
-  onClose: () => void;
-}
-
-interface PetPanelProps {
-  hv: HomeVillageData;
-  onAdd: (item: PetQueueItem) => void;
-  onClose: () => void;
-}
-
-// ─── Builder Panel ────────────────────────────────────────────────────────────
 
 export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, builderBoostPct = 0, onAdd, onClose }: BuilderPanelProps) {
   const [category, setCategory] = useState<BuilderCategory>("all");
@@ -393,11 +336,11 @@ export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, builder
               >
                 <div className="relative shrink-0">
                   {it.imageUrl ? (
-                    <div className={`relative h-11 w-11 overflow-hidden rounded border ${it.isSupercharge ? "border-cyan-400/30" : "border-white/10"}`}>
+                    <div className={`relative h-11 w-11 overflow-hidden rounded ${it.isSupercharge ? "border border-cyan-400/80" : ""}`}>
                       <Image src={it.imageUrl} alt={it.name} fill className="object-contain" sizes="44px" />
                     </div>
                   ) : (
-                    <div className="h-11 w-11 shrink-0 rounded bg-white/6 border border-white/10" />
+                    <div className="h-11 w-11 shrink-0 rounded bg-white/6" />
                   )}
                   {it.isSupercharge && (
                     <div className="absolute -top-1 -right-1 h-4 w-4">
@@ -437,7 +380,7 @@ export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, builder
                 </div>
                 <button
                   onClick={() => handleAdd(it)}
-                  className="shrink-0 cursor-pointer rounded border border-accent/35 bg-accent/10 px-1.5 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/25 transition-colors"
+                  className="shrink-0 cursor-pointer rounded border border-accent/80 bg-accent/10 px-1.5 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/25 transition-colors"
                 >
                   +
                 </button>
@@ -459,7 +402,7 @@ export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, builder
                   ? "bg-accent border-accent text-primary"
                   : s.busy
                   ? "bg-white/4 border-white/10 text-white/80"
-                  : "bg-primary/60 border-accent/30 text-white hover:border-accent"
+                  : "bg-primary/60 border-accent/80 text-white hover:border-accent"
               }`}
             >
               {s.label.replace("Builder ", "B")}
@@ -470,8 +413,6 @@ export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, builder
     </SlidePanel>
   );
 }
-
-// ─── Research Panel ───────────────────────────────────────────────────────────
 
 export function AvailableResearchUpgradesPanel({ hv, slots, targetSlotId, researchBoostPct = 0, onAdd, onUnlock, onClose }: ResearchPanelProps) {
   const [category, setCategory] = useState<ResearchCategory>("all");
@@ -597,11 +538,11 @@ export function AvailableResearchUpgradesPanel({ hv, slots, targetSlotId, resear
                 className="flex items-center gap-2 rounded-lg px-2.5 py-2 hover:bg-white/5 transition-colors"
               >
                 {it.imageUrl ? (
-                  <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded border border-white/10">
+                  <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded">
                     <Image src={it.imageUrl} alt={it.name} fill className="object-contain" sizes="44px" />
                   </div>
                 ) : (
-                  <div className="h-11 w-11 shrink-0 rounded bg-white/6 border border-white/10" />
+                  <div className="h-11 w-11 shrink-0 rounded bg-white/6" />
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-[11px] font-bold text-white truncate">{it.name}</p>
@@ -631,7 +572,7 @@ export function AvailableResearchUpgradesPanel({ hv, slots, targetSlotId, resear
                 </div>
                 <button
                   onClick={() => handleAdd(it)}
-                  className="shrink-0 cursor-pointer rounded border border-accent/35 bg-accent/10 px-1.5 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/25 transition-colors"
+                  className="shrink-0 cursor-pointer rounded border border-accent/80 bg-accent/10 px-1.5 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/25 transition-colors"
                 >
                   +
                 </button>
@@ -654,7 +595,7 @@ export function AvailableResearchUpgradesPanel({ hv, slots, targetSlotId, resear
                     ? "bg-accent border-accent text-primary"
                     : s.busy
                     ? "bg-white/4 border-white/10 text-white/80"
-                    : "bg-primary/60 border-accent/30 text-white hover:border-accent"
+                    : "bg-primary/60 border-accent/80 text-white hover:border-accent"
                 }`}
               >
                 {s.label}
@@ -666,8 +607,6 @@ export function AvailableResearchUpgradesPanel({ hv, slots, targetSlotId, resear
     </SlidePanel>
   );
 }
-
-// ─── Pet Panel ────────────────────────────────────────────────────────────────
 
 export function AvailablePetUpgradesPanel({ hv, onAdd, onClose }: PetPanelProps) {
   const [search, setSearch] = useState("");
@@ -741,11 +680,11 @@ export function AvailablePetUpgradesPanel({ hv, onAdd, onClose }: PetPanelProps)
                 className="flex items-center gap-2 rounded-lg px-2.5 py-2 hover:bg-white/5 transition-colors"
               >
                 {it.imageUrl ? (
-                  <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded border border-white/10">
+                  <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded">
                     <Image src={it.imageUrl} alt={it.name} fill className="object-contain" sizes="44px" />
                   </div>
                 ) : (
-                  <div className="h-11 w-11 shrink-0 rounded bg-white/6 border border-white/10" />
+                  <div className="h-11 w-11 shrink-0 rounded bg-white/6" />
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-[11px] font-bold text-white truncate">{it.name}</p>
@@ -761,7 +700,7 @@ export function AvailablePetUpgradesPanel({ hv, onAdd, onClose }: PetPanelProps)
                 </div>
                 <button
                   onClick={() => handleAdd(it)}
-                  className="shrink-0 cursor-pointer rounded border border-accent/35 bg-accent/10 px-1.5 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/25 transition-colors"
+                  className="shrink-0 cursor-pointer rounded border border-accent/80 bg-accent/10 px-1.5 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/25 transition-colors"
                 >
                   +
                 </button>
@@ -773,8 +712,6 @@ export function AvailablePetUpgradesPanel({ hv, onAdd, onClose }: PetPanelProps)
     </SlidePanel>
   );
 }
-
-// ─── Shared slide panel shell ─────────────────────────────────────────────────
 
 function SlidePanel({
   children,

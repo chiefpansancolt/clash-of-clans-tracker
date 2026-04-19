@@ -19,29 +19,8 @@ const RESOURCE_ICONS: Record<string, string> = {
   Gems: "/images/other/gem.png",
 };
 import { QueueItem } from "@/components/upgrade/queue/QueueItem";
-import type { BuilderSlot } from "@/types/app/upgrade";
 import type { BuilderQueueItem, QueueConflict } from "@/types/app/queue";
-
-interface ActiveUpgrade {
-  label: string;
-  imageUrl: string;
-  finishesAt: string;
-  level: number;
-  onFinish: () => void;
-  onCancel: () => void;
-  onAdjust: (finishesAt: string) => void;
-}
-
-interface Props {
-  slot: BuilderSlot;
-  queue: BuilderQueueItem[];
-  activeUpgrade?: ActiveUpgrade;
-  conflicts: QueueConflict[];
-  multiInstanceBuildingIds?: Set<string>;
-  onQueueChange: (newQueue: BuilderQueueItem[]) => void;
-  onAddClick: (slotId: number) => void;
-  onStartFirst?: (item: BuilderQueueItem) => void;
-}
+import type { BuilderQueueCardProps, ActiveUpgradeWithControls, ActiveItemProps } from "@/types/components/queue";
 
 function resourceColorClass(resource: string) {
   if (resource === "Gold") return "text-accent";
@@ -64,12 +43,6 @@ function ResourceFooterTotal({ resource, amount }: { resource: string; amount: n
       <span className="text-[9px] font-bold uppercase tracking-wide text-white/80">{resource}</span>
     </div>
   );
-}
-
-interface ActiveItemProps {
-  upgrade: ActiveUpgrade;
-  onRequestFinish: () => void;
-  onRequestAdjust: () => void;
 }
 
 function ActiveItem({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemProps) {
@@ -112,7 +85,7 @@ function ActiveItem({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemPro
         <div className="flex items-center gap-1">
           <button
             onClick={onRequestFinish}
-            className="cursor-pointer rounded-md bg-accent/15 border border-accent/30 px-2 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/25 transition-colors"
+            className="cursor-pointer rounded-md bg-accent/15 border border-accent/80 px-2 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/25 transition-colors"
           >
             Finish
           </button>
@@ -135,7 +108,7 @@ function ActiveItem({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemPro
   );
 }
 
-export function BuilderQueueCard({ slot, queue, activeUpgrade, conflicts, multiInstanceBuildingIds, onQueueChange, onAddClick, onStartFirst }: Props) {
+export function BuilderQueueCard({ slot, queue, activeUpgrade, conflicts, multiInstanceBuildingIds, onQueueChange, onAddClick, onStartFirst }: BuilderQueueCardProps) {
   const conflictIds = new Set(conflicts.map((c) => c.queueItemId));
   const conflictMap = new Map(conflicts.map((c) => [c.queueItemId, c.message]));
   const hasErrors = conflicts.length > 0;
@@ -184,7 +157,7 @@ export function BuilderQueueCard({ slot, queue, activeUpgrade, conflicts, multiI
         <span className="text-[12px] font-extrabold text-white">{slot.label}</span>
         <button
           onClick={() => onAddClick(slot.id)}
-          className="ml-auto flex items-center gap-1 rounded-md border border-accent/30 bg-accent/10 px-2 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/20 cursor-pointer"
+          className="ml-auto flex items-center gap-1 rounded-md border border-accent/80 bg-accent/10 px-2 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/20 cursor-pointer"
         >
           <RiAddLine size={11} />
           Add
@@ -227,7 +200,7 @@ export function BuilderQueueCard({ slot, queue, activeUpgrade, conflicts, multiI
             <p className="text-[11px] text-white/80">No upgrades queued</p>
             <button
               onClick={() => onAddClick(slot.id)}
-              className="rounded-lg border border-accent/30 bg-accent/10 px-4 py-1.5 text-[11px] font-bold text-accent hover:bg-accent/20 cursor-pointer"
+              className="rounded-lg border border-accent/80 bg-accent/10 px-4 py-1.5 text-[11px] font-bold text-accent hover:bg-accent/20 cursor-pointer"
             >
               + Add Upgrade
             </button>

@@ -1,5 +1,5 @@
 import type { BuilderSlot, UpgradeStep } from "@/types/app/upgrade";
-import type { UpgradeState } from "@/types/app/game";
+import type { UpgradeState, HomeVillageData } from "@/types/app/game";
 
 export interface InstanceData {
   currentLevel: number;
@@ -51,4 +51,11 @@ export interface BuilderPickerModalProps {
   itemName: string;
   nextLevel: number;
   step: UpgradeStep;
+}
+
+export interface TownHallTabProps {
+  hv: HomeVillageData;
+  thLevel: number;
+  slots: BuilderSlot[];
+  onSave: (newHv: HomeVillageData) => void;
 }

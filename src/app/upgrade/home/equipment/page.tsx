@@ -115,7 +115,7 @@ export default function EquipmentUpgradePage() {
                           )}
                           <span className="flex-1 text-sm font-bold text-white">{eq.name}</span>
                           <span className="text-xs text-white/80">
-                            {currentLevel}<span className="text-white/40">/{eq.maxLevel}</span>
+                            {currentLevel}<span className="text-white/80">/{eq.maxLevel}</span>
                           </span>
                           {atMax && (
                             <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent">Max</span>
@@ -126,7 +126,7 @@ export default function EquipmentUpgradePage() {
                         {steps.length > 0 && (
                           <div className="grid grid-cols-3 gap-1.5 p-2">
                             {steps.map((step, si) => (
-                              <div key={step.level} className="flex flex-col gap-1 rounded-md border border-white/10 bg-white/5 p-2">
+                              <div key={step.level} className="flex flex-col gap-1 rounded-md border border-white/80 bg-white/5 p-2">
                                 <div className="flex items-center justify-between">
                                   <span className="text-[10px] font-bold text-white/80">→ Lv {step.level}</span>
                                 </div>

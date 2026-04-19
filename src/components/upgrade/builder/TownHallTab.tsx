@@ -18,17 +18,9 @@ import {
   cancelTownHallWeaponUpgrade,
   adjustTownHallWeaponUpgrade,
 } from "@/lib/utils/upgradeActions";
-import type { HomeVillageData } from "@/types/app/game";
-import type { BuilderSlot } from "@/types/app/upgrade";
+import type { TownHallTabProps } from "@/types/components/upgrade";
 
-interface Props {
-  hv: HomeVillageData;
-  thLevel: number;
-  slots: BuilderSlot[];
-  onSave: (newHv: HomeVillageData) => void;
-}
-
-export function TownHallTab({ hv, thLevel, slots, onSave }: Props) {
+export function TownHallTab({ hv, thLevel, slots, onSave }: TownHallTabProps) {
   const maxTH = getTownHallMaxLevel();
   const thImageUrl = getTownHallImageUrl(thLevel);
   const nextStep = thLevel < maxTH ? getTownHallUpgradeStep(thLevel) : null;

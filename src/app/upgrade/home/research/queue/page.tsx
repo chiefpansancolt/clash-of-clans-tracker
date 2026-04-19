@@ -177,7 +177,7 @@ export default function ResearchQueuePage() {
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => setPlannerOpen(true)}
-              className="cursor-pointer rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-[12px] font-bold text-primary hover:bg-primary/20 transition-colors"
+              className="cursor-pointer rounded-lg border border-primary/80 bg-primary/10 px-3 py-1.5 text-[12px] font-bold text-primary hover:bg-primary/20 transition-colors"
             >
               📊 Resource Planner
             </button>

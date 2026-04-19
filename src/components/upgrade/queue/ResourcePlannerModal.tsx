@@ -2,13 +2,7 @@
 
 import { RiCloseLine } from "react-icons/ri";
 import { formatFullNumber } from "@/lib/utils/upgradeHelpers";
-import type { ResourceGroup } from "@/types/app/queue";
-
-interface Props {
-  groups: ResourceGroup[];
-  title?: string;
-  onClose: () => void;
-}
+import type { ResourcePlannerModalProps } from "@/types/components/queue";
 
 function resourceClass(resource: string) {
   if (resource === "Gold") return "text-accent";
@@ -24,7 +18,7 @@ function formatDate(date: Date): string {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-export function ResourcePlannerModal({ groups, title = "Resource Planner", onClose }: Props) {
+export function ResourcePlannerModal({ groups, title = "Resource Planner", onClose }: ResourcePlannerModalProps) {
   return (
     <>
       <div className="fixed inset-0 z-50 bg-black/65 flex items-center justify-center p-4" onClick={onClose} />
@@ -88,7 +82,7 @@ export function ResourcePlannerModal({ groups, title = "Resource Planner", onClo
                       {group.events.map((ev, ei) => (
                         <div
                           key={ei}
-                          className="flex items-center gap-3 px-4 py-2.5 border-b border-secondary/25 last:border-b-0"
+                          className="flex items-center gap-3 px-4 py-2.5 border-b border-secondary/80 last:border-b-0"
                         >
                           {/* Builder tag */}
                           <span className="shrink-0 rounded bg-white/8 px-2 py-0.5 text-[10px] font-bold text-white/80 whitespace-nowrap">
@@ -121,7 +115,7 @@ export function ResourcePlannerModal({ groups, title = "Resource Planner", onClo
 
                       {/* Totals footer — only for grouped cards */}
                       {isGrouped && (
-                        <div className="flex flex-wrap items-center gap-2 border-t border-secondary/25 bg-black/20 px-4 py-2">
+                        <div className="flex flex-wrap items-center gap-2 border-t border-secondary/80 bg-black/20 px-4 py-2">
                           <span className="text-[10px] font-bold uppercase tracking-wide text-white/80 mr-1">
                             Total needed
                           </span>

@@ -36,7 +36,7 @@ export default function CraftedUpgradePage() {
           <p className="py-8 text-center text-sm text-gray-400">Crafted Defenses unlock at TH18.</p>
         ) : (
           <>
-            <p className="mb-3 text-sm text-white/60">
+            <p className="mb-3 text-sm text-white/80">
               Crafted defense module levels are set in{" "}
               <Link href="/mass-edit/home" className="text-accent underline">
                 Mass Edit
@@ -74,9 +74,9 @@ export default function CraftedUpgradePage() {
                             className="flex items-center gap-3 px-3 py-2"
                           >
                             <span className="flex-1 text-sm text-white/80">{mod.name}</span>
-                            <span className="text-sm text-white/60">
+                            <span className="text-sm text-white/80">
                               Lvl {currentLevel}
-                              <span className="text-white/40"> / {mod.maxLevel}</span>
+                              <span className="text-white/80"> / {mod.maxLevel}</span>
                             </span>
                             {currentLevel >= mod.maxLevel && (
                               <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[11px] font-bold text-accent">

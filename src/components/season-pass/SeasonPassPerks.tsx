@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { FaCheck } from "react-icons/fa";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { defaultDailies } from "@/lib/services/storage";
 import type { GoldPassData } from "@/types/app/playthrough";
@@ -140,12 +141,10 @@ export function SeasonPassPerks() {
                   <p className="text-[10px] text-white/80">{description}</p>
                 </div>
                 <div className={`h-5 w-5 shrink-0 rounded border-2 flex items-center justify-center transition-colors ${
-                  unlocked ? "bg-accent border-accent" : "border-white/30 bg-transparent"
+                  unlocked ? "bg-accent border-accent" : "border-white/80 bg-transparent"
                 }`}>
                   {unlocked && (
-                    <svg viewBox="0 0 10 10" className="h-3 w-3">
-                      <path d="M1.5 5l2.5 2.5 4.5-5" stroke="#1a3869" strokeWidth="1.75" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                    <FaCheck className="h-3 w-3 text-primary" />
                   )}
                 </div>
               </button>
@@ -170,12 +169,10 @@ export function SeasonPassPerks() {
                   <p className="text-[10px] text-white/80">Adds a daily resource production bonus</p>
                 </div>
                 <div className={`h-5 w-5 shrink-0 rounded border-2 flex items-center justify-center transition-colors ${
-                  unlocked ? "bg-accent border-accent" : "border-white/30 bg-transparent"
+                  unlocked ? "bg-accent border-accent" : "border-white/80 bg-transparent"
                 }`}>
                   {unlocked && (
-                    <svg viewBox="0 0 10 10" className="h-3 w-3">
-                      <path d="M1.5 5l2.5 2.5 4.5-5" stroke="#1a3869" strokeWidth="1.75" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                    <FaCheck className="h-3 w-3 text-primary" />
                   )}
                 </div>
               </button>

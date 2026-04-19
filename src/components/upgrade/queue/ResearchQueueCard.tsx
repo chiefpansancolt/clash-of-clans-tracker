@@ -22,8 +22,8 @@ import { formatTimeRemaining, formatBuildTime, formatFullNumber } from "@/lib/ut
 import { FinishEarlyModal } from "@/components/upgrade/FinishEarlyModal";
 import { AdjustTimeModal } from "@/components/upgrade/AdjustTimeModal";
 import { QueueItem } from "@/components/upgrade/queue/QueueItem";
-import type { BuilderSlot } from "@/types/app/upgrade";
 import type { ResearchQueueItem, QueueConflict } from "@/types/app/queue";
+import type { ResearchQueueCardProps, ActiveItemProps } from "@/types/components/queue";
 
 const RESOURCE_ICONS: Record<string, string> = {
   Gold: "/images/other/gold.png",
@@ -34,36 +34,10 @@ const RESOURCE_ICONS: Record<string, string> = {
   Gems: "/images/other/gem.png",
 };
 
-interface ActiveUpgrade {
-  label: string;
-  imageUrl: string;
-  finishesAt: string;
-  level: number;
-  onFinish: () => void;
-  onCancel: () => void;
-  onAdjust: (finishesAt: string) => void;
-}
-
-interface Props {
-  slot: BuilderSlot;
-  queue: ResearchQueueItem[];
-  activeUpgrade?: ActiveUpgrade;
-  conflicts: QueueConflict[];
-  onQueueChange: (newQueue: ResearchQueueItem[]) => void;
-  onAddClick: (slotId: number) => void;
-  onStartFirst?: (item: ResearchQueueItem) => void;
-}
-
 function resourceColorClass(resource: string) {
   if (resource === "Gold") return "text-accent";
   if (resource === "Dark Elixir") return "text-blue-300";
   return "text-purple-300";
-}
-
-interface ActiveItemProps {
-  upgrade: ActiveUpgrade;
-  onRequestFinish: () => void;
-  onRequestAdjust: () => void;
 }
 
 function ActiveItem({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemProps) {
@@ -104,7 +78,7 @@ function ActiveItem({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemPro
         <div className="flex items-center gap-1">
           <button
             onClick={onRequestFinish}
-            className="cursor-pointer rounded-md bg-accent/15 border border-accent/30 px-2 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/25 transition-colors"
+            className="cursor-pointer rounded-md bg-accent/15 border border-accent/80 px-2 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/25 transition-colors"
           >
             Finish
           </button>
@@ -127,7 +101,7 @@ function ActiveItem({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemPro
   );
 }
 
-export function ResearchQueueCard({ slot, queue, activeUpgrade, conflicts, onQueueChange, onAddClick, onStartFirst }: Props) {
+export function ResearchQueueCard({ slot, queue, activeUpgrade, conflicts, onQueueChange, onAddClick, onStartFirst }: ResearchQueueCardProps) {
   const conflictIds = new Set(conflicts.map((c) => c.queueItemId));
   const conflictMap = new Map(conflicts.map((c) => [c.queueItemId, c.message]));
   const hasErrors = conflicts.length > 0;
@@ -177,7 +151,7 @@ export function ResearchQueueCard({ slot, queue, activeUpgrade, conflicts, onQue
         <span className="text-[12px] font-extrabold text-white">{slot.label}</span>
         <button
           onClick={() => onAddClick(slot.id)}
-          className="ml-auto flex items-center gap-1 rounded-md border border-accent/30 bg-accent/10 px-2 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/20 cursor-pointer"
+          className="ml-auto flex items-center gap-1 rounded-md border border-accent/80 bg-accent/10 px-2 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/20 cursor-pointer"
         >
           <RiAddLine size={11} />
           Add
@@ -215,7 +189,7 @@ export function ResearchQueueCard({ slot, queue, activeUpgrade, conflicts, onQue
           <p className="text-[11px] text-white/80">No research queued</p>
           <button
             onClick={() => onAddClick(slot.id)}
-            className="rounded-lg border border-accent/30 bg-accent/10 px-4 py-1.5 text-[11px] font-bold text-accent hover:bg-accent/20 cursor-pointer"
+            className="rounded-lg border border-accent/80 bg-accent/10 px-4 py-1.5 text-[11px] font-bold text-accent hover:bg-accent/20 cursor-pointer"
           >
             + Add Research
           </button>
@@ -244,7 +218,7 @@ export function ResearchQueueCard({ slot, queue, activeUpgrade, conflicts, onQue
       )}
 
       {queue.length > 0 && (
-        <div className="flex flex-wrap gap-3 px-3 py-2 border-t border-secondary/25">
+        <div className="flex flex-wrap gap-3 px-3 py-2 border-t border-secondary/80">
           <div className="flex flex-col">
             <span className="text-[13px] font-extrabold text-accent">{totalDuration}</span>
             <span className="text-[9px] font-bold uppercase tracking-wide text-white/80">Total Time</span>

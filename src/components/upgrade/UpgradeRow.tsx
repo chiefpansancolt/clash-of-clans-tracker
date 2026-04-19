@@ -250,7 +250,7 @@ export function UpgradeRow({
                           const boostedTime = formatBuildTime(msToBuildTime(boostedDurationMs));
                           const isFirst = si === 0 && !inst.upgradeState;
                           return (
-                            <div key={`${step.isSupercharge ? "sc" : ""}${step.level}`} className={`flex flex-col gap-1 rounded-md border p-2 ${step.isSupercharge ? "border-cyan-400/30 bg-cyan-400/5" : "border-white/10 bg-white/5"}`}>
+                            <div key={`${step.isSupercharge ? "sc" : ""}${step.level}`} className={`flex flex-col gap-1 rounded-md border p-2 ${step.isSupercharge ? "border-cyan-400/80 bg-cyan-400/5" : "border-white/80 bg-white/5"}`}>
                               <div className="flex items-center justify-between gap-1">
                                 <span className={`flex items-center gap-1 text-[10px] font-bold ${step.isSupercharge ? "text-cyan-300" : "text-white/80"}`}>
                                   {step.isSupercharge ? (
@@ -335,7 +335,7 @@ export function UpgradeRow({
             <div className="flex flex-wrap items-center gap-y-1 border-t border-secondary/80 px-3 py-2">
               {footerItems.map((item, i) => (
                 <React.Fragment key={i}>
-                  {i > 0 && <span className="mx-2 text-white/30">·</span>}
+                  {i > 0 && <span className="mx-2 text-white/80">·</span>}
                   {item}
                 </React.Fragment>
               ))}

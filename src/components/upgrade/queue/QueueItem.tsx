@@ -6,6 +6,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { RiDraggable, RiCloseLine } from "react-icons/ri";
 import { formatFullNumber, formatBuildTime } from "@/lib/utils/upgradeHelpers";
 import type { BuilderQueueItem, ResearchQueueItem, PetQueueItem } from "@/types/app/queue";
+import type { QueueItemProps } from "@/types/components/queue";
 
 const RESOURCE_ICONS: Record<string, string> = {
   Gold: "/images/other/gold.png",
@@ -17,15 +18,6 @@ const RESOURCE_ICONS: Record<string, string> = {
 };
 
 type AnyQueueItem = BuilderQueueItem | ResearchQueueItem | PetQueueItem;
-
-interface Props {
-  item: AnyQueueItem;
-  isConflict?: boolean;
-  conflictMessage?: string;
-  multiInstanceBuildingIds?: Set<string>;
-  onRemove: () => void;
-  onStart?: () => void;
-}
 
 function ResourceIcon({ resource, cost }: { resource: string; cost: number }) {
   const icon = RESOURCE_ICONS[resource];
@@ -49,7 +41,7 @@ export function QueueItemOverlay({ item, multiInstanceBuildingIds }: { item: Any
     minutes: totalMinutes % 60,
   });
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-accent/40 bg-primary shadow-xl opacity-95">
+    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-accent/80 bg-primary shadow-xl opacity-95">
       {item.imageUrl ? (
         <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded">
           <Image src={item.imageUrl} alt={item.name} fill className="object-contain" sizes="40px" />
@@ -69,7 +61,7 @@ export function QueueItemOverlay({ item, multiInstanceBuildingIds }: { item: Any
   );
 }
 
-export function QueueItem({ item, isConflict, conflictMessage, multiInstanceBuildingIds, onRemove, onStart }: Props) {
+export function QueueItem({ item, isConflict, conflictMessage, multiInstanceBuildingIds, onRemove, onStart }: QueueItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
   });
@@ -91,7 +83,7 @@ export function QueueItem({ item, isConflict, conflictMessage, multiInstanceBuil
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-2 px-3 py-1.5 border-b border-secondary/25 last:border-b-0 ${
+      className={`flex items-center gap-2 px-3 py-1.5 border-b border-secondary/80 last:border-b-0 ${
         isConflict ? "bg-red-900/20" : "bg-black/10"
       }`}
     >
@@ -145,7 +137,7 @@ export function QueueItem({ item, isConflict, conflictMessage, multiInstanceBuil
       )}
       <button
         onClick={onRemove}
-        className="shrink-0 cursor-pointer text-white/30 hover:text-red-400 transition-colors"
+        className="shrink-0 cursor-pointer text-white/80 hover:text-red-400 transition-colors"
         aria-label="Remove from queue"
       >
         <RiCloseLine size={16} />
