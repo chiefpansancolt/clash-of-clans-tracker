@@ -11,7 +11,7 @@ import { ClanCapitalSection } from "@/comps/dashboard/ClanCapitalSection";
 import { DailiesSection, defaultDailies } from "@/comps/dashboard/DailiesSection";
 import { calcAchievementsProgress } from "@/lib/utils/progressHelpers";
 
-export default function DashboardPage() {
+const DashboardPage = () => {
   const { activePlaythrough } = usePlaythrough();
 
   if (!activePlaythrough) {
@@ -53,3 +53,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+export default DashboardPage;

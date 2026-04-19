@@ -22,13 +22,13 @@ import { QueueItem } from "@/components/upgrade/queue/QueueItem";
 import type { BuilderQueueItem, QueueConflict } from "@/types/app/queue";
 import type { BuilderQueueCardProps, ActiveUpgradeWithControls, ActiveItemProps } from "@/types/components/queue";
 
-function resourceColorClass(resource: string) {
+const resourceColorClass = (resource: string) => {
   if (resource === "Gold") return "text-accent";
   if (resource === "Dark Elixir") return "text-blue-300";
   return "text-purple-300";
 }
 
-function ResourceFooterTotal({ resource, amount }: { resource: string; amount: number }) {
+const ResourceFooterTotal = ({ resource, amount }: { resource: string; amount: number }) => {
   const icon = RESOURCE_ICONS[resource];
   return (
     <div className="flex flex-col">
@@ -45,18 +45,21 @@ function ResourceFooterTotal({ resource, amount }: { resource: string; amount: n
   );
 }
 
-function ActiveItem({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemProps) {
+const ActiveItem = ({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemProps) => {
   const [countdown, setCountdown] = useState(() => formatTimeRemaining(upgrade.finishesAt));
+  const [isReady, setIsReady] = useState(() => new Date(upgrade.finishesAt).getTime() <= Date.now());
 
   useEffect(() => {
-    function tick() { setCountdown(formatTimeRemaining(upgrade.finishesAt)); }
+    const tick = () => {
+      setCountdown(formatTimeRemaining(upgrade.finishesAt));
+      setIsReady(new Date(upgrade.finishesAt).getTime() <= Date.now());
+    };
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [upgrade.finishesAt]);
 
   const parts = upgrade.label.split(/(\d+→\d+)/);
-  const isReady = new Date(upgrade.finishesAt).getTime() <= Date.now();
 
   return (
     <div className="flex items-center gap-2 px-3 py-2 border-b border-secondary/80 bg-accent/5">
@@ -108,7 +111,7 @@ function ActiveItem({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemPro
   );
 }
 
-export function BuilderQueueCard({ slot, queue, activeUpgrade, conflicts, multiInstanceBuildingIds, onQueueChange, onAddClick, onStartFirst }: BuilderQueueCardProps) {
+export const BuilderQueueCard = ({ slot, queue, activeUpgrade, conflicts, multiInstanceBuildingIds, onQueueChange, onAddClick, onStartFirst }: BuilderQueueCardProps) => {
   const conflictIds = new Set(conflicts.map((c) => c.queueItemId));
   const conflictMap = new Map(conflicts.map((c) => [c.queueItemId, c.message]));
   const hasErrors = conflicts.length > 0;
@@ -118,7 +121,7 @@ export function BuilderQueueCard({ slot, queue, activeUpgrade, conflicts, multiI
   const [finishModalOpen, setFinishModalOpen] = useState(false);
   const [adjustModalOpen, setAdjustModalOpen] = useState(false);
 
-  function removeItem(id: string) {
+  const removeItem = (id: string)=> {
     onQueueChange(queue.filter((i) => i.id !== id));
   }
 

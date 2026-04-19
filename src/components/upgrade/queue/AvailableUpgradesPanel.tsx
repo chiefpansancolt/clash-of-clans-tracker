@@ -45,6 +45,9 @@ import type {
   BuilderPanelProps,
   ResearchPanelProps,
   PetPanelProps,
+  PanelMode,
+  BuilderCategory,
+  ResearchCategory,
 } from "@/types/components/queue";
 
 const RESOURCE_ICONS: Record<string, string> = {
@@ -56,13 +59,9 @@ const RESOURCE_ICONS: Record<string, string> = {
   Gems: "/images/other/gem.png",
 };
 
-type PanelMode = "builder" | "research" | "pet";
-
-type BuilderCategory = "all" | "defenses" | "guardians" | "armyBuildings" | "resourceBuildings" | "traps" | "heroes" | "townHall" | "craftedDefenses" | "supercharges";
-type ResearchCategory = "all" | "troops" | "spells" | "siegeMachines";
 
 
-export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, builderBoostPct = 0, onAdd, onClose }: BuilderPanelProps) {
+export const AvailableBuilderUpgradesPanel = ({ hv, slots, targetSlotId, builderBoostPct = 0, onAdd, onClose }: BuilderPanelProps) => {
   const [category, setCategory] = useState<BuilderCategory>("all");
   const [search, setSearch] = useState("");
   const [selectedSlotId, setSelectedSlotId] = useState<number>(targetSlotId ?? slots[0]?.id ?? 1);
@@ -276,7 +275,7 @@ export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, builder
     ...(hasSupercharges ? [{ key: "supercharges" as BuilderCategory, label: "Supercharge" }] : []),
   ];
 
-  function handleAdd(it: AvailableBuilderItem) {
+  const handleAdd = (it: AvailableBuilderItem)=> {
     const item: BuilderQueueItem = {
       id: nanoid(),
       name: it.name,
@@ -414,7 +413,7 @@ export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, builder
   );
 }
 
-export function AvailableResearchUpgradesPanel({ hv, slots, targetSlotId, researchBoostPct = 0, onAdd, onUnlock, onClose }: ResearchPanelProps) {
+export const AvailableResearchUpgradesPanel = ({ hv, slots, targetSlotId, researchBoostPct = 0, onAdd, onUnlock, onClose }: ResearchPanelProps) => {
   const [category, setCategory] = useState<ResearchCategory>("all");
   const [search, setSearch] = useState("");
   const [selectedSlotId, setSelectedSlotId] = useState<number>(targetSlotId ?? slots[0]?.id ?? 1);
@@ -485,7 +484,7 @@ export function AvailableResearchUpgradesPanel({ hv, slots, targetSlotId, resear
     { key: "siegeMachines", label: "Siege" },
   ];
 
-  function handleAdd(it: AvailableResearchItem) {
+  const handleAdd = (it: AvailableResearchItem)=> {
     const item: ResearchQueueItem = {
       id: nanoid(),
       name: it.name,
@@ -608,7 +607,7 @@ export function AvailableResearchUpgradesPanel({ hv, slots, targetSlotId, resear
   );
 }
 
-export function AvailablePetUpgradesPanel({ hv, onAdd, onClose }: PetPanelProps) {
+export const AvailablePetUpgradesPanel = ({ hv, onAdd, onClose }: PetPanelProps) => {
   const [search, setSearch] = useState("");
   const thLevel = hv.townHallLevel;
 
@@ -644,7 +643,7 @@ export function AvailablePetUpgradesPanel({ hv, onAdd, onClose }: PetPanelProps)
     [available, search]
   );
 
-  function handleAdd(it: AvailablePetItem) {
+  const handleAdd = (it: AvailablePetItem)=> {
     const item: PetQueueItem = {
       id: nanoid(),
       name: it.name,
@@ -713,7 +712,7 @@ export function AvailablePetUpgradesPanel({ hv, onAdd, onClose }: PetPanelProps)
   );
 }
 
-function SlidePanel({
+const SlidePanel = ({
   children,
   onClose,
   title,
@@ -723,7 +722,7 @@ function SlidePanel({
   onClose: () => void;
   title: string;
   subtitle?: string;
-}) {
+}) => {
   return (
     <>
       {/* Overlay */}

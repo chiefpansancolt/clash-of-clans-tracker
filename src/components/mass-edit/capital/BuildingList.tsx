@@ -3,7 +3,7 @@ import type { LevelMap } from "@/types/app/massEdit";
 import { SectionHeader } from "@/components/mass-edit/SectionHeader";
 import { SliderRow } from "@/components/mass-edit/SliderRow";
 
-export function BuildingList({
+export const BuildingList = ({
   districtId,
   buildings,
   buildingLevels,
@@ -13,7 +13,7 @@ export function BuildingList({
   buildings: BuildingEditData[];
   buildingLevels: LevelMap;
   onBuildingChange: (key: string, val: number) => void;
-}) {
+}) => {
   if (buildings.length === 0) {
     return (
       <p className="py-6 text-center text-sm text-gray-400">
@@ -47,4 +47,4 @@ export function BuildingList({
       ))}
     </div>
   );
-}
+};

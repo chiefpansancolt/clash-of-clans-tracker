@@ -20,7 +20,7 @@ import {
 } from "@/lib/utils/upgradeActions";
 import type { TownHallTabProps } from "@/types/components/upgrade";
 
-export function TownHallTab({ hv, thLevel, slots, onSave }: TownHallTabProps) {
+export const TownHallTab = ({ hv, thLevel, slots, onSave }: TownHallTabProps) => {
   const maxTH = getTownHallMaxLevel();
   const thImageUrl = getTownHallImageUrl(thLevel);
   const nextStep = thLevel < maxTH ? getTownHallUpgradeStep(thLevel) : null;

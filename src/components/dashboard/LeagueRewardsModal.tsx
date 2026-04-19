@@ -13,7 +13,7 @@ import type {
 
 export type { HomeLeagueLoot, HomeLeagueData, BuilderLeagueData, LeagueModalData } from "@/types/components/dashboard";
 
-function ResourceLine({
+const ResourceLine = ({
   icon,
   label,
   value,
@@ -21,7 +21,7 @@ function ResourceLine({
   icon: keyof typeof RESOURCE_ICONS;
   label: string;
   value: number;
-}) {
+}) => {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-1.5">
@@ -41,7 +41,7 @@ function ResourceLine({
   );
 }
 
-function ModalSection({ title, children }: { title: string; children: React.ReactNode }) {
+const ModalSection = ({ title, children }: { title: string; children: React.ReactNode }) => {
   return (
     <div className="overflow-hidden rounded-lg border border-secondary/80">
       <div className="bg-secondary px-3 py-2">
@@ -52,7 +52,7 @@ function ModalSection({ title, children }: { title: string; children: React.Reac
   );
 }
 
-function StatRow({ label, value }: { label: string; value: string | number }) {
+const StatRow = ({ label, value }: { label: string; value: string | number }) => {
   return (
     <div className="flex items-center justify-between rounded-lg border border-secondary/80 bg-primary px-3 py-2">
       <span className="text-xs text-white/80">{label}</span>
@@ -61,7 +61,7 @@ function StatRow({ label, value }: { label: string; value: string | number }) {
   );
 }
 
-function LootBlock({ title, ge, de }: { title: string; ge: number | null; de: number | null }) {
+const LootBlock = ({ title, ge, de }: { title: string; ge: number | null; de: number | null }) => {
   const hasAny = ge != null || (de != null && de > 0);
   if (!hasAny) return null;
   return (
@@ -74,7 +74,7 @@ function LootBlock({ title, ge, de }: { title: string; ge: number | null; de: nu
   );
 }
 
-function HomeLeagueContent({ league }: { league: HomeLeagueData }) {
+const HomeLeagueContent = ({ league }: { league: HomeLeagueData }) => {
   const { loot } = league;
   return (
     <div className="space-y-4">
@@ -125,7 +125,7 @@ function HomeLeagueContent({ league }: { league: HomeLeagueData }) {
   );
 }
 
-function BuilderLeagueContent({ league }: { league: BuilderLeagueData }) {
+const BuilderLeagueContent = ({ league }: { league: BuilderLeagueData }) => {
   const trophyRange =
     league.trophyMin != null
       ? league.trophyMax != null
@@ -185,7 +185,7 @@ function BuilderLeagueContent({ league }: { league: BuilderLeagueData }) {
   );
 }
 
-export function LeagueRewardsModal({ league, onClose }: LeagueRewardsModalProps) {
+export const LeagueRewardsModal = ({ league, onClose }: LeagueRewardsModalProps) => {
   return (
     <Modal show={league !== null} onClose={onClose} size="md" dismissible>
       <ModalHeader>

@@ -2,6 +2,10 @@ import type { BuilderQueueItem, ResearchQueueItem, PetQueueItem, QueueConflict, 
 import type { HomeVillageData } from "@/types/app/game";
 import type { BuilderSlot } from "@/types/app/upgrade";
 
+export type PanelMode = "builder" | "research" | "pet";
+export type BuilderCategory = "all" | "defenses" | "guardians" | "armyBuildings" | "resourceBuildings" | "traps" | "heroes" | "townHall" | "craftedDefenses" | "supercharges";
+export type ResearchCategory = "all" | "troops" | "spells" | "siegeMachines";
+
 export interface ActiveUpgradeWithControls {
   label: string;
   imageUrl: string;

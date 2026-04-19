@@ -2,7 +2,7 @@ import { Spinner } from "flowbite-react";
 
 import type { LoadingPlaythroughProps } from "@/types/components/playthrough";
 
-export default function LoadingPlaythrough({ message = "Loading..." }: LoadingPlaythroughProps) {
+const LoadingPlaythrough = ({ message = "Loading..." }: LoadingPlaythroughProps) => {
 	return (
 		<div className="flex flex-col items-center justify-center py-16 text-gray-500 dark:text-gray-400">
 			<Spinner size="xl" />
@@ -10,3 +10,4 @@ export default function LoadingPlaythrough({ message = "Loading..." }: LoadingPl
 		</div>
 	);
 }
+export default LoadingPlaythrough;

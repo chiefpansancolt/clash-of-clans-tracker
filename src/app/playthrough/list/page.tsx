@@ -8,7 +8,7 @@ import { CreatePlaythroughModal } from "@/comps/modals/CreatePlaythroughModal";
 import PlaythroughCard from "./PlaythroughCard";
 import type { SortOption } from "@/types/app/playthrough";
 
-export default function PlaythroughListPage() {
+const PlaythroughListPage = () => {
 	const { playthroughs } = usePlaythrough();
 	const [searchQuery, setSearchQuery] = useState("");
 	const [sortOption, setSortOption] = useState<SortOption>("lastModified");
@@ -143,3 +143,4 @@ export default function PlaythroughListPage() {
 		</div>
 	);
 }
+export default PlaythroughListPage;

@@ -9,7 +9,7 @@ import { createDefaultVillageData } from "@/lib/utils/villageHelpers";
 
 const PlaythroughContext = createContext<PlaythroughContextType | undefined>(undefined);
 
-export function PlaythroughProvider({ children }: { children: React.ReactNode }) {
+export const PlaythroughProvider = ({ children }: { children: React.ReactNode }) => {
 	const [appData, setAppData] = useState<AppData>({ playthroughs: [], activePlaythroughId: null, settings: defaultSettings });
 	const [isLoaded, setIsLoaded] = useState(false);
 	const [loadError, setLoadError] = useState<Error | null>(null);
@@ -137,7 +137,7 @@ export function PlaythroughProvider({ children }: { children: React.ReactNode })
 	);
 }
 
-export function usePlaythrough() {
+export const usePlaythrough = () => {
 	const context = useContext(PlaythroughContext);
 	if (context === undefined) {
 		throw new Error("usePlaythrough must be used within a PlaythroughProvider");

@@ -24,10 +24,10 @@ type RawCapBuilding = {
   availablePerDistrict?: Array<{ district: string; countPerDistrictHall: number[] }>;
 };
 
-function countAtCapitalHall(
+const countAtCapitalHall = (
   availablePerCapitalHall: Array<{ capitalHallLevel: number; count: number }>,
   capitalHallLevel: number
-): number {
+): number  => {
   let count = 0;
   for (const entry of availablePerCapitalHall) {
     if (entry.capitalHallLevel <= capitalHallLevel) count = entry.count;
@@ -35,18 +35,18 @@ function countAtCapitalHall(
   return count;
 }
 
-function countAtDistrictHall(
+const countAtDistrictHall = (
   availablePerDistrict: Array<{ district: string; countPerDistrictHall: number[] }>,
   districtId: string,
   dhLevel: number
-): number {
+): number  => {
   const entry = availablePerDistrict.find((d) => d.district === districtId);
   if (!entry) return 0;
   // countPerDistrictHall is 0-indexed: index 0 = DH level 1
   return entry.countPerDistrictHall[dhLevel - 1] ?? 0;
 }
 
-export function getCapitalPeakBuildings(capitalHallLevel: number): BuildingEditData[] {
+export const getCapitalPeakBuildings = (capitalHallLevel: number): BuildingEditData[]  => {
   const raw = _cap.defenses().get() as RawCapBuilding[];
   const result: BuildingEditData[] = [];
 
@@ -68,7 +68,7 @@ export function getCapitalPeakBuildings(capitalHallLevel: number): BuildingEditD
   return result;
 }
 
-export function getDistrictBuildings(districtId: string, dhLevel: number): BuildingEditData[] {
+export const getDistrictBuildings = (districtId: string, dhLevel: number): BuildingEditData[]  => {
   if (dhLevel === 0) return [];
   const raw = _cap.defenses().get() as RawCapBuilding[];
   const result: BuildingEditData[] = [];
@@ -91,7 +91,7 @@ export function getDistrictBuildings(districtId: string, dhLevel: number): Build
   return result;
 }
 
-export function getCapitalPeakTraps(capitalHallLevel: number): BuildingEditData[] {
+export const getCapitalPeakTraps = (capitalHallLevel: number): BuildingEditData[]  => {
   if (capitalHallLevel === 0) return [];
   const raw = _cap.traps().get() as RawCapBuilding[];
   const result: BuildingEditData[] = [];
@@ -114,7 +114,7 @@ export function getCapitalPeakTraps(capitalHallLevel: number): BuildingEditData[
   return result;
 }
 
-export function getDistrictTraps(districtId: string, dhLevel: number): BuildingEditData[] {
+export const getDistrictTraps = (districtId: string, dhLevel: number): BuildingEditData[]  => {
   if (dhLevel === 0) return [];
   const raw = _cap.traps().get() as RawCapBuilding[];
   const result: BuildingEditData[] = [];
@@ -138,7 +138,7 @@ export function getDistrictTraps(districtId: string, dhLevel: number): BuildingE
 }
 
 /** Army camp, barracks, and spell factories per district. */
-export function getDistrictArmyBuildings(districtId: string, dhLevel: number): BuildingEditData[] {
+export const getDistrictArmyBuildings = (districtId: string, dhLevel: number): BuildingEditData[]  => {
   if (dhLevel === 0) return [];
   const raw = [
     ...(_cap.armyBuildings().get() as RawCapBuilding[]),
@@ -170,7 +170,7 @@ export function getDistrictArmyBuildings(districtId: string, dhLevel: number): B
  * Derived from districtHall level-1 `capitalHallRequired` data.
  * `capitalPeak` is always 1.
  */
-export function getDistrictUnlockLevels(): Record<string, number> {
+export const getDistrictUnlockLevels = (): Record<string, number>  => {
   type RawDH = { levels: Array<{ capitalHallRequired?: Record<string, number> }> };
   const raw = _cap.districtHall().get() as RawDH[];
   const reqs = raw[0]?.levels[0]?.capitalHallRequired ?? {};
@@ -178,7 +178,7 @@ export function getDistrictUnlockLevels(): Record<string, number> {
 }
 
 /** Highest Capital Hall level present in building data. */
-export function getMaxCapitalHallLevel(): number {
+export const getMaxCapitalHallLevel = (): number  => {
   const raw = _cap.defenses().get() as RawCapBuilding[];
   let max = 1;
   for (const b of raw) {
@@ -191,7 +191,7 @@ export function getMaxCapitalHallLevel(): number {
 }
 
 /** Highest District Hall level for a given district, derived from building data. */
-export function getMaxDistrictHallLevel(districtId: string): number {
+export const getMaxDistrictHallLevel = (districtId: string): number  => {
   const raw = _cap.defenses().get() as RawCapBuilding[];
   let max = 0;
   for (const b of raw) {
@@ -214,12 +214,12 @@ type RawWall = {
   availablePerDistrict?: Array<{ district: string; countPerDistrictHall: number[] }>;
 };
 
-function getWallData(): RawWall | null {
+const getWallData = (): RawWall | null  => {
   const raw = _cap.walls().get() as RawWall[];
   return raw[0] ?? null;
 }
 
-export function getCapitalPeakWalls(capitalHallLevel: number): CapitalWallInfo {
+export const getCapitalPeakWalls = (capitalHallLevel: number): CapitalWallInfo  => {
   if (capitalHallLevel === 0) return { maxLevel: 0, totalCount: 0, levels: [] };
   const wall = getWallData();
   if (!wall) return { maxLevel: 0, totalCount: 0, levels: [] };
@@ -235,7 +235,7 @@ export function getCapitalPeakWalls(capitalHallLevel: number): CapitalWallInfo {
   };
 }
 
-export function getDistrictWalls(districtId: string, dhLevel: number): CapitalWallInfo {
+export const getDistrictWalls = (districtId: string, dhLevel: number): CapitalWallInfo  => {
   if (dhLevel === 0) return { maxLevel: 0, totalCount: 0, levels: [] };
   const wall = getWallData();
   if (!wall) return { maxLevel: 0, totalCount: 0, levels: [] };
@@ -260,7 +260,7 @@ type RawSpellFactory = {
   availablePerDistrict?: Array<{ district: string }>;
 };
 
-function buildTroopDistrictMap(): Record<string, string> {
+const buildTroopDistrictMap = (): Record<string, string>  => {
   const barracks = _cap.armyBuildings().barracks().get() as RawBarracks[];
   const map: Record<string, string> = {};
   for (const b of barracks) {
@@ -271,7 +271,7 @@ function buildTroopDistrictMap(): Record<string, string> {
   return map;
 }
 
-function buildSpellDistrictMap(): Record<string, string> {
+const buildSpellDistrictMap = (): Record<string, string>  => {
   const factories = _cap.armyBuildings().spellFactories().get() as RawSpellFactory[];
   const map: Record<string, string> = {};
   for (const f of factories) {
@@ -289,7 +289,7 @@ const SPELL_DISTRICT_MAP = buildSpellDistrictMap();
  * Returns only the troops available at the current district hall levels,
  * with maxLevel capped to what the troop's home district can actually reach.
  */
-export function getCapitalTroops(districtHallLevels: Record<string, number>): ItemEditData[] {
+export const getCapitalTroops = (districtHallLevels: Record<string, number>): ItemEditData[]  => {
   type RawTroop = {
     name: string;
     levels: Array<{ level: number; districtHallRequired?: number }>;
@@ -319,7 +319,7 @@ export function getCapitalTroops(districtHallLevels: Record<string, number>): It
  * Returns only the spells available at the current district hall levels,
  * with maxLevel capped to what the spell's home district can actually reach.
  */
-export function getCapitalSpells(districtHallLevels: Record<string, number>): ItemEditData[] {
+export const getCapitalSpells = (districtHallLevels: Record<string, number>): ItemEditData[]  => {
   type RawSpell = {
     name: string;
     levels: Array<{ level: number; districtHallRequired?: number; images?: { normal?: string } }>;

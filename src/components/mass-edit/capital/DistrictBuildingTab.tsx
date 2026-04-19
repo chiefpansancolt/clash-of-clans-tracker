@@ -10,7 +10,7 @@ import { BuildingList } from "@/components/mass-edit/capital/BuildingList";
 import { GroupedBuildingList } from "@/components/mass-edit/capital/GroupedBuildingList";
 import { WallsPanel } from "@/components/mass-edit/capital/WallsPanel";
 
-export function DistrictBuildingTab({
+export const DistrictBuildingTab = ({
   districtId,
   defenseBuildings,
   trapBuildings,
@@ -38,7 +38,7 @@ export function DistrictBuildingTab({
   maxHallLevel: number;
   onHallLevelChange: (level: number) => void;
   hallLabel: string;
-}) {
+}) => {
   const [subTab, setSubTab] = useState<DistrictSubTab>("defenses");
 
   const tabs: { id: DistrictSubTab; label: string; show: boolean }[] = [
@@ -136,4 +136,4 @@ export function DistrictBuildingTab({
       )}
     </>
   );
-}
+};

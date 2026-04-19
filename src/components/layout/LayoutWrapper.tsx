@@ -6,7 +6,7 @@ import { ToastContainer } from "react-toastify";
 import { AppNavbar } from "@/comps/layout/AppNavbar";
 import { AppSidebar } from "@/comps/layout/sidebar/AppSidebar";
 
-export function LayoutWrapper({ children }: { children: React.ReactNode }) {
+export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<ThemeProvider theme={customTheme}>
 			<div className="flex h-screen flex-col overflow-hidden">

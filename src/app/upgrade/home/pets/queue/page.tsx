@@ -20,7 +20,7 @@ import { AvailablePetUpgradesPanel } from "@/components/upgrade/queue/AvailableU
 import { ResourcePlannerModal } from "@/components/upgrade/queue/ResourcePlannerModal";
 import type { PetQueueItem } from "@/types/app/queue";
 
-export default function PetsQueuePage() {
+const PetsQueuePage = () => {
   const router = useRouter();
   const { activePlaythrough, isLoaded, updatePlaythrough } = usePlaythrough();
 
@@ -47,21 +47,21 @@ export default function PetsQueuePage() {
 
   const resourceGroups = useMemo(() => (hv ? getPetResourceEvents(hv) : []), [hv]);
 
-  const activeUpgrade = useMemo(() => {
-    if (!hv) return undefined;
+  let activeUpgrade: { label: string; finishesAt: string } | undefined;
+  if (hv) {
     for (const pet of hv.pets) {
       const u = (pet as any).upgrade;
       if (u && isActiveUpgrade(u.finishesAt)) {
-        return {
+        activeUpgrade = {
           label: `${pet.name} ${pet.level}→${pet.level + 1}`,
           finishesAt: u.finishesAt,
         };
+        break;
       }
     }
-    return undefined;
-  }, [hv]);
+  }
 
-  function handleQueueChange(newQueue: PetQueueItem[]) {
+  const handleQueueChange = (newQueue: PetQueueItem[]) => {
     if (!activePlaythrough || !hv) return;
     updatePlaythrough(activePlaythrough.id, {
       data: {
@@ -69,12 +69,12 @@ export default function PetsQueuePage() {
         homeVillage: { ...hv, petQueue: newQueue },
       },
     });
-  }
+  };
 
-  function handleAddItem(item: PetQueueItem) {
+  const handleAddItem = (item: PetQueueItem) => {
     const existing = hv?.petQueue ?? [];
     handleQueueChange([...existing, item]);
-  }
+  };
 
   if (!activePlaythrough || !hv) return null;
 
@@ -152,3 +152,4 @@ export default function PetsQueuePage() {
     </div>
   );
 }
+export default PetsQueuePage;

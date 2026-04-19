@@ -12,7 +12,7 @@ import {
 } from "@/lib/utils/dailyTimerHelpers";
 import type { CapitalGoldCardProps } from "@/types/components/forge";
 
-export function CapitalGoldCard({ timer, thLevel, onCollect, onAdjust }: CapitalGoldCardProps) {
+export const CapitalGoldCard = ({ timer, thLevel, onCollect, onAdjust }: CapitalGoldCardProps) => {
   const available = isAvailable(timer);
   const counting = !available && !!timer.resetTime;
 
@@ -42,7 +42,7 @@ export function CapitalGoldCard({ timer, thLevel, onCollect, onAdjust }: Capital
 
   const dailyAmount = getDailyForgeAmount(thLevel);
 
-  function handleCollect() {
+  const handleCollect = ()=> {
     if (!timer.resetTime && setupTime) {
       onCollect(setupTime);
       setSetupTime("");
@@ -51,7 +51,7 @@ export function CapitalGoldCard({ timer, thLevel, onCollect, onAdjust }: Capital
     }
   }
 
-  function handleAdjustConfirm() {
+  const handleAdjustConfirm = ()=> {
     if (adjustValue) onAdjust(adjustValue);
     setShowAdjust(false);
   }

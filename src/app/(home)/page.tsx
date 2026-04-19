@@ -75,7 +75,7 @@ const FAQS = [
 	},
 ];
 
-export default function Home() {
+const Home = () => {
 	const [openFaq, setOpenFaq] = useState<number | null>(null);
 
 	return (
@@ -262,3 +262,4 @@ export default function Home() {
 		</div>
 	);
 }
+export default Home;

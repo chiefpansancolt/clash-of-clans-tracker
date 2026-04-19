@@ -9,7 +9,7 @@ import { CreatePlaythroughModal } from "@/comps/modals/CreatePlaythroughModal";
  * redirects back to the list once closed. This allows linking directly to
  * the "create" flow from nav buttons or the sidebar.
  */
-export default function NewPlaythroughPage() {
+const NewPlaythroughPage = () => {
 	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(true);
 
@@ -21,3 +21,4 @@ export default function NewPlaythroughPage() {
 
 	return <CreatePlaythroughModal isOpen={isOpen} onClose={() => setIsOpen(false)} />;
 }
+export default NewPlaythroughPage;

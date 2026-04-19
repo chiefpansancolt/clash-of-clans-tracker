@@ -27,13 +27,13 @@ export const regularTroopNames = new Set(
   (_home.troops().get() as Array<{ name: string }>).map((t) => t.name.toLowerCase())
 );
 
-function toResult(current: number, max: number): ProgressResult {
+const toResult = (current: number, max: number): ProgressResult  => {
   if (max <= 0) return { current, max, pct: 0 };
   if (current >= max) return { current, max, pct: 100 };
   return { current, max, pct: Math.floor((current / max) * 100) };
 }
 
-function sumBuildingLevels(record: Record<string, Array<{ level: number }>>): number {
+const sumBuildingLevels = (record: Record<string, Array<{ level: number }>>): number  => {
   let total = 0;
   for (const instances of Object.values(record)) {
     for (const inst of instances) total += inst.level;
@@ -41,7 +41,7 @@ function sumBuildingLevels(record: Record<string, Array<{ level: number }>>): nu
   return total;
 }
 
-export function calcHomeStructuresProgress(hv: HomeVillageData, thLevel: number): ProgressResult {
+export const calcHomeStructuresProgress = (hv: HomeVillageData, thLevel: number): ProgressResult  => {
   const max = _home.levelCountAtTownHall(thLevel).structures;
   const current =
     sumBuildingLevels(hv.defenses) +
@@ -50,12 +50,12 @@ export function calcHomeStructuresProgress(hv: HomeVillageData, thLevel: number)
   return toResult(current, max);
 }
 
-export function calcHomeTrapsProgress(hv: HomeVillageData, thLevel: number): ProgressResult {
+export const calcHomeTrapsProgress = (hv: HomeVillageData, thLevel: number): ProgressResult  => {
   const max = _home.levelCountAtTownHall(thLevel).traps;
   return toResult(sumBuildingLevels(hv.traps), max);
 }
 
-export function calcBuilderStructuresProgress(bb: BuilderBaseData, bhLevel: number): ProgressResult {
+export const calcBuilderStructuresProgress = (bb: BuilderBaseData, bhLevel: number): ProgressResult  => {
   const max = _builder.levelCountAtBuilderHall(bhLevel).structures;
   const current =
     sumBuildingLevels(bb.defenses) +
@@ -64,12 +64,12 @@ export function calcBuilderStructuresProgress(bb: BuilderBaseData, bhLevel: numb
   return toResult(current, max);
 }
 
-export function calcBuilderTrapsProgress(bb: BuilderBaseData, bhLevel: number): ProgressResult {
+export const calcBuilderTrapsProgress = (bb: BuilderBaseData, bhLevel: number): ProgressResult  => {
   const max = _builder.levelCountAtBuilderHall(bhLevel).traps;
   return toResult(sumBuildingLevels(bb.traps), max);
 }
 
-export function calcHomeLabProgress(hv: HomeVillageData, thLevel: number): ProgressResult {
+export const calcHomeLabProgress = (hv: HomeVillageData, thLevel: number): ProgressResult  => {
   const max = _home.levelCountAtTownHall(thLevel).lab;
   const regularTroops = hv.troops.filter((t) => regularTroopNames.has(t.name.toLowerCase()));
   const current =
@@ -79,22 +79,22 @@ export function calcHomeLabProgress(hv: HomeVillageData, thLevel: number): Progr
   return toResult(current, max);
 }
 
-export function calcBuilderLabProgress(bb: BuilderBaseData, bhLevel: number): ProgressResult {
+export const calcBuilderLabProgress = (bb: BuilderBaseData, bhLevel: number): ProgressResult  => {
   const max = _builder.levelCountAtBuilderHall(bhLevel).starLab;
   return toResult(bb.troops.reduce((s, t) => s + t.level, 0), max);
 }
 
-export function calcHomeHeroesProgress(heroes: TrackedHero[], thLevel: number): ProgressResult {
+export const calcHomeHeroesProgress = (heroes: TrackedHero[], thLevel: number): ProgressResult  => {
   const max = _home.levelCountAtTownHall(thLevel).heroes;
   return toResult(heroes.reduce((s, h) => s + h.level, 0), max);
 }
 
-export function calcBuilderHeroesProgress(heroes: TrackedHero[], bhLevel: number): ProgressResult {
+export const calcBuilderHeroesProgress = (heroes: TrackedHero[], bhLevel: number): ProgressResult  => {
   const max = _builder.levelCountAtBuilderHall(bhLevel).heroes;
   return toResult(heroes.reduce((s, h) => s + h.level, 0), max);
 }
 
-export function calcEquipmentProgress(heroes: TrackedHero[]): ProgressResult {
+export const calcEquipmentProgress = (heroes: TrackedHero[]): ProgressResult  => {
   const allEquipment = heroes.flatMap((h) => h.equipment);
   const equipData = _home.heroEquipment().get() as Array<{ name: string; levels: unknown[] }>;
   let current = 0;
@@ -108,12 +108,12 @@ export function calcEquipmentProgress(heroes: TrackedHero[]): ProgressResult {
   return toResult(current, max);
 }
 
-export function calcPetsProgress(pets: TrackedItem[], thLevel: number): ProgressResult {
+export const calcPetsProgress = (pets: TrackedItem[], thLevel: number): ProgressResult  => {
   const max = _home.levelCountAtTownHall(thLevel).pets;
   return toResult(pets.reduce((s, p) => s + p.level, 0), max);
 }
 
-export function calcWallsProgress(walls: Record<string, number>, thLevel: number): ProgressResult {
+export const calcWallsProgress = (walls: Record<string, number>, thLevel: number): ProgressResult  => {
   const max = _home.levelCountAtTownHall(thLevel).walls;
   let current = 0;
   for (const [levelStr, count] of Object.entries(walls)) {
@@ -122,7 +122,7 @@ export function calcWallsProgress(walls: Record<string, number>, thLevel: number
   return toResult(current, max);
 }
 
-export function calcBuilderWallsProgress(walls: Record<string, number>, bhLevel: number): ProgressResult {
+export const calcBuilderWallsProgress = (walls: Record<string, number>, bhLevel: number): ProgressResult  => {
   const max = _builder.levelCountAtBuilderHall(bhLevel).walls;
   let current = 0;
   for (const [levelStr, count] of Object.entries(walls)) {
@@ -132,7 +132,7 @@ export function calcBuilderWallsProgress(walls: Record<string, number>, bhLevel:
 }
 
 /** Wall count and max level at TH — used for the progress card sub-label. */
-export function getHomeWallData(thLevel: number): { maxLevel: number; totalAtTH: number } {
+export const getHomeWallData = (thLevel: number): { maxLevel: number; totalAtTH: number } => {
   try {
     const wallData = require("clash-of-clans-data/data/home/walls/wall.json") as {
       levels: Array<{ level: number; townHallRequired: number }>;
@@ -151,7 +151,7 @@ export function getHomeWallData(thLevel: number): { maxLevel: number; totalAtTH:
 }
 
 /** Wall count and max level at BH — used for the progress card sub-label. */
-export function getBuilderWallData(bhLevel: number): { maxLevel: number; totalAtBH: number } {
+export const getBuilderWallData = (bhLevel: number): { maxLevel: number; totalAtBH: number } => {
   try {
     const wallData = require("clash-of-clans-data/data/builder/walls/wall.json") as {
       levels: Array<{ level: number; builderHallRequired?: number }>;
@@ -170,7 +170,7 @@ export function getBuilderWallData(bhLevel: number): { maxLevel: number; totalAt
 }
 
 /** Max Hero Hall level achievable at the given TH level — gates per-hero max levels. */
-export function getMaxHeroHallLevel(thLevel: number): number {
+export const getMaxHeroHallLevel = (thLevel: number): number  => {
   try {
     const raw = require("clash-of-clans-data/data/home/army-buildings/hero-hall.json") as {
       levels: Array<{ level: number; townHallRequired?: number }>;
@@ -181,7 +181,7 @@ export function getMaxHeroHallLevel(thLevel: number): number {
   }
 }
 
-export function calcCraftedDefensesProgress(hv: HomeVillageData, thLevel: number): ProgressResult {
+export const calcCraftedDefensesProgress = (hv: HomeVillageData, thLevel: number): ProgressResult  => {
   if (thLevel < 18) return toResult(0, 0);
 
   type RawCraftedDefense = { id: string; modules: Array<{ upgrades: unknown[] }> };
@@ -207,10 +207,10 @@ type RawBuildingData = {
   availablePerTownHall: Array<{ townHallLevel: number; count: number }>;
 };
 
-export function getCountAtTH(
+export const getCountAtTH = (
   availablePerTownHall: Array<{ townHallLevel: number; count: number; countAfterMerges?: number }>,
   thLevel: number
-): number {
+): number  => {
   let count = 0;
   for (const entry of availablePerTownHall) {
     if (entry.townHallLevel <= thLevel) {
@@ -222,7 +222,7 @@ export function getCountAtTH(
   return count;
 }
 
-export function calcSuperchargeProgress(hv: HomeVillageData, thLevel: number): ProgressResult {
+export const calcSuperchargeProgress = (hv: HomeVillageData, thLevel: number): ProgressResult  => {
   const defenseData = _home.defenses().get() as RawBuildingData[];
   const resourceData = _home.resourceBuildings().get() as RawBuildingData[];
 
@@ -245,13 +245,13 @@ export function calcSuperchargeProgress(hv: HomeVillageData, thLevel: number): P
   return toResult(current, max);
 }
 
-export function calcAchievementsProgress(achievements: Array<{ stars: number }>): ProgressResult {
+export const calcAchievementsProgress = (achievements: Array<{ stars: number }>): ProgressResult  => {
   const current = achievements.reduce((sum, a) => sum + a.stars, 0);
   const max = achievements.length * 3;
   return toResult(current, max);
 }
 
-export function calcDaysAt(changedAt: string | undefined): number {
+export const calcDaysAt = (changedAt: string | undefined): number  => {
   if (!changedAt) return 0;
   const ms = Date.now() - new Date(changedAt).getTime();
   return Math.max(0, Math.floor(ms / (1000 * 60 * 60 * 24)));

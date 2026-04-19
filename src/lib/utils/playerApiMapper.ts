@@ -20,7 +20,7 @@ import type {
  * Building levels are not available in the Player API — those sections
  * are initialised empty for the user to fill in.
  */
-export function mapPlayerApiToVillageData(player: PlayerApiResponse): VillageData {
+export const mapPlayerApiToVillageData = (player: PlayerApiResponse): VillageData  => {
   const h = home();
   const siegeMachineNames = new Set(h.siegeMachines().get().map((s) => s.name));
   const petNames = new Set(h.pets().get().map((p) => p.name));
@@ -141,8 +141,8 @@ export function mapPlayerApiToVillageData(player: PlayerApiResponse): VillageDat
  * Active upgrade states are preserved from the existing data when the item level
  * has not changed (i.e. the upgrade is still in progress).
  */
-export function mergeWithBuildingData(apiData: VillageData, buildingJson: VillageData): VillageData {
-  function withUpgrades(apiItems: TrackedItem[], existingItems: TrackedItem[]): TrackedItem[] {
+export const mergeWithBuildingData = (apiData: VillageData, buildingJson: VillageData): VillageData  => {
+  const withUpgrades = (apiItems: TrackedItem[], existingItems: TrackedItem[]): TrackedItem[] => {
     return apiItems.map((apiItem) => {
       const existing = existingItems.find((e) => e.name === apiItem.name);
       if (existing?.upgrade && existing.level === apiItem.level) {

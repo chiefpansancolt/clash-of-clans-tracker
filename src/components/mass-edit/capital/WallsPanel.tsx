@@ -1,7 +1,7 @@
 import type { CapitalWallInfo } from "@/lib/utils/massEditCapitalHelpers";
 import { SliderRow } from "@/components/mass-edit/SliderRow";
 
-export function WallsPanel({
+export const WallsPanel = ({
   wallInfo,
   wallLevelCounts,
   onWallChange,
@@ -9,7 +9,7 @@ export function WallsPanel({
   wallInfo: CapitalWallInfo;
   wallLevelCounts: Record<string, number>;
   onWallChange: (level: string, count: number) => void;
-}) {
+}) => {
   if (wallInfo.totalCount === 0) {
     return (
       <p className="py-6 text-center text-sm text-gray-400">
@@ -57,4 +57,4 @@ export function WallsPanel({
       </div>
     </div>
   );
-}
+};

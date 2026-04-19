@@ -11,7 +11,7 @@ import type { PlayerApiResponse } from "@/types/app";
 const _lastCall = new Map<string, number>();
 const RATE_LIMIT_MS = 60_000; // 60 seconds
 
-function getRateLimitResult(ip: string): { allowed: boolean; secondsRemaining: number } {
+const getRateLimitResult = (ip: string): { allowed: boolean; secondsRemaining: number } => {
   const now = Date.now();
   const last = _lastCall.get(ip) ?? 0;
   const elapsed = now - last;
@@ -20,9 +20,9 @@ function getRateLimitResult(ip: string): { allowed: boolean; secondsRemaining: n
   }
   _lastCall.set(ip, now);
   return { allowed: true, secondsRemaining: 0 };
-}
+};
 
-async function getClientIp(): Promise<string> {
+const getClientIp = async (): Promise<string> => {
   try {
     const h = await headers();
     return (
@@ -33,11 +33,11 @@ async function getClientIp(): Promise<string> {
   } catch {
     return "unknown";
   }
-}
+};
 
-export async function fetchPlayerByTag(
+export const fetchPlayerByTag = async (
   tag: string
-): Promise<{ success: true; player: PlayerApiResponse } | { success: false; error: string }> {
+): Promise<{ success: true; player: PlayerApiResponse } | { success: false; error: string }> => {
   const ip = await getClientIp();
   const { allowed, secondsRemaining } = getRateLimitResult(ip);
 

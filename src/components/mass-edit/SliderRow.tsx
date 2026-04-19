@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import type { SliderRowProps } from "@/types/components/massEdit";
 
-export function SliderRow({ label, imageUrl, currentLevel, maxLevel, onChange, indent = false, disabled = false, neverLocked = false }: SliderRowProps) {
+export const SliderRow = ({ label, imageUrl, currentLevel, maxLevel, onChange, indent = false, disabled = false, neverLocked = false }: SliderRowProps) => {
   const [inputValue, setInputValue] = useState(String(currentLevel));
 
   // Sync text input when slider (or external state) changes
@@ -16,24 +16,24 @@ export function SliderRow({ label, imageUrl, currentLevel, maxLevel, onChange, i
   const isMaxed = maxLevel > 0 && currentLevel >= maxLevel;
   const isDisabled = maxLevel === 0 || disabled;
 
-  function handleRange(e: React.ChangeEvent<HTMLInputElement>) {
+  const handleRange = (e: React.ChangeEvent<HTMLInputElement>)=> {
     const val = Number(e.target.value);
     setInputValue(String(val));
     onChange(val);
   }
 
-  function handleNumberChange(e: React.ChangeEvent<HTMLInputElement>) {
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>)=> {
     setInputValue(e.target.value);
   }
 
-  function handleNumberBlur() {
+  const handleNumberBlur = ()=> {
     const parsed = parseInt(inputValue, 10);
     const clamped = isNaN(parsed) ? 0 : Math.max(0, Math.min(maxLevel, parsed));
     setInputValue(String(clamped));
     onChange(clamped);
   }
 
-  function handleNumberKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+  const handleNumberKeyDown = (e: React.KeyboardEvent<HTMLInputElement>)=> {
     if (e.key === "Enter") handleNumberBlur();
   }
 

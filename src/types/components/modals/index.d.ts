@@ -1,5 +1,7 @@
 import { Playthrough } from "@/types/app";
 
+export type CreationMode = "fresh" | "import";
+
 export interface CreatePlaythroughModalProps {
   isOpen: boolean;
   onClose: () => void;

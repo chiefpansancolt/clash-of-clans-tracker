@@ -10,8 +10,6 @@ import type {
   ResourceGroup,
 } from "@/types/app/queue";
 
-// ─── Validation ───────────────────────────────────────────────────────────────
-
 interface AnnotatedBuilderItem {
   item: BuilderQueueItem;
   scheduledStartAt: Date;
@@ -22,10 +20,10 @@ interface AnnotatedBuilderItem {
  * A conflict occurs when a higher targetLevel for a building instance is
  * scheduled to start before a lower targetLevel for the same instance.
  */
-export function getBuilderQueueConflicts(
+export const getBuilderQueueConflicts = (
   hv: HomeVillageData,
   slots: BuilderSlot[]
-): QueueConflict[] {
+): QueueConflict[]  => {
   const allAnnotated: AnnotatedBuilderItem[] = [];
 
   // Build a map of builderId → active upgrade finishesAt
@@ -101,10 +99,10 @@ export function getBuilderQueueConflicts(
  * Detects ordering conflicts in research queues.
  * Ensures the same research item doesn't appear out of level order.
  */
-export function getResearchQueueConflicts(
+export const getResearchQueueConflicts = (
   hv: HomeVillageData,
   slots: BuilderSlot[]
-): QueueConflict[] {
+): QueueConflict[]  => {
   const allAnnotated: Array<{ item: ResearchQueueItem; scheduledStartAt: Date }> = [];
 
   const activeFinishMap = new Map<number, Date>();
@@ -155,7 +153,7 @@ export function getResearchQueueConflicts(
  * Detects ordering conflicts in the pet queue.
  * Same rule: lower level must complete before higher level starts.
  */
-export function getPetQueueConflicts(hv: HomeVillageData): QueueConflict[] {
+export const getPetQueueConflicts = (hv: HomeVillageData): QueueConflict[]  => {
   const queued = hv.petQueue ?? [];
   if (queued.length < 2) return [];
 
@@ -201,8 +199,6 @@ export function getPetQueueConflicts(hv: HomeVillageData): QueueConflict[] {
   return conflicts;
 }
 
-// ─── Resource Planner ─────────────────────────────────────────────────────────
-
 const ONE_HOUR_MS = 3_600_000;
 
 /**
@@ -210,10 +206,10 @@ const ONE_HOUR_MS = 3_600_000;
  * Events within 1 hour of each other are placed in the same ResourceGroup.
  * Groups with no next queued item (queue is empty after this one) are omitted.
  */
-export function getBuilderResourceEvents(
+export const getBuilderResourceEvents = (
   hv: HomeVillageData,
   slots: BuilderSlot[]
-): ResourceGroup[] {
+): ResourceGroup[]  => {
   const rawEvents: ResourceEvent[] = [];
 
   const activeFinishMap = new Map<number, { completesAt: Date; label: string }>();
@@ -294,10 +290,10 @@ export function getBuilderResourceEvents(
 /**
  * Returns grouped resource events for the research queue.
  */
-export function getResearchResourceEvents(
+export const getResearchResourceEvents = (
   hv: HomeVillageData,
   slots: BuilderSlot[]
-): ResourceGroup[] {
+): ResourceGroup[]  => {
   const rawEvents: ResourceEvent[] = [];
 
   const activeFinishMap = new Map<number, { completesAt: Date; label: string }>();
@@ -344,7 +340,7 @@ export function getResearchResourceEvents(
 /**
  * Returns grouped resource events for the pet queue.
  */
-export function getPetResourceEvents(hv: HomeVillageData): ResourceGroup[] {
+export const getPetResourceEvents = (hv: HomeVillageData): ResourceGroup[]  => {
   const queued = hv.petQueue ?? [];
   if (queued.length === 0) return [];
 
@@ -382,9 +378,7 @@ export function getPetResourceEvents(hv: HomeVillageData): ResourceGroup[] {
   return groupEvents(rawEvents);
 }
 
-// ─── Grouping helper ──────────────────────────────────────────────────────────
-
-function groupEvents(events: ResourceEvent[]): ResourceGroup[] {
+const groupEvents = (events: ResourceEvent[]): ResourceGroup[]  => {
   if (events.length === 0) return [];
 
   const sorted = [...events].sort((a, b) => a.completesAt.getTime() - b.completesAt.getTime());
@@ -409,7 +403,7 @@ function groupEvents(events: ResourceEvent[]): ResourceGroup[] {
   return groups;
 }
 
-function makeGroup(events: ResourceEvent[], date: Date, nowMs: number): ResourceGroup {
+const makeGroup = (events: ResourceEvent[], date: Date, nowMs: number): ResourceGroup  => {
   const dayOffset = Math.round((date.getTime() - nowMs) / 86400_000);
   return { dayOffset: Math.max(0, dayOffset), date, events };
 }

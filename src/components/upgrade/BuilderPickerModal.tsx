@@ -4,7 +4,7 @@ import { Modal, ModalBody, ModalHeader } from "flowbite-react";
 import { formatBuildTime, formatCost, formatTimeRemaining } from "@/lib/utils/upgradeHelpers";
 import type { BuilderPickerModalProps } from "@/types/components/upgrade";
 
-export function BuilderPickerModal({
+export const BuilderPickerModal = ({
   isOpen,
   onClose,
   onConfirm,
@@ -12,7 +12,7 @@ export function BuilderPickerModal({
   itemName,
   nextLevel,
   step,
-}: BuilderPickerModalProps) {
+}: BuilderPickerModalProps) => {
   const hasAvailable = slots.some((s) => !s.busy);
 
   return (

@@ -3,14 +3,14 @@ import type { UpgradeStep } from "@/types/app/upgrade";
 
 type BuildingRecordKey = "defenses" | "armyBuildings" | "resourceBuildings" | "traps";
 
-export function startBuildingUpgrade(
+export const startBuildingUpgrade = (
   hv: HomeVillageData,
   recordKey: BuildingRecordKey,
   buildingId: string,
   instanceIndex: number,
   step: UpgradeStep,
   builderId: number
-): HomeVillageData {
+): HomeVillageData  => {
   const record = hv[recordKey] as BuildingRecord;
   const instances = [...(record[buildingId] ?? [])];
   while (instances.length <= instanceIndex) instances.push({ level: 0 });
@@ -25,12 +25,12 @@ export function startBuildingUpgrade(
   return { ...hv, [recordKey]: { ...record, [buildingId]: instances } };
 }
 
-export function finishBuildingUpgrade(
+export const finishBuildingUpgrade = (
   hv: HomeVillageData,
   recordKey: BuildingRecordKey,
   buildingId: string,
   instanceIndex: number
-): HomeVillageData {
+): HomeVillageData  => {
   const record = hv[recordKey] as BuildingRecord;
   const instances = [...(record[buildingId] ?? [])];
   const inst = instances[instanceIndex];
@@ -39,12 +39,12 @@ export function finishBuildingUpgrade(
   return { ...hv, [recordKey]: { ...record, [buildingId]: instances } };
 }
 
-export function cancelBuildingUpgrade(
+export const cancelBuildingUpgrade = (
   hv: HomeVillageData,
   recordKey: BuildingRecordKey,
   buildingId: string,
   instanceIndex: number
-): HomeVillageData {
+): HomeVillageData  => {
   const record = hv[recordKey] as BuildingRecord;
   const instances = [...(record[buildingId] ?? [])];
   const inst = instances[instanceIndex];
@@ -53,13 +53,13 @@ export function cancelBuildingUpgrade(
   return { ...hv, [recordKey]: { ...record, [buildingId]: instances } };
 }
 
-export function startResearchUpgrade(
+export const startResearchUpgrade = (
   hv: HomeVillageData,
   researchKey: "troops" | "spells" | "siegeMachines",
   name: string,
   step: UpgradeStep,
   builderId: number
-): HomeVillageData {
+): HomeVillageData  => {
   const items = hv[researchKey] as TrackedItem[];
   const updated = items.map((item) =>
     item.name === name
@@ -76,11 +76,11 @@ export function startResearchUpgrade(
   return { ...hv, [researchKey]: updated };
 }
 
-export function finishResearchUpgrade(
+export const finishResearchUpgrade = (
   hv: HomeVillageData,
   researchKey: "troops" | "spells" | "siegeMachines",
   name: string
-): HomeVillageData {
+): HomeVillageData  => {
   const items = hv[researchKey] as TrackedItem[];
   const updated = items.map((item) =>
     item.name === name ? { ...item, level: item.level + 1, upgrade: undefined } : item
@@ -88,11 +88,11 @@ export function finishResearchUpgrade(
   return { ...hv, [researchKey]: updated };
 }
 
-export function cancelResearchUpgrade(
+export const cancelResearchUpgrade = (
   hv: HomeVillageData,
   researchKey: "troops" | "spells" | "siegeMachines",
   name: string
-): HomeVillageData {
+): HomeVillageData  => {
   const items = hv[researchKey] as TrackedItem[];
   const updated = items.map((item) =>
     item.name === name ? { ...item, upgrade: undefined } : item
@@ -100,12 +100,12 @@ export function cancelResearchUpgrade(
   return { ...hv, [researchKey]: updated };
 }
 
-export function startPetUpgrade(
+export const startPetUpgrade = (
   hv: HomeVillageData,
   name: string,
   step: UpgradeStep,
   builderId: number
-): HomeVillageData {
+): HomeVillageData  => {
   const pets = hv.pets.map((p) =>
     p.name === name
       ? {
@@ -121,26 +121,26 @@ export function startPetUpgrade(
   return { ...hv, pets };
 }
 
-export function finishPetUpgrade(hv: HomeVillageData, name: string): HomeVillageData {
+export const finishPetUpgrade = (hv: HomeVillageData, name: string): HomeVillageData  => {
   const pets = hv.pets.map((p) =>
     p.name === name ? { ...p, level: p.level + 1, upgrade: undefined } : p
   ) as typeof hv.pets;
   return { ...hv, pets };
 }
 
-export function cancelPetUpgrade(hv: HomeVillageData, name: string): HomeVillageData {
+export const cancelPetUpgrade = (hv: HomeVillageData, name: string): HomeVillageData  => {
   const pets = hv.pets.map((p) =>
     p.name === name ? { ...p, upgrade: undefined } : p
   ) as typeof hv.pets;
   return { ...hv, pets };
 }
 
-export function startHeroUpgrade(
+export const startHeroUpgrade = (
   hv: HomeVillageData,
   name: string,
   step: UpgradeStep,
   builderId: number
-): HomeVillageData {
+): HomeVillageData  => {
   const heroes = hv.heroes.map((h) =>
     h.name === name
       ? {
@@ -156,27 +156,27 @@ export function startHeroUpgrade(
   return { ...hv, heroes };
 }
 
-export function finishHeroUpgrade(hv: HomeVillageData, name: string): HomeVillageData {
+export const finishHeroUpgrade = (hv: HomeVillageData, name: string): HomeVillageData  => {
   const heroes = hv.heroes.map((h) =>
     h.name === name ? { ...h, level: h.level + 1, upgrade: undefined } : h
   ) as TrackedHero[];
   return { ...hv, heroes };
 }
 
-export function cancelHeroUpgrade(hv: HomeVillageData, name: string): HomeVillageData {
+export const cancelHeroUpgrade = (hv: HomeVillageData, name: string): HomeVillageData  => {
   const heroes = hv.heroes.map((h) =>
     h.name === name ? { ...h, upgrade: undefined } : h
   ) as TrackedHero[];
   return { ...hv, heroes };
 }
 
-export function adjustBuildingUpgrade(
+export const adjustBuildingUpgrade = (
   hv: HomeVillageData,
   recordKey: BuildingRecordKey,
   buildingId: string,
   instanceIndex: number,
   finishesAt: string
-): HomeVillageData {
+): HomeVillageData  => {
   const record = hv[recordKey] as BuildingRecord;
   const instances = [...(record[buildingId] ?? [])];
   const inst = instances[instanceIndex];
@@ -185,12 +185,12 @@ export function adjustBuildingUpgrade(
   return { ...hv, [recordKey]: { ...record, [buildingId]: instances } };
 }
 
-export function adjustResearchUpgrade(
+export const adjustResearchUpgrade = (
   hv: HomeVillageData,
   researchKey: "troops" | "spells" | "siegeMachines",
   name: string,
   finishesAt: string
-): HomeVillageData {
+): HomeVillageData  => {
   const items = hv[researchKey] as TrackedItem[];
   const updated = items.map((item) =>
     item.name === name && item.upgrade
@@ -200,11 +200,11 @@ export function adjustResearchUpgrade(
   return { ...hv, [researchKey]: updated };
 }
 
-export function adjustPetUpgrade(
+export const adjustPetUpgrade = (
   hv: HomeVillageData,
   name: string,
   finishesAt: string
-): HomeVillageData {
+): HomeVillageData  => {
   const pets = hv.pets.map((p) =>
     p.name === name && (p as any).upgrade
       ? { ...p, upgrade: { ...(p as any).upgrade, finishesAt } }
@@ -213,11 +213,11 @@ export function adjustPetUpgrade(
   return { ...hv, pets };
 }
 
-export function adjustHeroUpgrade(
+export const adjustHeroUpgrade = (
   hv: HomeVillageData,
   name: string,
   finishesAt: string
-): HomeVillageData {
+): HomeVillageData  => {
   const heroes = hv.heroes.map((h) =>
     h.name === name && h.upgrade
       ? { ...h, upgrade: { ...h.upgrade, finishesAt } }
@@ -226,9 +226,7 @@ export function adjustHeroUpgrade(
   return { ...hv, heroes };
 }
 
-// ─── Town Hall ────────────────────────────────────────────────────────────────
-
-export function startTownHallUpgrade(hv: HomeVillageData, step: UpgradeStep, builderId: number): HomeVillageData {
+export const startTownHallUpgrade = (hv: HomeVillageData, step: UpgradeStep, builderId: number): HomeVillageData  => {
   return {
     ...hv,
     townHallUpgrade: {
@@ -239,20 +237,20 @@ export function startTownHallUpgrade(hv: HomeVillageData, step: UpgradeStep, bui
   };
 }
 
-export function finishTownHallUpgrade(hv: HomeVillageData): HomeVillageData {
+export const finishTownHallUpgrade = (hv: HomeVillageData): HomeVillageData  => {
   return { ...hv, townHallLevel: hv.townHallLevel + 1, townHallUpgrade: undefined };
 }
 
-export function cancelTownHallUpgrade(hv: HomeVillageData): HomeVillageData {
+export const cancelTownHallUpgrade = (hv: HomeVillageData): HomeVillageData  => {
   return { ...hv, townHallUpgrade: undefined };
 }
 
-export function adjustTownHallUpgrade(hv: HomeVillageData, finishesAt: string): HomeVillageData {
+export const adjustTownHallUpgrade = (hv: HomeVillageData, finishesAt: string): HomeVillageData  => {
   if (!hv.townHallUpgrade) return hv;
   return { ...hv, townHallUpgrade: { ...hv.townHallUpgrade, finishesAt } };
 }
 
-export function startTownHallWeaponUpgrade(hv: HomeVillageData, step: UpgradeStep, builderId: number): HomeVillageData {
+export const startTownHallWeaponUpgrade = (hv: HomeVillageData, step: UpgradeStep, builderId: number): HomeVillageData  => {
   return {
     ...hv,
     townHallWeaponUpgrade: {
@@ -263,25 +261,25 @@ export function startTownHallWeaponUpgrade(hv: HomeVillageData, step: UpgradeSte
   };
 }
 
-export function finishTownHallWeaponUpgrade(hv: HomeVillageData): HomeVillageData {
+export const finishTownHallWeaponUpgrade = (hv: HomeVillageData): HomeVillageData  => {
   return { ...hv, townHallWeaponLevel: (hv.townHallWeaponLevel ?? 1) + 1, townHallWeaponUpgrade: undefined };
 }
 
-export function cancelTownHallWeaponUpgrade(hv: HomeVillageData): HomeVillageData {
+export const cancelTownHallWeaponUpgrade = (hv: HomeVillageData): HomeVillageData  => {
   return { ...hv, townHallWeaponUpgrade: undefined };
 }
 
-export function adjustTownHallWeaponUpgrade(hv: HomeVillageData, finishesAt: string): HomeVillageData {
+export const adjustTownHallWeaponUpgrade = (hv: HomeVillageData, finishesAt: string): HomeVillageData  => {
   if (!hv.townHallWeaponUpgrade) return hv;
   return { ...hv, townHallWeaponUpgrade: { ...hv.townHallWeaponUpgrade, finishesAt } };
 }
 
-function patchCraftedModuleUpgrades(
+const patchCraftedModuleUpgrades = (
   hv: HomeVillageData,
   defenseId: string,
   moduleIndex: number,
   patch: (upgrades: (import("@/types/app/game").UpgradeState | undefined)[]) => (import("@/types/app/game").UpgradeState | undefined)[]
-): HomeVillageData {
+): HomeVillageData => {
   const existing = hv.craftedDefenses[defenseId] ?? { modules: [0, 0, 0] as [number, number, number] };
   const upgrades = [...(existing.moduleUpgrades ?? [])];
   return {
@@ -293,13 +291,13 @@ function patchCraftedModuleUpgrades(
   };
 }
 
-export function startCraftedDefenseUpgrade(
+export const startCraftedDefenseUpgrade = (
   hv: HomeVillageData,
   defenseId: string,
   moduleIndex: number,
   step: UpgradeStep,
   builderId: number
-): HomeVillageData {
+): HomeVillageData  => {
   return patchCraftedModuleUpgrades(hv, defenseId, moduleIndex, (upgrades) => {
     const next = [...upgrades];
     next[moduleIndex] = {
@@ -311,11 +309,11 @@ export function startCraftedDefenseUpgrade(
   });
 }
 
-export function finishCraftedDefenseUpgrade(
+export const finishCraftedDefenseUpgrade = (
   hv: HomeVillageData,
   defenseId: string,
   moduleIndex: number
-): HomeVillageData {
+): HomeVillageData  => {
   const existing = hv.craftedDefenses[defenseId] ?? { modules: [0, 0, 0] as [number, number, number] };
   const newModules = [...existing.modules] as [number, number, number];
   newModules[moduleIndex] = (newModules[moduleIndex] ?? 0) + 1;
@@ -326,11 +324,11 @@ export function finishCraftedDefenseUpgrade(
   });
 }
 
-export function cancelCraftedDefenseUpgrade(
+export const cancelCraftedDefenseUpgrade = (
   hv: HomeVillageData,
   defenseId: string,
   moduleIndex: number
-): HomeVillageData {
+): HomeVillageData  => {
   return patchCraftedModuleUpgrades(hv, defenseId, moduleIndex, (upgrades) => {
     const next = [...upgrades];
     next[moduleIndex] = undefined;
@@ -338,12 +336,12 @@ export function cancelCraftedDefenseUpgrade(
   });
 }
 
-export function adjustCraftedDefenseUpgrade(
+export const adjustCraftedDefenseUpgrade = (
   hv: HomeVillageData,
   defenseId: string,
   moduleIndex: number,
   finishesAt: string
-): HomeVillageData {
+): HomeVillageData  => {
   return patchCraftedModuleUpgrades(hv, defenseId, moduleIndex, (upgrades) => {
     const next = [...upgrades];
     if (next[moduleIndex]) next[moduleIndex] = { ...next[moduleIndex]!, finishesAt };

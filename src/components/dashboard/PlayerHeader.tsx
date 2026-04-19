@@ -5,12 +5,12 @@ import type { PlayerHeaderProps } from "@/types/components/dashboard";
 
 const _clan = clanData();
 
-function getClanBannerUrl(clanLevel: number): string {
+const getClanBannerUrl = (clanLevel: number): string  => {
   const level = _clan.levels().atLevel(clanLevel) as { image?: string } | undefined;
   return toPublicImageUrl(level?.image ?? "");
 }
 
-export function PlayerHeader({ playthrough, achievementsProgress }: PlayerHeaderProps) {
+export const PlayerHeader = ({ playthrough, achievementsProgress }: PlayerHeaderProps) => {
   const { data } = playthrough;
   const hv = data.homeVillage;
   const thLevel = hv.townHallLevel;

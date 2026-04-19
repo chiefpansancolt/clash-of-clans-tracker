@@ -16,7 +16,7 @@ export const RESOURCE_ORDER: ForgeResourceType[] = [
   "gold", "elixir", "darkElixir", "builderGold", "builderElixir",
 ];
 
-export function getForgeDurationMs(builderBoostPct: 0 | 10 | 15 | 20): number {
+export const getForgeDurationMs = (builderBoostPct: 0 | 10 | 15 | 20): number  => {
   // BoostTier is 10 | 15 | 20 — 0% means no reduction, return base 3-day duration
   if (builderBoostPct === 0) {
     return (_craftingTime.days ?? 3) * 86400 * 1000;
@@ -31,12 +31,12 @@ export function getForgeDurationMs(builderBoostPct: 0 | 10 | 15 | 20): number {
   );
 }
 
-export function getForgeSlotCount(thLevel: number): number {
+export const getForgeSlotCount = (thLevel: number): number  => {
   return _forge.availableForgesAtTownHall(thLevel) ?? 0;
 }
 
 /** Returns the TH level at which slot index (1-based) unlocks, or null if always available. */
-export function getForgeSlotUnlockTH(slotIndex: number): number | null {
+export const getForgeSlotUnlockTH = (slotIndex: number): number | null  => {
   // Slot 1 unlocks at TH9, slot 2 at TH11, slot 3 at TH12, slot 4 at TH14
   const unlockMap: Record<number, number> = { 1: 9, 2: 11, 3: 12, 4: 14 };
   return unlockMap[slotIndex] ?? null;
@@ -54,7 +54,7 @@ export interface ConversionRate {
 }
 
 /** Manual forge rates for TH and BH resources at given levels */
-export function getForgeRates(thLevel: number, bhLevel: number): ConversionRate[] {
+export const getForgeRates = (thLevel: number, bhLevel: number): ConversionRate[]  => {
   const rates: ConversionRate[] = [];
 
   const thData = _forge.forgeAtTownHall(thLevel);
@@ -135,7 +135,7 @@ export function getForgeRates(thLevel: number, bhLevel: number): ConversionRate[
 }
 
 /** Auto Forge Gold Pass rates (reduced cost) for TH and BH resources */
-export function getAutoForgeRates(thLevel: number, bhLevel: number): ConversionRate[] {
+export const getAutoForgeRates = (thLevel: number, bhLevel: number): ConversionRate[]  => {
   const rates: ConversionRate[] = [];
 
   const thData = _forge.autoForgeAtTownHall(thLevel);
@@ -215,12 +215,12 @@ export function getAutoForgeRates(thLevel: number, bhLevel: number): ConversionR
   return rates;
 }
 
-export function getDailyForgeAmount(thLevel: number): number {
+export const getDailyForgeAmount = (thLevel: number): number  => {
   return _forge.dailyForgeAtTownHall(thLevel)?.capitalGoldObtained ?? 0;
 }
 
 /** Format milliseconds remaining as "Xd Hh Mm Ss" */
-export function formatForgeDuration(ms: number): string {
+export const formatForgeDuration = (ms: number): string  => {
   if (ms <= 0) return "Done!";
   const totalSec = Math.floor(ms / 1000);
   const d = Math.floor(totalSec / 86400);

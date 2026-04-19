@@ -7,7 +7,7 @@ import Link from "next/link";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { getWallLevelsAtTH } from "@/lib/utils/massEditHelpers";
 
-export default function WallsUpgradePage() {
+const WallsUpgradePage = () => {
   const router = useRouter();
   const { activePlaythrough, isLoaded, updatePlaythrough } = usePlaythrough();
   const [customCounts, setCustomCounts] = useState<Record<number, string>>({});
@@ -32,7 +32,7 @@ export default function WallsUpgradePage() {
     ?? 0;
   const visibleLevels = wallInfo.levels.filter((wl) => wl.level >= lowestOccupied);
 
-  function upgradeWalls(fromLevel: number, count: number) {
+  const upgradeWalls = (fromLevel: number, count: number)=> {
     const fromCount = hv!.walls[String(fromLevel)] ?? 0;
     const actual = Math.min(count, fromCount);
     if (actual <= 0) return;
@@ -52,7 +52,7 @@ export default function WallsUpgradePage() {
     });
   }
 
-  function handleCustomUpgrade(level: number) {
+  const handleCustomUpgrade = (level: number)=> {
     const raw = customCounts[level] ?? "";
     const count = parseInt(raw, 10);
     if (!count || count <= 0) return;
@@ -183,3 +183,4 @@ export default function WallsUpgradePage() {
     </div>
   );
 }
+export default WallsUpgradePage;

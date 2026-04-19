@@ -3,7 +3,7 @@ import type { LevelMap } from "@/types/app/massEdit";
 import { SectionHeader } from "@/components/mass-edit/SectionHeader";
 import { SliderRow } from "@/components/mass-edit/SliderRow";
 
-export function GroupedBuildingList({
+export const GroupedBuildingList = ({
   districtId,
   buildings,
   buildingLevels,
@@ -13,7 +13,7 @@ export function GroupedBuildingList({
   buildings: BuildingEditData[];
   buildingLevels: LevelMap;
   onBuildingChange: (key: string, val: number) => void;
-}) {
+}) => {
   if (buildings.length === 0) {
     return (
       <p className="py-6 text-center text-sm text-gray-400">
@@ -26,7 +26,7 @@ export function GroupedBuildingList({
   const factories = buildings.filter((b) => b.id.includes("factory"));
   const other = buildings.filter((b) => !b.id.includes("barracks") && !b.id.includes("factory"));
 
-  function renderGroup(group: BuildingEditData[], groupLabel: string) {
+  const renderGroup = (group: BuildingEditData[], groupLabel: string) => {
     if (group.length === 0) return null;
     return (
       <div className="mt-6 first:mt-0">
@@ -50,7 +50,7 @@ export function GroupedBuildingList({
         </div>
       </div>
     );
-  }
+  };
 
   return (
     <div>
@@ -80,4 +80,4 @@ export function GroupedBuildingList({
       {renderGroup(factories, "Spell Factories")}
     </div>
   );
-}
+};

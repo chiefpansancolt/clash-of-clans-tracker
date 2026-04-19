@@ -19,7 +19,7 @@ const RESOURCE_ICONS: Record<string, string> = {
   Gems: "/images/other/gem.png",
 };
 
-function ResourceCost({ resource, cost, boosted }: { resource: string; cost: number; boosted?: boolean }) {
+const ResourceCost = ({ resource, cost, boosted }: { resource: string; cost: number; boosted?: boolean }) => {
   const icon = RESOURCE_ICONS[resource];
   return (
     <span className="flex items-center gap-1">
@@ -33,7 +33,7 @@ function ResourceCost({ resource, cost, boosted }: { resource: string; cost: num
   );
 }
 
-export function UpgradeRow({
+export const UpgradeRow = ({
   name,
   imageUrl,
   instances,
@@ -46,7 +46,7 @@ export function UpgradeRow({
   onFinishUpgrade,
   onCancelUpgrade,
   onAdjustUpgrade,
-}: UpgradeRowProps) {
+}: UpgradeRowProps) => {
   const [pendingUpgrade, setPendingUpgrade] = useState<{
     instanceIndex: number;
     step: UpgradeStep;

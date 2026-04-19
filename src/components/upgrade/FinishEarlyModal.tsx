@@ -41,14 +41,14 @@ const FINISH_OPTIONS: {
   },
 ];
 
-export function FinishEarlyModal({
+export const FinishEarlyModal = ({
   isOpen,
   onClose,
   onConfirm,
   itemName,
   nextLevel,
   timeRemaining,
-}: FinishEarlyModalProps) {
+}: FinishEarlyModalProps) => {
   return (
     <Modal show={isOpen} onClose={onClose} size="md">
       <ModalHeader>Finish Upgrade Early</ModalHeader>

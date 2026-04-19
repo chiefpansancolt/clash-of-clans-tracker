@@ -5,7 +5,8 @@ export interface PlayerApiTroop {
   name: string;
   level: number;
   maxLevel: number;
-  village: string; // "home" | "builderBase" | "clanCapital"
+  // "home" | "builderBase" | "clanCapital"
+  village: string;
 }
 
 export interface PlayerApiEquipment {

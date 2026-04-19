@@ -25,8 +25,9 @@ import { ResearchQueueCard } from "@/components/upgrade/queue/ResearchQueueCard"
 import { AvailableResearchUpgradesPanel } from "@/components/upgrade/queue/AvailableUpgradesPanel";
 import { ResourcePlannerModal } from "@/components/upgrade/queue/ResourcePlannerModal";
 import type { ResearchQueueItem } from "@/types/app/queue";
+import type { ResearchKey } from "@/types/app/game";
 
-export default function ResearchQueuePage() {
+const ResearchQueuePage = () => {
   const router = useRouter();
   const { activePlaythrough, appSettings, isLoaded, updatePlaythrough } = usePlaythrough();
 
@@ -75,11 +76,10 @@ export default function ResearchQueuePage() {
       onAdjust: (f: string) => void;
     }>();
     if (!hv) return map;
-    type RKey = "troops" | "spells" | "siegeMachines";
-    const entries: Array<[typeof hv.troops[number], RKey]> = [
-      ...hv.troops.map((t): [typeof t, RKey] => [t, "troops"]),
-      ...hv.spells.map((t): [typeof t, RKey] => [t, "spells"]),
-      ...hv.siegeMachines.map((t): [typeof t, RKey] => [t, "siegeMachines"]),
+    const entries: Array<[typeof hv.troops[number], ResearchKey]> = [
+      ...hv.troops.map((t): [typeof t, ResearchKey] => [t, "troops"]),
+      ...hv.spells.map((t): [typeof t, ResearchKey] => [t, "spells"]),
+      ...hv.siegeMachines.map((t): [typeof t, ResearchKey] => [t, "siegeMachines"]),
     ];
     for (const [item, key] of entries) {
       const u = (item as any).upgrade;
@@ -100,14 +100,14 @@ export default function ResearchQueuePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hv]);
 
-  function saveHv(newHv: NonNullable<typeof hv>) {
+  const saveHv = (newHv: NonNullable<typeof hv>)=> {
     if (!activePlaythrough) return;
     updatePlaythrough(activePlaythrough.id, {
       data: { ...activePlaythrough.data, homeVillage: newHv },
     });
   }
 
-  function saveQueues(newQueues: Record<string, ResearchQueueItem[]>) {
+  const saveQueues = (newQueues: Record<string, ResearchQueueItem[]>)=> {
     if (!activePlaythrough || !hv) return;
     updatePlaythrough(activePlaythrough.id, {
       data: {
@@ -117,12 +117,12 @@ export default function ResearchQueuePage() {
     });
   }
 
-  function handleQueueChange(slotId: number, newQueue: ResearchQueueItem[]) {
+  const handleQueueChange = (slotId: number, newQueue: ResearchQueueItem[])=> {
     const current = hv?.researchQueue ?? {};
     saveQueues({ ...current, [String(slotId)]: newQueue });
   }
 
-  function handleStartFirst(item: ResearchQueueItem, slotId: number) {
+  const handleStartFirst = (item: ResearchQueueItem, slotId: number)=> {
     if (!hv) return;
     const step = {
       level: item.targetLevel,
@@ -137,13 +137,13 @@ export default function ResearchQueuePage() {
     saveHv({ ...newHv, researchQueue: { ...current, [String(slotId)]: queue.filter((q) => q.id !== item.id) } });
   }
 
-  function handleAddItem(item: ResearchQueueItem, slotId: number) {
+  const handleAddItem = (item: ResearchQueueItem, slotId: number)=> {
     const current = hv?.researchQueue ?? {};
     const existing = current[String(slotId)] ?? [];
     saveQueues({ ...current, [String(slotId)]: [...existing, item] });
   }
 
-  function handleUnlock(name: string, category: "troops" | "spells" | "siegeMachines") {
+  const handleUnlock = (name: string, category: "troops" | "spells" | "siegeMachines")=> {
     if (!activePlaythrough || !hv) return;
     const key = category as "troops" | "spells" | "siegeMachines";
     const existing = hv[key] as { name: string; level: number }[];
@@ -240,3 +240,4 @@ export default function ResearchQueuePage() {
     </div>
   );
 }
+export default ResearchQueuePage;

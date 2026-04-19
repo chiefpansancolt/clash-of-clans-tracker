@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 
 const STORAGE_KEY = "coc_api_cooldown_until";
 
-function getRemainingSeconds(): number {
+const getRemainingSeconds = (): number  => {
   if (typeof window === "undefined") return 0;
   const until = parseInt(localStorage.getItem(STORAGE_KEY) ?? "0", 10);
   return Math.max(0, Math.ceil((until - Date.now()) / 1000));
@@ -17,7 +17,7 @@ interface ApiCooldown {
   handleError: (error: string) => string;
 }
 
-export function useApiCooldown(): ApiCooldown {
+export const useApiCooldown = (): ApiCooldown  => {
   const [secondsLeft, setSecondsLeft] = useState(getRemainingSeconds);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 

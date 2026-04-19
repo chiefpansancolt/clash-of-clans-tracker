@@ -24,21 +24,21 @@ import type { EditPlaythroughModalProps } from "@/types/components";
 import type { PlayerApiResponse } from "@/types/app";
 import type { VillageData } from "@/types/app/game";
 
-function toDateInputValue(iso?: string): string {
+const toDateInputValue = (iso?: string): string  => {
 	if (!iso) return "";
 	return iso.split("T")[0];
 }
 
-function fromDateInputValue(val: string): string | undefined {
+const fromDateInputValue = (val: string): string | undefined  => {
 	if (!val) return undefined;
 	return new Date(val + "T00:00:00.000Z").toISOString();
 }
 
-export function EditPlaythroughModal({
+export const EditPlaythroughModal = ({
 	isOpen,
 	currentPlaythrough,
 	onClose,
-}: EditPlaythroughModalProps) {
+}: EditPlaythroughModalProps) => {
 	const { updatePlaythrough } = usePlaythrough();
 
 	const [name, setName] = useState(currentPlaythrough.name);

@@ -5,7 +5,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { RiDraggable, RiCloseLine } from "react-icons/ri";
 import { formatFullNumber, formatBuildTime } from "@/lib/utils/upgradeHelpers";
-import type { BuilderQueueItem, ResearchQueueItem, PetQueueItem } from "@/types/app/queue";
+import type { AnyQueueItem, BuilderQueueItem } from "@/types/app/queue";
 import type { QueueItemProps } from "@/types/components/queue";
 
 const RESOURCE_ICONS: Record<string, string> = {
@@ -17,9 +17,8 @@ const RESOURCE_ICONS: Record<string, string> = {
   Gems: "/images/other/gem.png",
 };
 
-type AnyQueueItem = BuilderQueueItem | ResearchQueueItem | PetQueueItem;
 
-function ResourceIcon({ resource, cost }: { resource: string; cost: number }) {
+const ResourceIcon = ({ resource, cost }: { resource: string; cost: number }) => {
   const icon = RESOURCE_ICONS[resource];
   return (
     <span className="flex items-center gap-0.5">
@@ -33,7 +32,7 @@ function ResourceIcon({ resource, cost }: { resource: string; cost: number }) {
   );
 }
 
-export function QueueItemOverlay({ item, multiInstanceBuildingIds }: { item: AnyQueueItem; multiInstanceBuildingIds?: Set<string> }) {
+export const QueueItemOverlay = ({ item, multiInstanceBuildingIds }: { item: AnyQueueItem; multiInstanceBuildingIds?: Set<string> }) => {
   const totalMinutes = Math.floor(item.durationMs / 60_000);
   const durationLabel = formatBuildTime({
     days: Math.floor(totalMinutes / 1440),
@@ -61,7 +60,7 @@ export function QueueItemOverlay({ item, multiInstanceBuildingIds }: { item: Any
   );
 }
 
-export function QueueItem({ item, isConflict, conflictMessage, multiInstanceBuildingIds, onRemove, onStart }: QueueItemProps) {
+export const QueueItem = ({ item, isConflict, conflictMessage, multiInstanceBuildingIds, onRemove, onStart }: QueueItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
   });

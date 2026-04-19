@@ -3,7 +3,7 @@ import type { LevelMap } from "@/types/app/massEdit";
 import { BulkActions } from "@/components/mass-edit/BulkActions";
 import { SliderRow } from "@/components/mass-edit/SliderRow";
 
-export function ItemTab({
+export const ItemTab = ({
   items,
   levelMap,
   onChange,
@@ -13,7 +13,7 @@ export function ItemTab({
   levelMap: LevelMap;
   onChange: (name: string, val: number) => void;
   emptyMsg?: string;
-}) {
+}) => {
   if (items.length === 0) {
     return (
       <p className="py-6 text-center text-sm text-gray-400">

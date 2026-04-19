@@ -4,7 +4,7 @@ import { BulkActions } from "@/components/mass-edit/BulkActions";
 import { SectionHeader } from "@/components/mass-edit/SectionHeader";
 import { SliderRow } from "@/components/mass-edit/SliderRow";
 
-export function BuildingTab({
+export const BuildingTab = ({
   buildings,
   buildingLevels,
   superchargeLevels,
@@ -18,7 +18,7 @@ export function BuildingTab({
   onBuildingChange: (key: string, val: number) => void;
   onSuperchargeChange: (key: string, val: number) => void;
   sectionsInColumns?: boolean;
-}) {
+}) => {
   if (buildings.length === 0) {
     return (
       <p className="py-6 text-center text-sm text-gray-400">
@@ -27,26 +27,26 @@ export function BuildingTab({
     );
   }
 
-  function handleMaxAll() {
+  const handleMaxAll = () => {
     for (const b of buildings) {
       for (let i = 0; i < b.instanceCount; i++) {
         onBuildingChange(`${b.id}-${i}`, b.maxLevel);
         if (b.superchargeTiers > 0) onSuperchargeChange(`${b.id}-${i}`, b.superchargeTiers);
       }
     }
-  }
+  };
 
-  function handleResetAll() {
+  const handleResetAll = () => {
     for (const b of buildings) {
       for (let i = 0; i < b.instanceCount; i++) {
         onBuildingChange(`${b.id}-${i}`, 0);
         if (b.superchargeTiers > 0) onSuperchargeChange(`${b.id}-${i}`, 0);
       }
     }
-  }
+  };
 
-  function renderInstances(b: BuildingEditData) {
-    return Array.from({ length: b.instanceCount }, (_, i) => {
+  const renderInstances = (b: BuildingEditData) =>
+    Array.from({ length: b.instanceCount }, (_, i) => {
       const instanceKey = `${b.id}-${i}`;
       const currentLevel = buildingLevels[instanceKey] ?? 0;
       const isMaxed = currentLevel >= b.maxLevel;
@@ -73,7 +73,6 @@ export function BuildingTab({
         </div>
       );
     });
-  }
 
   if (sectionsInColumns) {
     return (
@@ -110,4 +109,4 @@ export function BuildingTab({
       </div>
     </>
   );
-}
+};

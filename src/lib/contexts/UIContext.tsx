@@ -5,7 +5,7 @@ import type { UIContextType } from "@/types/contexts";
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
 
-export function UIProvider({ children }: { children: React.ReactNode }) {
+export const UIProvider = ({ children }: { children: React.ReactNode }) => {
 	const [sidebarOpen, setSidebarOpen] = useState(true);
 
 	useEffect(() => {
@@ -34,7 +34,7 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
 	);
 }
 
-export function useUI() {
+export const useUI = () => {
 	const context = useContext(UIContext);
 	if (context === undefined) {
 		throw new Error("useUI must be used within a UIProvider");

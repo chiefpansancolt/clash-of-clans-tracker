@@ -9,7 +9,7 @@ const _home = home() as any;
 
 type RawBuildTime = { days?: number; hours?: number; minutes?: number; seconds?: number };
 
-function timeToDurationMs(t: RawBuildTime): number {
+const timeToDurationMs = (t: RawBuildTime): number  => {
   return (
     ((t.days ?? 0) * 86400 +
       (t.hours ?? 0) * 3600 +
@@ -19,12 +19,12 @@ function timeToDurationMs(t: RawBuildTime): number {
   );
 }
 
-function normalizeTime(t: RawBuildTime): Required<RawBuildTime> {
+const normalizeTime = (t: RawBuildTime): Required<RawBuildTime>  => {
   return { days: t.days ?? 0, hours: t.hours ?? 0, minutes: t.minutes ?? 0, seconds: t.seconds ?? 0 };
 }
 
 /** Apply builder or research boost to a durationMs value. Returns original ms unchanged if boostPct is 0. */
-export function applyBoost(durationMs: number, boostPct: 0 | 10 | 15 | 20): number {
+export const applyBoost = (durationMs: number, boostPct: 0 | 10 | 15 | 20): number  => {
   if (boostPct === 0 || durationMs <= 0) return durationMs;
   const totalSecs = Math.floor(durationMs / 1000);
   const raw: RawBuildTime = {
@@ -38,18 +38,18 @@ export function applyBoost(durationMs: number, boostPct: 0 | 10 | 15 | 20): numb
 }
 
 /** Apply builder boost to a cost value. Returns original cost unchanged if boostPct is 0. */
-export function applyBuilderBoostCost(cost: number, boostPct: 0 | 10 | 15 | 20): number {
+export const applyBuilderBoostCost = (cost: number, boostPct: 0 | 10 | 15 | 20): number  => {
   if (boostPct === 0 || cost <= 0) return cost;
   return calculators().boost().builderBoostCost(cost, "Gold" as any, boostPct);
 }
 
 /** Apply research boost to a cost value. Returns original cost unchanged if boostPct is 0. */
-export function applyResearchBoostCost(cost: number, boostPct: 0 | 10 | 15 | 20): number {
+export const applyResearchBoostCost = (cost: number, boostPct: 0 | 10 | 15 | 20): number  => {
   if (boostPct === 0 || cost <= 0) return cost;
   return calculators().boost().researchBoostCost(cost, "Elixir" as any, boostPct);
 }
 
-export function msToBuildTime(ms: number): RawBuildTime {
+export const msToBuildTime = (ms: number): Required<RawBuildTime>  => {
   const totalSecs = Math.floor(ms / 1000);
   return {
     days: Math.floor(totalSecs / 86400),
@@ -60,12 +60,12 @@ export function msToBuildTime(ms: number): RawBuildTime {
 }
 
 /** Calculate the gem cost to instantly complete an upgrade of the given duration in ms. */
-export function getGemCost(durationMs: number): number {
+export const getGemCost = (durationMs: number): number  => {
   return new GemsCalculator().cost(msToBuildTime(durationMs));
 }
 
 /** Format a build time object as "Xd Yh Zm" (omits zero segments, always shows at least "0m"). */
-export function formatBuildTime(t: RawBuildTime): string {
+export const formatBuildTime = (t: RawBuildTime): string  => {
   const d = t.days ?? 0;
   const h = t.hours ?? 0;
   const m = t.minutes ?? 0;
@@ -77,13 +77,11 @@ export function formatBuildTime(t: RawBuildTime): string {
 }
 
 /** Format a large number as "X.XM", "X.Xk", or plain number. */
-export function formatCost(cost: number): string {
+export const formatCost = (cost: number): string  => {
   if (cost >= 1_000_000) return `${(cost / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
   if (cost >= 1_000) return `${(cost / 1_000).toFixed(1).replace(/\.0$/, "")}k`;
   return String(cost);
 }
-
-// ─── Buildings ───────────────────────────────────────────────────────────────
 
 type RawLevel = {
   level: number;
@@ -111,11 +109,10 @@ const ARMY_BUILDING_FILES = [
   "blacksmith",
 ] as const;
 
-function allHomeBuildings(): RawBuilding[] {
+const allHomeBuildings = (): RawBuilding[]  => {
   const armyBuildings: RawBuilding[] = [];
   for (const file of ARMY_BUILDING_FILES) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       armyBuildings.push(require(`clash-of-clans-data/data/home/army-buildings/${file}.json`) as RawBuilding);
     } catch {
       // file missing in this version of the package — skip
@@ -138,13 +135,13 @@ const _buildingMap = new Map<string, RawBuilding>(
  * Returns all upgrade steps from currentLevel+1 up to the max level
  * available at thLevel for the given building id.
  */
-export function getBuildingUpgradeSteps(
+export const getBuildingUpgradeSteps = (
   buildingId: string,
   currentLevel: number,
   thLevel: number,
   instanceIndex = 0,
   currentSuperchargeLevel = 0
-): UpgradeStep[] {
+): UpgradeStep[]  => {
   const building = _buildingMap.get(buildingId);
   if (!building) return [];
 
@@ -182,8 +179,6 @@ export function getBuildingUpgradeSteps(
   return [...normalSteps, ...superchargeSteps];
 }
 
-// ─── Troops / Spells / Siege ──────────────────────────────────────────────────
-
 type RawResearchLevel = {
   level: number;
   townHallRequired?: number;
@@ -196,7 +191,7 @@ type RawResearchLevel = {
 
 type RawResearchItem = { name: string; levels: RawResearchLevel[] };
 
-function allResearchItems(): RawResearchItem[] {
+const allResearchItems = (): RawResearchItem[]  => {
   return [
     ...(_home.troops().get() as RawResearchItem[]),
     ...(_home.spells().get() as RawResearchItem[]),
@@ -211,11 +206,11 @@ const _researchMap = new Map<string, RawResearchItem>(
 /**
  * Returns all research steps from currentLevel+1 to max for a troop/spell/siege.
  */
-export function getResearchUpgradeSteps(
+export const getResearchUpgradeSteps = (
   name: string,
   currentLevel: number,
   thLevel: number
-): UpgradeStep[] {
+): UpgradeStep[]  => {
   const item = _researchMap.get(name.toLowerCase());
   if (!item) return [];
   return item.levels
@@ -235,8 +230,6 @@ export function getResearchUpgradeSteps(
     }));
 }
 
-// ─── Pets ─────────────────────────────────────────────────────────────────────
-
 type RawPetLevel = {
   level: number;
   townHallRequired?: number;
@@ -253,7 +246,7 @@ const _petMap = new Map<string, RawPet>(
 );
 
 /** Returns all research steps from currentLevel+1 to max for a pet. */
-export function getPetUpgradeSteps(name: string, currentLevel: number): UpgradeStep[] {
+export const getPetUpgradeSteps = (name: string, currentLevel: number): UpgradeStep[]  => {
   const item = _petMap.get(name.toLowerCase());
   if (!item) return [];
   return item.levels
@@ -267,8 +260,6 @@ export function getPetUpgradeSteps(name: string, currentLevel: number): UpgradeS
       imageUrl: toPublicImageUrl(l.images?.normal),
     }));
 }
-
-// ─── Crafted Defenses ────────────────────────────────────────────────────────
 
 type RawCraftedModule = {
   name: string;
@@ -285,17 +276,17 @@ const _craftedMap = new Map<string, RawCraftedDefense>(
   (_home.craftedDefenses().current().get() as RawCraftedDefense[]).map((c) => [c.id, c])
 );
 
-export function getCraftedDefenseUpgradeSteps(
+export const getCraftedDefenseUpgradeSteps = (
   defenseId: string,
   moduleIndex: number,
   currentLevel: number
-): UpgradeStep[] {
+): UpgradeStep[]  => {
   const defense = _craftedMap.get(defenseId);
   if (!defense) return [];
-  const module = defense.modules[moduleIndex];
-  if (!module) return [];
+  const mod = defense.modules[moduleIndex];
+  if (!mod) return [];
   const imageUrl = toPublicImageUrl(defense.images[0]?.normal);
-  return module.upgrades
+  return mod.upgrades
     .filter((u) => u.level > currentLevel && (u.buildCost ?? 0) > 0)
     .map((u) => ({
       level: u.level,
@@ -307,19 +298,17 @@ export function getCraftedDefenseUpgradeSteps(
     }));
 }
 
-export function getCraftedDefenseName(defenseId: string): string {
+export const getCraftedDefenseName = (defenseId: string): string  => {
   return _craftedMap.get(defenseId)?.name ?? defenseId;
 }
 
-export function getCraftedDefenseModuleName(defenseId: string, moduleIndex: number): string {
+export const getCraftedDefenseModuleName = (defenseId: string, moduleIndex: number): string  => {
   return _craftedMap.get(defenseId)?.modules[moduleIndex]?.name ?? `Module ${moduleIndex + 1}`;
 }
 
-export function getCraftedDefenseImageUrl(defenseId: string): string {
+export const getCraftedDefenseImageUrl = (defenseId: string): string  => {
   return toPublicImageUrl(_craftedMap.get(defenseId)?.images[0]?.normal);
 }
-
-// ─── Heroes ───────────────────────────────────────────────────────────────────
 
 type RawHeroLevel = {
   level: number;
@@ -337,11 +326,11 @@ const _heroMap = new Map<string, RawHero>(
 );
 
 /** Returns all upgrade steps from currentLevel+1 to max for a hero at the given TH. */
-export function getHeroUpgradeSteps(
+export const getHeroUpgradeSteps = (
   heroId: string,
   currentLevel: number,
   thLevel: number
-): UpgradeStep[] {
+): UpgradeStep[]  => {
   const hero = _heroMap.get(heroId);
   if (!hero) return [];
   const heroHallLevel = getMaxHeroHallLevel(thLevel);
@@ -362,15 +351,13 @@ export function getHeroUpgradeSteps(
     }));
 }
 
-// ─── Builder Queue ─────────────────────────────────────────────────────────────
-
-export function isActiveUpgrade(finishesAt: string | undefined): boolean {
+export const isActiveUpgrade = (finishesAt: string | undefined): boolean  => {
   if (!finishesAt) return false;
   return new Date(finishesAt) > new Date();
 }
 
 /** Returns builder IDs currently occupied (upgrade not yet finished). */
-export function getActiveBuilderIds(hv: HomeVillageData): number[] {
+export const getActiveBuilderIds = (hv: HomeVillageData): number[]  => {
   const active: number[] = [];
 
   const checkRecord = (record: Record<string, Array<{ upgrade?: { finishesAt: string; builderId: number } }>>) => {
@@ -403,14 +390,14 @@ export function getActiveBuilderIds(hv: HomeVillageData): number[] {
  * - +1 if B.O.B's Hut is present in hv.armyBuildings
  * - +1 if goblinEnabled
  */
-export function getTotalBuilderSlots(hv: HomeVillageData, goblinEnabled: boolean): number {
+export const getTotalBuilderSlots = (hv: HomeVillageData, goblinEnabled: boolean): number  => {
   const builderHuts = (hv.defenses["builders-hut"] ?? []).filter((h) => h.level > 0).length;
   const hasBob = (hv.armyBuildings["bobs-hut"] ?? []).some((h) => h.level > 0);
   return builderHuts + (hasBob ? 1 : 0) + (goblinEnabled ? 1 : 0);
 }
 
 /** Returns research slot IDs currently occupied (1 = lab, 7 = goblin). */
-export function getActiveResearchIds(hv: HomeVillageData): number[] {
+export const getActiveResearchIds = (hv: HomeVillageData): number[]  => {
   const active: number[] = [];
   const checkItems = (items: Array<{ upgrade?: { finishesAt: string; builderId: number } }>) => {
     for (const item of items) {
@@ -426,7 +413,7 @@ export function getActiveResearchIds(hv: HomeVillageData): number[] {
 }
 
 /** Returns the pet research slot ID if occupied (1 = pet house). */
-export function getActivePetResearchId(hv: HomeVillageData): number | null {
+export const getActivePetResearchId = (hv: HomeVillageData): number | null  => {
   for (const pet of hv.pets) {
     if ((pet as any).upgrade && isActiveUpgrade((pet as any).upgrade.finishesAt)) {
       return (pet as any).upgrade.builderId;
@@ -436,9 +423,9 @@ export function getActivePetResearchId(hv: HomeVillageData): number | null {
 }
 
 /** Count of actively upgrading instances in a BuildingRecord section. */
-export function countActiveInRecord(
+export const countActiveInRecord = (
   record: Record<string, Array<{ upgrade?: { finishesAt: string } }>>
-): number {
+): number  => {
   let count = 0;
   for (const instances of Object.values(record)) {
     for (const inst of instances) {
@@ -449,24 +436,24 @@ export function countActiveInRecord(
 }
 
 /** Count of actively upgrading heroes. */
-export function countActiveHeroes(heroes: Array<{ upgrade?: { finishesAt: string } }>): number {
+export const countActiveHeroes = (heroes: Array<{ upgrade?: { finishesAt: string } }>): number  => {
   return heroes.filter((h) => h.upgrade && isActiveUpgrade(h.upgrade.finishesAt)).length;
 }
 
 /** Count of actively researching troops/spells/siege. */
-export function countActiveResearch(hv: HomeVillageData): number {
+export const countActiveResearch = (hv: HomeVillageData): number  => {
   return [...hv.troops, ...hv.spells, ...hv.siegeMachines].filter(
     (i) => (i as any).upgrade && isActiveUpgrade((i as any).upgrade.finishesAt)
   ).length;
 }
 
 /** Count of actively researching pets. */
-export function countActivePets(hv: HomeVillageData): number {
+export const countActivePets = (hv: HomeVillageData): number  => {
   return hv.pets.filter((p) => (p as any).upgrade && isActiveUpgrade((p as any).upgrade.finishesAt)).length;
 }
 
 /** Returns BuilderSlot[] for the builder queue (buildings + heroes). */
-export function getBuilderSlots(hv: HomeVillageData, goblinEnabled: boolean): BuilderSlot[] {
+export const getBuilderSlots = (hv: HomeVillageData, goblinEnabled: boolean): BuilderSlot[]  => {
   const totalSlots = getTotalBuilderSlots(hv, goblinEnabled);
   const busyMap = new Map<number, string>();
 
@@ -508,7 +495,7 @@ export function getBuilderSlots(hv: HomeVillageData, goblinEnabled: boolean): Bu
 }
 
 /** Returns BuilderSlot[] for the research (lab) queue. */
-export function getResearchSlots(hv: HomeVillageData, goblinEnabled: boolean): BuilderSlot[] {
+export const getResearchSlots = (hv: HomeVillageData, goblinEnabled: boolean): BuilderSlot[]  => {
   const busyMap = new Map<number, string>();
   for (const item of [...hv.troops, ...hv.spells, ...hv.siegeMachines]) {
     if ((item as any).upgrade && isActiveUpgrade((item as any).upgrade.finishesAt)) {
@@ -533,7 +520,7 @@ export function getResearchSlots(hv: HomeVillageData, goblinEnabled: boolean): B
 }
 
 /** Returns BuilderSlot[] for the pet house queue. */
-export function getPetSlots(hv: HomeVillageData): BuilderSlot[] {
+export const getPetSlots = (hv: HomeVillageData): BuilderSlot[]  => {
   let finishesAt: string | undefined;
   for (const pet of hv.pets) {
     if ((pet as any).upgrade && isActiveUpgrade((pet as any).upgrade.finishesAt)) {
@@ -545,7 +532,7 @@ export function getPetSlots(hv: HomeVillageData): BuilderSlot[] {
 }
 
 /** Format a number as a full comma-separated integer string (no M/K abbreviations). */
-export function formatFullNumber(n: number): string {
+export const formatFullNumber = (n: number): string  => {
   return n.toLocaleString("en-US");
 }
 
@@ -554,11 +541,11 @@ export function formatFullNumber(n: number): string {
  * Returns a map of builderId → ordered TimelineBlock[].
  * Active upgrade is block[0], queued items follow, trailing idle block is last.
  */
-export function getBuilderTimeline(
+export const getBuilderTimeline = (
   hv: HomeVillageData,
   slots: BuilderSlot[],
   windowDays = 90
-): Record<string, TimelineBlock[]> {
+): Record<string, TimelineBlock[]>  => {
   const now = new Date();
   const windowEnd = new Date(now.getTime() + windowDays * 86400_000);
   const result: Record<string, TimelineBlock[]> = {};
@@ -679,11 +666,11 @@ export function getBuilderTimeline(
 /**
  * Builds the swimlane timeline for research slots.
  */
-export function getResearchTimeline(
+export const getResearchTimeline = (
   hv: HomeVillageData,
   slots: BuilderSlot[],
   windowDays = 90
-): Record<string, TimelineBlock[]> {
+): Record<string, TimelineBlock[]>  => {
   const now = new Date();
   const windowEnd = new Date(now.getTime() + windowDays * 86400_000);
   const result: Record<string, TimelineBlock[]> = {};
@@ -729,10 +716,10 @@ export function getResearchTimeline(
 /**
  * Builds the swimlane timeline for the pet house slot.
  */
-export function getPetTimeline(
+export const getPetTimeline = (
   hv: HomeVillageData,
   windowDays = 90
-): TimelineBlock[] {
+): TimelineBlock[]  => {
   const now = new Date();
   const windowEnd = new Date(now.getTime() + windowDays * 86400_000);
   const blocks: TimelineBlock[] = [];
@@ -761,8 +748,6 @@ export function getPetTimeline(
 
   return blocks;
 }
-
-// ─── Town Hall ────────────────────────────────────────────────────────────────
 
 type RawTHLevel = {
   level: number;
@@ -793,13 +778,13 @@ const _thData: RawTHLevel[] = (() => {
 
 const _thMaxLevel = _thData.length;
 
-export function getTownHallImageUrl(thLevel: number): string {
+export const getTownHallImageUrl = (thLevel: number): string  => {
   const lvl = _thData.find((l) => l.level === thLevel);
   return toPublicImageUrl(lvl?.images?.normal);
 }
 
 /** Returns the upgrade step to reach TH (currentLevel+1), or null if at max. */
-export function getTownHallUpgradeStep(currentLevel: number): UpgradeStep | null {
+export const getTownHallUpgradeStep = (currentLevel: number): UpgradeStep | null  => {
   const nextLevel = currentLevel + 1;
   const lvl = _thData.find((l) => l.level === nextLevel);
   if (!lvl || lvl.buildCost === 0) return null;
@@ -813,7 +798,7 @@ export function getTownHallUpgradeStep(currentLevel: number): UpgradeStep | null
 }
 
 /** Returns the max TH level defined in data. */
-export function getTownHallMaxLevel(): number {
+export const getTownHallMaxLevel = (): number  => {
   return _thMaxLevel;
 }
 
@@ -822,7 +807,7 @@ export function getTownHallMaxLevel(): number {
  * Only THs whose weapon has levels with buildCost > 0 have upgradeable weapons.
  * currentWeaponLevel is 1-based (weapon starts at level 1 when TH is built).
  */
-export function getTownHallWeaponUpgradeSteps(thLevel: number, currentWeaponLevel: number): UpgradeStep[] {
+export const getTownHallWeaponUpgradeSteps = (thLevel: number, currentWeaponLevel: number): UpgradeStep[]  => {
   const lvl = _thData.find((l) => l.level === thLevel);
   if (!lvl?.weapon) return [];
   return lvl.weapon.levels
@@ -837,7 +822,7 @@ export function getTownHallWeaponUpgradeSteps(thLevel: number, currentWeaponLeve
 }
 
 /** Returns name and max level of the TH weapon for a given TH level, or null if no weapon. */
-export function getTownHallWeaponInfo(thLevel: number): { name: string; maxLevel: number; imageUrl: string } | null {
+export const getTownHallWeaponInfo = (thLevel: number): { name: string; maxLevel: number; imageUrl: string } | null => {
   const lvl = _thData.find((l) => l.level === thLevel);
   if (!lvl?.weapon || lvl.weapon.levels.length <= 1) return null;
   const hasUpgrades = lvl.weapon.levels.some((wl) => wl.buildCost > 0);
@@ -850,7 +835,7 @@ export function getTownHallWeaponInfo(thLevel: number): { name: string; maxLevel
 }
 
 /** Format remaining time from an ISO finishesAt string, including seconds. */
-export function formatTimeRemaining(finishesAt: string): string {
+export const formatTimeRemaining = (finishesAt: string): string  => {
   const ms = new Date(finishesAt).getTime() - Date.now();
   if (ms <= 0) return "Ready";
   const totalSec = Math.floor(ms / 1000);
@@ -864,8 +849,6 @@ export function formatTimeRemaining(finishesAt: string): string {
   return `${s}s`;
 }
 
-// ─── Equipment ────────────────────────────────────────────────────────────────
-
 export interface EquipmentUpgradeStep {
   level: number;
   shinyOre: number;
@@ -878,7 +861,7 @@ const _equipMap = new Map<string, any>(
 );
 
 /** Returns upgrade steps from currentLevel+1 to max for the given equipment. */
-export function getEquipmentUpgradeSteps(name: string, currentLevel: number): EquipmentUpgradeStep[] {
+export const getEquipmentUpgradeSteps = (name: string, currentLevel: number): EquipmentUpgradeStep[]  => {
   const eq = _equipMap.get(name);
   if (!eq) return [];
   return (eq.levels as any[])

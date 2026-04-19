@@ -2,14 +2,14 @@ import { Button, Modal, ModalBody, ModalHeader } from "flowbite-react";
 import { LuTrash2 } from "react-icons/lu";
 import type { DeleteConfirmModalProps } from "@/types/components";
 
-export function DeleteConfirmModal({
+export const DeleteConfirmModal = ({
 	isOpen,
 	onClose,
 	onConfirm,
 	title = "Confirm Delete",
 	message = "Are you sure you want to delete this item?",
 	itemName,
-}: DeleteConfirmModalProps) {
+}: DeleteConfirmModalProps) => {
 	const handleConfirm = () => {
 		onConfirm();
 		onClose();

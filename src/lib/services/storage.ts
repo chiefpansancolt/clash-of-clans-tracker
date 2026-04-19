@@ -21,7 +21,7 @@ export { defaultSettings };
  * Fills in missing fields on stored data so old records are always safe to use.
  * Add an entry here any time a new required field is added to the data model.
  */
-function migrateHomeVillage(hv: HomeVillageData): HomeVillageData {
+const migrateHomeVillage = (hv: HomeVillageData): HomeVillageData  => {
   const defaultWeaponLevel = hv.townHallLevel === 17 ? 1 : 0;
   return {
     ...hv,
@@ -33,7 +33,7 @@ function migrateHomeVillage(hv: HomeVillageData): HomeVillageData {
   };
 }
 
-function migrateBuilderBase(bb: BuilderBaseData): BuilderBaseData {
+const migrateBuilderBase = (bb: BuilderBaseData): BuilderBaseData  => {
   return {
     ...bb,
     traps: bb.traps ?? {},
@@ -74,7 +74,7 @@ const defaultDailies: DailiesData = {
 
 export { defaultDailies };
 
-function migrateDailies(existing: DailiesData | undefined): DailiesData {
+const migrateDailies = (existing: DailiesData | undefined): DailiesData  => {
   if (!existing) return defaultDailies;
   return {
     ...defaultDailies,
@@ -94,7 +94,7 @@ function migrateDailies(existing: DailiesData | undefined): DailiesData {
   };
 }
 
-function migratePlaythrough(p: Playthrough): Playthrough {
+const migratePlaythrough = (p: Playthrough): Playthrough  => {
   if (!p.data) return p;
   return {
     ...p,

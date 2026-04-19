@@ -21,7 +21,7 @@ import { QueueItem } from "@/components/upgrade/queue/QueueItem";
 import type { PetQueueItem, QueueConflict } from "@/types/app/queue";
 import type { PetQueueCardProps, PetActiveUpgrade } from "@/types/components/queue";
 
-function ActiveItem({ upgrade }: { upgrade: PetActiveUpgrade }) {
+const ActiveItem = ({ upgrade }: { upgrade: PetActiveUpgrade }) => {
   const [countdown, setCountdown] = useState(() => formatTimeRemaining(upgrade.finishesAt));
 
   useEffect(() => {
@@ -42,7 +42,7 @@ function ActiveItem({ upgrade }: { upgrade: PetActiveUpgrade }) {
   );
 }
 
-export function PetQueueCard({ queue, activeUpgrade, isBusy, conflicts, onQueueChange, onAddClick }: PetQueueCardProps) {
+export const PetQueueCard = ({ queue, activeUpgrade, isBusy, conflicts, onQueueChange, onAddClick }: PetQueueCardProps) => {
   const conflictIds = new Set(conflicts.map((c) => c.queueItemId));
   const conflictMap = new Map(conflicts.map((c) => [c.queueItemId, c.message]));
   const hasErrors = conflicts.length > 0;
@@ -52,7 +52,7 @@ export function PetQueueCard({ queue, activeUpgrade, isBusy, conflicts, onQueueC
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
   );
 
-  function handleDragEnd(event: DragEndEvent) {
+  const handleDragEnd = (event: DragEndEvent)=> {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
     const oldIdx = queue.findIndex((i) => i.id === active.id);

@@ -17,10 +17,9 @@ import {
 import Image from "next/image";
 import { massEditTabsTheme } from "@/lib/constants/massEditTheme";
 import { UpgradeRow } from "@/components/upgrade/UpgradeRow";
+import type { ResearchKey } from "@/types/app/game";
 
-type ResearchKey = "troops" | "spells" | "siegeMachines";
-
-function TabTitle({ label, count }: { label: string; count: number }) {
+const TabTitle = ({ label, count }: { label: string; count: number }) => {
   return (
     <span className="flex items-center gap-1.5">
       {label}
@@ -33,7 +32,7 @@ function TabTitle({ label, count }: { label: string; count: number }) {
   );
 }
 
-export default function ResearchUpgradePage() {
+const ResearchUpgradePage = () => {
   const router = useRouter();
   const { activePlaythrough, appSettings, isLoaded, updatePlaythrough } = usePlaythrough();
   const researchBoostPct = (activePlaythrough?.dailies?.goldPass.researchBoostPct ?? 0) as 0 | 10 | 15 | 20;
@@ -51,14 +50,14 @@ export default function ResearchUpgradePage() {
   const siege = useMemo(() => getSiegeMachinesAtTH(thLevel), [thLevel]);
   const slots = hv ? getResearchSlots(hv, appSettings.goblinResearchEnabled) : [];
 
-  function save(newHv: typeof hv) {
+  const save = (newHv: typeof hv)=> {
     if (!activePlaythrough || !newHv) return;
     updatePlaythrough(activePlaythrough.id, {
       data: { ...activePlaythrough.data, homeVillage: newHv },
     });
   }
 
-  function handleUnlock(name: string, key: ResearchKey) {
+  const handleUnlock = (name: string, key: ResearchKey)=> {
     if (!activePlaythrough || !hv) return;
     const existing = hv[key] as { name: string; level: number }[];
     const updated = existing.some((t) => t.name === name)
@@ -69,13 +68,13 @@ export default function ResearchUpgradePage() {
 
   if (!activePlaythrough || !hv) return null;
 
-  function countUpgrading(key: ResearchKey): number {
+  const countUpgrading = (key: ResearchKey): number => {
     return hv![key].filter(
       (item) => (item as any).upgrade && isActiveUpgrade((item as any).upgrade.finishesAt)
     ).length;
   }
 
-  function renderSection(key: ResearchKey, items: ReturnType<typeof getTroopsAtTH>, emptyLabel: string) {
+  const renderSection = (key: ResearchKey, items: ReturnType<typeof getTroopsAtTH>, emptyLabel: string)=> {
     if (items.length === 0) {
       return (
         <p className="py-8 text-center text-sm text-gray-400">
@@ -188,3 +187,4 @@ export default function ResearchUpgradePage() {
     </div>
   );
 }
+export default ResearchUpgradePage;

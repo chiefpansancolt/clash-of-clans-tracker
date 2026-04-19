@@ -1,6 +1,8 @@
 import type { BuilderSlot, UpgradeStep } from "@/types/app/upgrade";
 import type { UpgradeState, HomeVillageData } from "@/types/app/game";
 
+export type BoostPct = 0 | 10 | 15 | 20;
+
 export interface InstanceData {
   currentLevel: number;
   maxLevel: number;
@@ -57,5 +59,6 @@ export interface TownHallTabProps {
   hv: HomeVillageData;
   thLevel: number;
   slots: BuilderSlot[];
+  boostPct?: 0 | 10 | 15 | 20;
   onSave: (newHv: HomeVillageData) => void;
 }

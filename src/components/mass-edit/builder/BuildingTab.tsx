@@ -4,7 +4,7 @@ import { BulkActions } from "@/components/mass-edit/BulkActions";
 import { SectionHeader } from "@/components/mass-edit/SectionHeader";
 import { SliderRow } from "@/components/mass-edit/SliderRow";
 
-export function BuildingTab({
+export const BuildingTab = ({
   buildings,
   buildingLevels,
   onBuildingChange,
@@ -14,7 +14,7 @@ export function BuildingTab({
   buildingLevels: LevelMap;
   onBuildingChange: (key: string, val: number) => void;
   sectionsInColumns?: boolean;
-}) {
+}) => {
   if (buildings.length === 0) {
     return (
       <p className="py-6 text-center text-sm text-gray-400">
@@ -23,24 +23,24 @@ export function BuildingTab({
     );
   }
 
-  function handleMaxAll() {
+  const handleMaxAll = () => {
     for (const b of buildings) {
       for (let i = 0; i < b.instanceCount; i++) {
         onBuildingChange(`${b.id}-${i}`, b.maxLevel);
       }
     }
-  }
+  };
 
-  function handleResetAll() {
+  const handleResetAll = () => {
     for (const b of buildings) {
       for (let i = 0; i < b.instanceCount; i++) {
         onBuildingChange(`${b.id}-${i}`, 0);
       }
     }
-  }
+  };
 
-  function renderInstances(b: BuildingEditData) {
-    return Array.from({ length: b.instanceCount }, (_, i) => {
+  const renderInstances = (b: BuildingEditData) =>
+    Array.from({ length: b.instanceCount }, (_, i) => {
       const instanceKey = `${b.id}-${i}`;
       return (
         <SliderRow
@@ -53,7 +53,6 @@ export function BuildingTab({
         />
       );
     });
-  }
 
   if (sectionsInColumns) {
     return (
@@ -90,4 +89,4 @@ export function BuildingTab({
       </div>
     </>
   );
-}
+};

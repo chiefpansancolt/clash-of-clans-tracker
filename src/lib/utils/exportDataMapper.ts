@@ -53,7 +53,7 @@ interface DataItem {
   heroId?: string; // only set for hero-equipment items
 }
 
-function buildDataIdMap(): Map<number, DataItem> {
+const buildDataIdMap = (): Map<number, DataItem>  => {
   const h = home();
   const b = builder();
   const map = new Map<number, DataItem>();
@@ -143,7 +143,7 @@ function buildDataIdMap(): Map<number, DataItem> {
   return map;
 }
 
-function toUpgradeState(entry: ExportEntry) {
+const toUpgradeState = (entry: ExportEntry) => {
   if (entry.timer === undefined) return undefined;
   const now = new Date();
   // entry.timer is remaining seconds; approximate start as now
@@ -151,12 +151,12 @@ function toUpgradeState(entry: ExportEntry) {
   return { upgradeStartedAt: now.toISOString(), finishesAt, builderId: 1 };
 }
 
-function entriesToBuildingRecord(
+const entriesToBuildingRecord = (
   entries: ExportEntry[],
   dataMap: Map<number, DataItem>,
   targetBase: "home" | "builder",
   targetCategory: string
-): BuildingRecord {
+): BuildingRecord  => {
   const record: BuildingRecord = {};
 
   for (const entry of entries) {
@@ -177,11 +177,11 @@ function entriesToBuildingRecord(
   return record;
 }
 
-function entriesToWalls(
+const entriesToWalls = (
   entries: ExportEntry[],
   dataMap: Map<number, DataItem>,
   targetBase: "home" | "builder"
-): Record<string, number> {
+): Record<string, number>  => {
   const walls: Record<string, number> = {};
 
   for (const entry of entries) {
@@ -194,7 +194,7 @@ function entriesToWalls(
   return walls;
 }
 
-function entriesToTrackedItems(entries: ExportEntry[], dataMap: Map<number, DataItem>): TrackedItem[] {
+const entriesToTrackedItems = (entries: ExportEntry[], dataMap: Map<number, DataItem>): TrackedItem[]  => {
   return entries.flatMap((entry) => {
     const item = dataMap.get(entry.data);
     if (!item) return [];
@@ -202,10 +202,10 @@ function entriesToTrackedItems(entries: ExportEntry[], dataMap: Map<number, Data
   });
 }
 
-function buildEquipmentByHeroMap(
+const buildEquipmentByHeroMap = (
   entries: ExportEntry[],
   dataMap: Map<number, DataItem>
-): Map<string, TrackedEquipment[]> {
+): Map<string, TrackedEquipment[]>  => {
   const byHero = new Map<string, TrackedEquipment[]>();
   for (const entry of entries) {
     const item = dataMap.get(entry.data);
@@ -217,11 +217,11 @@ function buildEquipmentByHeroMap(
   return byHero;
 }
 
-function entriesToTrackedHeroes(
+const entriesToTrackedHeroes = (
   entries: ExportEntry[],
   dataMap: Map<number, DataItem>,
   equipmentByHero?: Map<string, TrackedEquipment[]>
-): TrackedHero[] {
+): TrackedHero[]  => {
   return entries.flatMap((entry) => {
     const item = dataMap.get(entry.data);
     if (!item) return [];
@@ -234,11 +234,11 @@ function entriesToTrackedHeroes(
   });
 }
 
-function extractHallLevel(
+const extractHallLevel = (
   entries: ExportEntry[],
   dataMap: Map<number, DataItem>,
   category: "town-hall" | "builder-hall"
-): number {
+): number  => {
   for (const entry of entries) {
     const item = dataMap.get(entry.data);
     if (item?.category === category) return entry.lvl ?? 0;
@@ -246,10 +246,10 @@ function extractHallLevel(
   return 0;
 }
 
-function extractCraftedDefenses(
+const extractCraftedDefenses = (
   entries: ExportEntry[],
   dataMap: Map<number, DataItem>
-): Record<string, { modules: [number, number, number] }> {
+): Record<string, { modules: [number, number, number] }> => {
   const result: Record<string, { modules: [number, number, number] }> = {};
 
   for (const entry of entries) {
@@ -277,7 +277,7 @@ function extractCraftedDefenses(
  * Building instances are expanded from cnt fields.
  * Upgrade timers are noted but start times are approximated to now.
  */
-export function mapExportDataToVillageData(data: ExportData): VillageData {
+export const mapExportDataToVillageData = (data: ExportData): VillageData  => {
   const dataMap = buildDataIdMap();
 
   const allHomeBuildings = [...(data.buildings ?? [])];
@@ -345,7 +345,7 @@ export function mapExportDataToVillageData(data: ExportData): VillageData {
  * Returns true if the given JSON object matches the raw export format.
  * Checks for the presence of `buildings` array with numeric `data` fields.
  */
-export function isExportDataFormat(json: unknown): json is ExportData {
+export const isExportDataFormat = (json: unknown): json is ExportData  => {
   if (!json || typeof json !== "object") return false;
   const obj = json as Record<string, unknown>;
   return (

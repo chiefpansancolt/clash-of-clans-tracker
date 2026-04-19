@@ -20,10 +20,10 @@ import type {
 // Module-level singleton — matches progressHelpers.ts pattern
 const _builder = builder() as any;
 
-function builderBuildingToEditData(
+const builderBuildingToEditData = (
   b: { id: string; name: string; levels: Array<{ level: number; builderHallRequired?: number; images?: { normal?: string } }>; availablePerBuilderHall?: Array<{ builderHallLevel: number; count: number }> },
   bhLevel: number
-): BuildingEditData | null {
+): BuildingEditData | null  => {
   const nonSCLevels = b.levels.filter((l) => (l.builderHallRequired ?? 0) <= bhLevel);
   const maxLevel = nonSCLevels[nonSCLevels.length - 1]?.level ?? nonSCLevels.length;
   const instanceCount = getCountAtBH(b.availablePerBuilderHall ?? [], bhLevel);
@@ -37,10 +37,10 @@ function builderBuildingToEditData(
   return { id: b.id, name: b.name, maxLevel, instanceCount, imageUrl, superchargeTiers: 0 };
 }
 
-export function getCountAtBH(
+export const getCountAtBH = (
   availablePerBuilderHall: Array<{ builderHallLevel: number; count: number }>,
   bhLevel: number
-): number {
+): number  => {
   let count = 0;
   for (const entry of availablePerBuilderHall) {
     if (entry.builderHallLevel <= bhLevel) count = entry.count;
@@ -48,7 +48,7 @@ export function getCountAtBH(
   return count;
 }
 
-export function getBuilderDefensesAtBH(bhLevel: number): BuildingEditData[] {
+export const getBuilderDefensesAtBH = (bhLevel: number): BuildingEditData[]  => {
   const raw = _builder.defenses().get() as Array<{
     id: string;
     name: string;
@@ -61,7 +61,7 @@ export function getBuilderDefensesAtBH(bhLevel: number): BuildingEditData[] {
   });
 }
 
-export function getBuilderArmyBuildingsAtBH(bhLevel: number): BuildingEditData[] {
+export const getBuilderArmyBuildingsAtBH = (bhLevel: number): BuildingEditData[]  => {
   const raw = _builder.armyBuildings().get() as Array<{
     id: string;
     name: string;
@@ -74,7 +74,7 @@ export function getBuilderArmyBuildingsAtBH(bhLevel: number): BuildingEditData[]
   });
 }
 
-export function getBuilderResourceBuildingsAtBH(bhLevel: number): BuildingEditData[] {
+export const getBuilderResourceBuildingsAtBH = (bhLevel: number): BuildingEditData[]  => {
   const raw = _builder.resourceBuildings().get() as Array<{
     id: string;
     name: string;
@@ -87,7 +87,7 @@ export function getBuilderResourceBuildingsAtBH(bhLevel: number): BuildingEditDa
   });
 }
 
-export function getBuilderTrapsAtBH(bhLevel: number): BuildingEditData[] {
+export const getBuilderTrapsAtBH = (bhLevel: number): BuildingEditData[]  => {
   const raw = _builder.traps().get() as Array<{
     id: string;
     name: string;
@@ -100,7 +100,7 @@ export function getBuilderTrapsAtBH(bhLevel: number): BuildingEditData[] {
   });
 }
 
-export function getBuilderTroopsAtBH(bhLevel: number): ItemEditData[] {
+export const getBuilderTroopsAtBH = (bhLevel: number): ItemEditData[]  => {
   type RawTroop = {
     name: string;
     levels: Array<{ level: number; starLabRequired?: number }>;
@@ -116,7 +116,7 @@ export function getBuilderTroopsAtBH(bhLevel: number): ItemEditData[] {
   });
 }
 
-export function getBuilderHeroesAtBH(bhLevel: number): HeroEditData[] {
+export const getBuilderHeroesAtBH = (bhLevel: number): HeroEditData[]  => {
   type RawHero = {
     id: string;
     name: string;
@@ -135,7 +135,7 @@ export function getBuilderHeroesAtBH(bhLevel: number): HeroEditData[] {
   });
 }
 
-export function getBuilderWallLevelsAtBH(bhLevel: number): WallEditInfo {
+export const getBuilderWallLevelsAtBH = (bhLevel: number): WallEditInfo  => {
   const { maxLevel, totalAtBH } = getBuilderWallData(bhLevel);
   try {
     const wallData = require("clash-of-clans-data/data/builder/walls/wall.json") as {

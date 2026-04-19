@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { SeasonPassPerks } from "@/components/season-pass/SeasonPassPerks";
 
-export default function SeasonPassPage() {
+const SeasonPassPage = () => {
   const router = useRouter();
   const { activePlaythrough } = usePlaythrough();
 
@@ -39,3 +39,4 @@ export default function SeasonPassPage() {
     </div>
   );
 }
+export default SeasonPassPage;

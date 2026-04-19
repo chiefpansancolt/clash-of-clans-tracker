@@ -16,7 +16,7 @@ import {
 } from "@/lib/utils/upgradeHelpers";
 import { PlaythroughSwitcher } from "./PlaythroughSwitcher";
 
-function UpgradeBadge({ count }: { count: number }) {
+const UpgradeBadge = ({ count }: { count: number }) => {
   if (count === 0) return null;
   return (
     <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-primary">
@@ -25,7 +25,7 @@ function UpgradeBadge({ count }: { count: number }) {
   );
 }
 
-export function AppSidebar() {
+export const AppSidebar = () => {
   const pathname = usePathname();
   const { activePlaythrough } = usePlaythrough();
   const { sidebarOpen, setSidebarOpen } = useUI();

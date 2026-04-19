@@ -1,4 +1,4 @@
-export function HallLevelPicker({
+export const HallLevelPicker = ({
   label,
   level,
   maxLevel,
@@ -10,7 +10,7 @@ export function HallLevelPicker({
   maxLevel: number;
   onChange: (level: number) => void;
   allowZero?: boolean;
-}) {
+}) => {
   const levels = allowZero
     ? [0, ...Array.from({ length: maxLevel }, (_, i) => i + 1)]
     : Array.from({ length: maxLevel }, (_, i) => i + 1);
@@ -40,4 +40,4 @@ export function HallLevelPicker({
       </div>
     </div>
   );
-}
+};

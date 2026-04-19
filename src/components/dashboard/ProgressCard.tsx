@@ -1,14 +1,14 @@
 import Link from "next/link";
 import type { ProgressCardProps } from "@/types/components/dashboard";
 
-function progressColor(pct: number): string {
+const progressColor = (pct: number): string  => {
   if (pct >= 100) return "bg-green-500";
   if (pct >= 80)  return "bg-blue-400";
   if (pct >= 60)  return "bg-accent";
   return "bg-orange-400";
 }
 
-export function ProgressCard({ label, result, sub, queueHref }: ProgressCardProps) {
+export const ProgressCard = ({ label, result, sub, queueHref }: ProgressCardProps) => {
   const trackColor = progressColor(result.pct);
   return (
     <div className="overflow-hidden rounded-lg border border-secondary/80">

@@ -9,19 +9,19 @@ import type {
   VillageData,
 } from "@/types/app";
 
-function makeTrackedItems(items: { name: string }[]): TrackedItem[] {
+const makeTrackedItems = (items: { name: string }[]): TrackedItem[]  => {
   return items.map((item) => ({ name: item.name, level: 0 }));
 }
 
-function makeTrackedHeroes(heroes: { name: string }[]): TrackedHero[] {
+const makeTrackedHeroes = (heroes: { name: string }[]): TrackedHero[]  => {
   return heroes.map((hero) => ({ name: hero.name, level: 0, equipment: [] }));
 }
 
-function defaultDistrict() {
+const defaultDistrict = () => {
   return { hallLevel: 0, buildings: {} };
 }
 
-export function createDefaultHomeVillage(townHallLevel = 1): HomeVillageData {
+export const createDefaultHomeVillage = (townHallLevel = 1): HomeVillageData  => {
   const h = home();
   return {
     townHallLevel,
@@ -44,7 +44,7 @@ export function createDefaultHomeVillage(townHallLevel = 1): HomeVillageData {
   };
 }
 
-export function createDefaultBuilderBase(builderHallLevel = 1): BuilderBaseData {
+export const createDefaultBuilderBase = (builderHallLevel = 1): BuilderBaseData  => {
   const b = builder();
   return {
     builderHallLevel,
@@ -61,7 +61,7 @@ export function createDefaultBuilderBase(builderHallLevel = 1): BuilderBaseData 
   };
 }
 
-export function createDefaultClanCapital(): ClanCapitalData {
+export const createDefaultClanCapital = (): ClanCapitalData  => {
   const cc = clanCapitalData() as any;
   return {
     clanCapitalContributions: 0,
@@ -79,10 +79,10 @@ export function createDefaultClanCapital(): ClanCapitalData {
   };
 }
 
-export function createDefaultVillageData(
+export const createDefaultVillageData = (
   townHallLevel = 1,
   builderHallLevel = 1
-): VillageData {
+): VillageData  => {
   return {
     playerTag: "",
     expLevel: 0,

@@ -1,4 +1,4 @@
-export function BulkActions({ onMaxAll, onResetAll }: { onMaxAll: () => void; onResetAll: () => void }) {
+export const BulkActions = ({ onMaxAll, onResetAll }: { onMaxAll: () => void; onResetAll: () => void }) => {
   return (
     <div className="mb-3 flex items-center justify-end gap-2">
       <button

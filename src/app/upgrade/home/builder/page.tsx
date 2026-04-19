@@ -56,11 +56,9 @@ import {
 import { massEditTabsTheme } from "@/lib/constants/massEditTheme";
 import { UpgradeRow } from "@/components/upgrade/UpgradeRow";
 import { TownHallTab } from "@/components/upgrade/builder/TownHallTab";
-import type { BuildingRecord } from "@/types/app/game";
+import type { BuildingRecord, BuildingRecordKey } from "@/types/app/game";
 
-type BuildingRecordKey = "defenses" | "armyBuildings" | "resourceBuildings" | "traps";
-
-function TabTitle({ label, count }: { label: string; count: number }) {
+const TabTitle = ({ label, count }: { label: string; count: number }) => {
   return (
     <span className="flex items-center gap-1.5">
       {label}
@@ -73,7 +71,7 @@ function TabTitle({ label, count }: { label: string; count: number }) {
   );
 }
 
-export default function BuilderUpgradePage() {
+const BuilderUpgradePage = () => {
   const router = useRouter();
   const { activePlaythrough, appSettings, isLoaded, updatePlaythrough } = usePlaythrough();
   const builderBoostPct = (activePlaythrough?.dailies?.goldPass.builderBoostPct ?? 0) as 0 | 10 | 15 | 20;
@@ -97,7 +95,7 @@ export default function BuilderUpgradePage() {
 
   const slots = hv ? getBuilderSlots(hv, appSettings.goblinBuilderEnabled) : [];
 
-  function save(newHv: typeof hv) {
+  const save = (newHv: typeof hv)=> {
     if (!activePlaythrough || !newHv) return;
     updatePlaythrough(activePlaythrough.id, {
       data: { ...activePlaythrough.data, homeVillage: newHv },
@@ -106,10 +104,10 @@ export default function BuilderUpgradePage() {
 
   if (!activePlaythrough || !hv) return null;
 
-  function renderBuildings(
+  const renderBuildings = (
     buildings: ReturnType<typeof getDefensesAtTH>,
     recordKey: BuildingRecordKey
-  ) {
+  )=> {
     return (
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
         {buildings.map((b) => {
@@ -315,3 +313,4 @@ export default function BuilderUpgradePage() {
     </div>
   );
 }
+export default BuilderUpgradePage;

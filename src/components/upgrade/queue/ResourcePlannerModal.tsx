@@ -4,21 +4,21 @@ import { RiCloseLine } from "react-icons/ri";
 import { formatFullNumber } from "@/lib/utils/upgradeHelpers";
 import type { ResourcePlannerModalProps } from "@/types/components/queue";
 
-function resourceClass(resource: string) {
+const resourceClass = (resource: string) => {
   if (resource === "Gold") return "text-accent";
   if (resource === "Dark Elixir") return "text-blue-300";
   return "text-purple-300";
 }
 
-function formatTime(date: Date): string {
+const formatTime = (date: Date): string  => {
   return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
 }
 
-function formatDate(date: Date): string {
+const formatDate = (date: Date): string  => {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-export function ResourcePlannerModal({ groups, title = "Resource Planner", onClose }: ResourcePlannerModalProps) {
+export const ResourcePlannerModal = ({ groups, title = "Resource Planner", onClose }: ResourcePlannerModalProps) => {
   return (
     <>
       <div className="fixed inset-0 z-50 bg-black/65 flex items-center justify-center p-4" onClick={onClose} />

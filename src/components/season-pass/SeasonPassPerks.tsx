@@ -5,9 +5,9 @@ import { FaCheck } from "react-icons/fa";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { defaultDailies } from "@/lib/services/storage";
 import type { GoldPassData } from "@/types/app/playthrough";
+import type { BoostPct } from "@/types/components/upgrade";
 
-const BOOST_OPTIONS = [0, 10, 15, 20] as const;
-type BoostPct = (typeof BOOST_OPTIONS)[number];
+const BOOST_OPTIONS: readonly BoostPct[] = [0, 10, 15, 20];
 
 const GOLD_PASS_PERKS: {
   key: keyof Pick<GoldPassData, "hoggyBankUnlocked" | "gemDonationsUnlocked" | "autoForgeUnlocked" | "requestTimeReductionUnlocked">;
@@ -41,20 +41,20 @@ const GOLD_PASS_PERKS: {
   },
 ];
 
-export function SeasonPassPerks() {
+export const SeasonPassPerks = () => {
   const { activePlaythrough, updatePlaythrough } = usePlaythrough();
   if (!activePlaythrough) return null;
 
   const dailies = activePlaythrough.dailies ?? defaultDailies;
   const goldPass = dailies.goldPass;
 
-  function patchGoldPass(patch: Partial<GoldPassData>) {
+  const patchGoldPass = (patch: Partial<GoldPassData>)=> {
     updatePlaythrough(activePlaythrough!.id, {
       dailies: { ...dailies, goldPass: { ...goldPass, ...patch } },
     });
   }
 
-  function patchHelpers(patch: Partial<typeof dailies.helpers>) {
+  const patchHelpers = (patch: Partial<typeof dailies.helpers>)=> {
     updatePlaythrough(activePlaythrough!.id, {
       dailies: { ...dailies, helpers: { ...dailies.helpers, ...patch } },
     });

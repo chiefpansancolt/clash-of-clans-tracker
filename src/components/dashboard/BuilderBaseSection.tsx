@@ -18,16 +18,13 @@ import {
   getBuilderWallData,
 } from "@/lib/utils/progressHelpers";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
-
-type RawItem = { name: string; images: { icon?: string }; levels: any[] };
-type RawLeague = { name: string; image: string };
-type RawResourceBuilding = { id: string; levels: Array<{ level: number; capacity?: number; productionRate?: number }> };
+import type { RawItem, RawLeague, RawResourceBuilding } from "@/types/app/rawData";
 const _b = builder();
 const _troops = _b.troops().get() as unknown as RawItem[];
 const _heroes = _b.heroes().get() as unknown as RawItem[];
 const _rbMap = new Map((_b.resourceBuildings().get() as RawResourceBuilding[]).map((b) => [b.id, b]));
 
-function getBuilderLeague(leagueName: string): RawLeague | undefined {
+const getBuilderLeague = (leagueName: string): RawLeague | undefined  => {
   // API stores "Titanium League I"; package uses "Titanium I"
   const normalized = leagueName.replace(" League", "");
   return ((_b.leagues() as any).byName(normalized).get() as RawLeague[])?.[0];
@@ -35,7 +32,7 @@ function getBuilderLeague(leagueName: string): RawLeague | undefined {
 
 import type { BuilderBaseSectionProps } from "@/types/components/dashboard";
 
-export function BuilderBaseSection({ bb, playthrough }: BuilderBaseSectionProps) {
+export const BuilderBaseSection = ({ bb, playthrough }: BuilderBaseSectionProps) => {
   const bhLevel = bb.builderHallLevel;
   const bhImageUrl = toPublicImageUrl(`images/builder/builder-hall/normal/level-${bhLevel}.png`);
   const days = calcDaysAt(playthrough.bhChangedAt);

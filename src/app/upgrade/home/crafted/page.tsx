@@ -7,7 +7,7 @@ import Image from "next/image";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { getCraftedDefenses } from "@/lib/utils/massEditHelpers";
 
-export default function CraftedUpgradePage() {
+const CraftedUpgradePage = () => {
   const router = useRouter();
   const { activePlaythrough, isLoaded } = usePlaythrough();
 
@@ -97,3 +97,4 @@ export default function CraftedUpgradePage() {
     </div>
   );
 }
+export default CraftedUpgradePage;

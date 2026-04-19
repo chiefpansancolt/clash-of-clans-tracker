@@ -68,10 +68,11 @@ import { QueueItemOverlay } from "@/components/upgrade/queue/QueueItem";
 import { AvailableBuilderUpgradesPanel } from "@/components/upgrade/queue/AvailableUpgradesPanel";
 import { ResourcePlannerModal } from "@/components/upgrade/queue/ResourcePlannerModal";
 import type { BuilderQueueItem } from "@/types/app/queue";
+import type { BuildingRecordKey } from "@/types/app/game";
 import type { UpgradeStep } from "@/types/app/upgrade";
 import type { ActiveUpgradeForSlot } from "@/types/components/queue";
 
-export default function BuilderQueuePage() {
+const BuilderQueuePage = () => {
   const router = useRouter();
   const { activePlaythrough, appSettings, isLoaded, updatePlaythrough } = usePlaythrough();
 
@@ -141,8 +142,7 @@ export default function BuilderQueuePage() {
       ].map((b) => [b.id, b.name])
     );
 
-    type RecordKey = "defenses" | "armyBuildings" | "resourceBuildings" | "traps";
-    const checkRecord = (recordKey: RecordKey) => {
+    const checkRecord = (recordKey: BuildingRecordKey) => {
       const record = hv[recordKey] as Record<string, Array<{ level: number; upgrade?: { finishesAt: string; builderId: number } }>>;
       for (const [id, instances] of Object.entries(record)) {
         instances.forEach((inst, idx) => {
@@ -235,14 +235,14 @@ export default function BuilderQueuePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hv]);
 
-  function saveHv(newHv: NonNullable<typeof hv>) {
+  const saveHv = (newHv: NonNullable<typeof hv>)=> {
     if (!activePlaythrough) return;
     updatePlaythrough(activePlaythrough.id, {
       data: { ...activePlaythrough.data, homeVillage: newHv },
     });
   }
 
-  function saveQueues(newQueues: Record<string, BuilderQueueItem[]>) {
+  const saveQueues = (newQueues: Record<string, BuilderQueueItem[]>)=> {
     if (!activePlaythrough || !hv) return;
     updatePlaythrough(activePlaythrough.id, {
       data: {
@@ -252,12 +252,12 @@ export default function BuilderQueuePage() {
     });
   }
 
-  function handleQueueChange(slotId: number, newQueue: BuilderQueueItem[]) {
+  const handleQueueChange = (slotId: number, newQueue: BuilderQueueItem[])=> {
     const current = hv?.builderQueues ?? {};
     saveQueues({ ...current, [String(slotId)]: newQueue });
   }
 
-  function handleStartFirst(item: BuilderQueueItem, slotId: number) {
+  const handleStartFirst = (item: BuilderQueueItem, slotId: number)=> {
     if (!hv) return;
     const step: UpgradeStep = {
       level: item.targetLevel,
@@ -298,12 +298,12 @@ export default function BuilderQueuePage() {
     saveHv({ ...newHv, builderQueues: { ...current, [String(slotId)]: queue.filter((q) => q.id !== item.id) } });
   }
 
-  function handleDragStart(event: DragStartEvent) {
+  const handleDragStart = (event: DragStartEvent)=> {
     const allItems = Object.values(hv?.builderQueues ?? {}).flat() as BuilderQueueItem[];
     setDraggingItem(allItems.find((i) => i.id === event.active.id) ?? null);
   }
 
-  function handleDragEnd(event: DragEndEvent) {
+  const handleDragEnd = (event: DragEndEvent)=> {
     setDraggingItem(null);
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -353,13 +353,13 @@ export default function BuilderQueuePage() {
     });
   }
 
-  function handleAddItem(item: BuilderQueueItem, slotId: number) {
+  const handleAddItem = (item: BuilderQueueItem, slotId: number)=> {
     const current = hv?.builderQueues ?? {};
     const existing = current[String(slotId)] ?? [];
     saveQueues({ ...current, [String(slotId)]: [...existing, item] });
   }
 
-  function openPanel(slotId?: number) {
+  const openPanel = (slotId?: number)=> {
     setPanelSlotId(slotId);
     setPanelOpen(true);
   }
@@ -462,3 +462,4 @@ export default function BuilderQueuePage() {
     </div>
   );
 }
+export default BuilderQueuePage;

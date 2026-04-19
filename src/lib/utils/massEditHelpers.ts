@@ -73,7 +73,7 @@ export interface WallLevelData {
   imageUrl: string;
 }
 
-function buildingToEditData(b: RawBuilding, thLevel: number): BuildingEditData | null {
+const buildingToEditData = (b: RawBuilding, thLevel: number): BuildingEditData | null  => {
   const nonSCLevels = b.levels.filter(
     (l) => !l.supercharge && (l.townHallRequired ?? 0) <= thLevel
   );
@@ -91,7 +91,7 @@ function buildingToEditData(b: RawBuilding, thLevel: number): BuildingEditData |
   return { id: b.id, name: b.name, maxLevel, instanceCount, imageUrl, superchargeTiers };
 }
 
-export function getDefensesAtTH(thLevel: number): BuildingEditData[] {
+export const getDefensesAtTH = (thLevel: number): BuildingEditData[]  => {
   const raw = _home.defenses().get() as RawBuilding[];
   return raw.flatMap((b) => {
     const d = buildingToEditData(b, thLevel);
@@ -112,7 +112,7 @@ const ARMY_BUILDING_FILES = [
   "blacksmith",
 ] as const;
 
-export function getArmyBuildingsAtTH(thLevel: number): BuildingEditData[] {
+export const getArmyBuildingsAtTH = (thLevel: number): BuildingEditData[]  => {
   const result: BuildingEditData[] = [];
   for (const file of ARMY_BUILDING_FILES) {
     try {
@@ -126,7 +126,7 @@ export function getArmyBuildingsAtTH(thLevel: number): BuildingEditData[] {
   return result;
 }
 
-export function getResourceBuildingsAtTH(thLevel: number): BuildingEditData[] {
+export const getResourceBuildingsAtTH = (thLevel: number): BuildingEditData[]  => {
   const raw = _home.resourceBuildings().get() as RawBuilding[];
   return raw.flatMap((b) => {
     const d = buildingToEditData(b, thLevel);
@@ -134,7 +134,7 @@ export function getResourceBuildingsAtTH(thLevel: number): BuildingEditData[] {
   });
 }
 
-export function getTrapsAtTH(thLevel: number): BuildingEditData[] {
+export const getTrapsAtTH = (thLevel: number): BuildingEditData[]  => {
   const raw = _home.traps().get() as RawBuilding[];
   return raw.flatMap((b) => {
     const d = buildingToEditData(b, thLevel);
@@ -142,7 +142,7 @@ export function getTrapsAtTH(thLevel: number): BuildingEditData[] {
   });
 }
 
-export function getGuardiansAtTH(thLevel: number): BuildingEditData[] {
+export const getGuardiansAtTH = (thLevel: number): BuildingEditData[]  => {
   type RawGuardian = {
     id: string;
     name: string;
@@ -162,7 +162,7 @@ export function getGuardiansAtTH(thLevel: number): BuildingEditData[] {
   });
 }
 
-export function getOtherBuildingsAtTH(thLevel: number): BuildingEditData[] {
+export const getOtherBuildingsAtTH = (thLevel: number): BuildingEditData[]  => {
   type RawOther = {
     id: string;
     name: string;
@@ -186,7 +186,7 @@ export function getOtherBuildingsAtTH(thLevel: number): BuildingEditData[] {
   });
 }
 
-export function getTroopsAtTH(thLevel: number): ItemEditData[] {
+export const getTroopsAtTH = (thLevel: number): ItemEditData[]  => {
   type RawTroop = {
     name: string;
     levels: Array<{ level: number; townHallRequired?: number; researchCostResource?: string }>;
@@ -205,7 +205,7 @@ export function getTroopsAtTH(thLevel: number): ItemEditData[] {
   });
 }
 
-export function getSpellsAtTH(thLevel: number): ItemEditData[] {
+export const getSpellsAtTH = (thLevel: number): ItemEditData[]  => {
   type RawSpell = {
     name: string;
     levels: Array<{ level: number; townHallRequired?: number; researchCostResource?: string }>;
@@ -222,7 +222,7 @@ export function getSpellsAtTH(thLevel: number): ItemEditData[] {
   });
 }
 
-export function getSiegeMachinesAtTH(thLevel: number): ItemEditData[] {
+export const getSiegeMachinesAtTH = (thLevel: number): ItemEditData[]  => {
   type RawSiege = {
     name: string;
     levels: Array<{ level: number; townHallRequired?: number }>;
@@ -238,7 +238,7 @@ export function getSiegeMachinesAtTH(thLevel: number): ItemEditData[] {
   });
 }
 
-export function getPetsAtTH(thLevel: number): ItemEditData[] {
+export const getPetsAtTH = (thLevel: number): ItemEditData[]  => {
   type RawPet = {
     name: string;
     levels: Array<{ level: number; townHallRequired?: number }>;
@@ -253,7 +253,7 @@ export function getPetsAtTH(thLevel: number): ItemEditData[] {
   });
 }
 
-export function getHeroesAtTH(thLevel: number): HeroEditData[] {
+export const getHeroesAtTH = (thLevel: number): HeroEditData[]  => {
   type RawHero = {
     id: string;
     name: string;
@@ -273,7 +273,7 @@ export function getHeroesAtTH(thLevel: number): HeroEditData[] {
   });
 }
 
-export function getAllEquipment(): EquipEditData[] {
+export const getAllEquipment = (): EquipEditData[]  => {
   type RawEquip = {
     name: string;
     hero: string;
@@ -289,7 +289,7 @@ export function getAllEquipment(): EquipEditData[] {
   }));
 }
 
-export function getCraftedDefenses(): CraftedDefenseEditData[] {
+export const getCraftedDefenses = (): CraftedDefenseEditData[]  => {
   type RawModule = { name: string; upgrades: unknown[] };
   type RawCrafted = {
     id: string;
@@ -312,7 +312,7 @@ export interface WallEditInfo {
   maxLevel: number;
 }
 
-export function getWallLevelsAtTH(thLevel: number): WallEditInfo {
+export const getWallLevelsAtTH = (thLevel: number): WallEditInfo  => {
   const { maxLevel, totalAtTH } = getHomeWallData(thLevel);
   try {
     const wallData = require("clash-of-clans-data/data/home/walls/wall.json") as {

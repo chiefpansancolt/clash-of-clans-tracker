@@ -12,7 +12,7 @@ const ZOOM_OPTIONS = [
   { label: "90d", days: 90 },
 ] as const;
 
-function formatTime(date: Date) {
+const formatTime = (date: Date) => {
   return date.toLocaleString("en-US", {
     month: "short",
     day: "numeric",
@@ -22,7 +22,7 @@ function formatTime(date: Date) {
   });
 }
 
-function BlockTooltip({ block }: { block: TimelineBlock }) {
+const BlockTooltip = ({ block }: { block: TimelineBlock }) => {
   const durationMs = block.endsAt.getTime() - block.startsAt.getTime();
   const totalMinutes = Math.floor(durationMs / 60_000);
   const duration = formatBuildTime({
@@ -47,7 +47,7 @@ function BlockTooltip({ block }: { block: TimelineBlock }) {
   );
 }
 
-export function QueueTimeline({ timeline, slots, conflictItemIds }: QueueTimelineProps) {
+export const QueueTimeline = ({ timeline, slots, conflictItemIds }: QueueTimelineProps) => {
   const [windowDays, setWindowDays] = useState(1);
   const [hovered, setHovered] = useState<HoveredBlock | null>(null);
 
@@ -99,10 +99,10 @@ export function QueueTimeline({ timeline, slots, conflictItemIds }: QueueTimelin
     return markers;
   }, [now, windowDays, windowStart, windowEnd, windowMs]);
 
-  function toLeftPct(date: Date) {
+  const toLeftPct = (date: Date)=> {
     return Math.max(0, Math.min(100, ((date.getTime() - windowStart) / windowMs) * 100));
   }
-  function toWidthPct(start: Date, end: Date) {
+  const toWidthPct = (start: Date, end: Date)=> {
     const l = toLeftPct(start);
     const r = Math.max(0, Math.min(100, ((end.getTime() - windowStart) / windowMs) * 100));
     return Math.max(0, r - l);

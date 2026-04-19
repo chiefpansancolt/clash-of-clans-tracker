@@ -4,7 +4,7 @@ import { LuChevronsUpDown, LuPlus } from "react-icons/lu";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { CreatePlaythroughModal } from "@/comps/modals/CreatePlaythroughModal";
 
-export function PlaythroughSwitcher() {
+export const PlaythroughSwitcher = () => {
 	const { playthroughs, activePlaythrough, setActivePlaythrough } = usePlaythrough();
 	const [isModalOpen, setIsModalOpen] = useState(false);
 

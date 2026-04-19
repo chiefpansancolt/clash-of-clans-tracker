@@ -8,7 +8,7 @@ import { DeleteConfirmModal } from "@/comps/modals/DeleteConfirmModal";
 import { EditPlaythroughModal } from "@/comps/modals/EditPlaythroughModal";
 import type { PlaythroughCardProps } from "@/types/components/playthrough";
 
-export default function PlaythroughCard({ playthrough }: PlaythroughCardProps) {
+const PlaythroughCard = ({ playthrough }: PlaythroughCardProps) => {
 	const { activePlaythrough, setActivePlaythrough, deletePlaythrough } = usePlaythrough();
 	const [isEditOpen, setIsEditOpen] = useState(false);
 	const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -94,3 +94,4 @@ export default function PlaythroughCard({ playthrough }: PlaythroughCardProps) {
 		</>
 	);
 }
+export default PlaythroughCard;

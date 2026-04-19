@@ -20,7 +20,7 @@ import { FaRegSave } from "react-icons/fa";
 import type { SaveFABProps } from "@/types/contexts";
 import { errorToast, successToast } from "@/lib/notifications";
 
-export default function SaveFAB({ isDirty, onSave }: SaveFABProps) {
+const SaveFAB = ({ isDirty, onSave }: SaveFABProps) => {
 	const [isSaving, setIsSaving] = useState(false);
 
 	const handleSave = async () => {
@@ -58,3 +58,4 @@ export default function SaveFAB({ isDirty, onSave }: SaveFABProps) {
 		</button>
 	);
 }
+export default SaveFAB;

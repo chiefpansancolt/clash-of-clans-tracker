@@ -34,22 +34,25 @@ const RESOURCE_ICONS: Record<string, string> = {
   Gems: "/images/other/gem.png",
 };
 
-function resourceColorClass(resource: string) {
+const resourceColorClass = (resource: string) => {
   if (resource === "Gold") return "text-accent";
   if (resource === "Dark Elixir") return "text-blue-300";
   return "text-purple-300";
 }
 
-function ActiveItem({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemProps) {
+const ActiveItem = ({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemProps) => {
   const [countdown, setCountdown] = useState(() => formatTimeRemaining(upgrade.finishesAt));
+  const [isReady, setIsReady] = useState(() => new Date(upgrade.finishesAt).getTime() <= Date.now());
 
   useEffect(() => {
-    const id = setInterval(() => setCountdown(formatTimeRemaining(upgrade.finishesAt)), 1000);
+    const id = setInterval(() => {
+      setCountdown(formatTimeRemaining(upgrade.finishesAt));
+      setIsReady(new Date(upgrade.finishesAt).getTime() <= Date.now());
+    }, 1000);
     return () => clearInterval(id);
   }, [upgrade.finishesAt]);
 
   const parts = upgrade.label.split(/(\d+→\d+)/);
-  const isReady = new Date(upgrade.finishesAt).getTime() <= Date.now();
 
   return (
     <div className="flex items-center gap-2 px-3 py-2 border-b border-secondary/80 bg-accent/5">
@@ -101,7 +104,7 @@ function ActiveItem({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemPro
   );
 }
 
-export function ResearchQueueCard({ slot, queue, activeUpgrade, conflicts, onQueueChange, onAddClick, onStartFirst }: ResearchQueueCardProps) {
+export const ResearchQueueCard = ({ slot, queue, activeUpgrade, conflicts, onQueueChange, onAddClick, onStartFirst }: ResearchQueueCardProps) => {
   const conflictIds = new Set(conflicts.map((c) => c.queueItemId));
   const conflictMap = new Map(conflicts.map((c) => [c.queueItemId, c.message]));
   const hasErrors = conflicts.length > 0;
@@ -114,7 +117,7 @@ export function ResearchQueueCard({ slot, queue, activeUpgrade, conflicts, onQue
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
   );
 
-  function handleDragEnd(event: DragEndEvent) {
+  const handleDragEnd = (event: DragEndEvent)=> {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
     const oldIdx = queue.findIndex((i) => i.id === active.id);

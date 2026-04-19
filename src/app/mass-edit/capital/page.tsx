@@ -33,7 +33,7 @@ const DISTRICT_MAX_LEVELS = Object.fromEntries(
   DISTRICTS.map((d) => [d.id, getMaxDistrictHallLevel(d.id)])
 ) as Record<string, number>;
 
-export default function MassEditCapitalPage() {
+const MassEditCapitalPage = () => {
   const { activePlaythrough, updatePlaythrough, isLoaded } = usePlaythrough();
   const router = useRouter();
 
@@ -121,7 +121,7 @@ export default function MassEditCapitalPage() {
 
     const bLevels: LevelMap = {};
 
-    function initDistrict(districtId: string, buildings: BuildingEditData[], record: CapitalBuildingRecord) {
+    const initDistrict = (districtId: string, buildings: BuildingEditData[], record: CapitalBuildingRecord)=> {
       for (const b of buildings) {
         const existing = record[b.id] ?? [];
         for (let i = 0; i < b.instanceCount; i++) {
@@ -184,7 +184,7 @@ export default function MassEditCapitalPage() {
     };
   }, [isDirty]);
 
-  function handleCapitalHallChange(newLevel: number) {
+  const handleCapitalHallChange = (newLevel: number)=> {
     setCapitalHallDraft(newLevel);
     const newBuildings = getCapitalPeakBuildings(newLevel);
     const newTraps = getCapitalPeakTraps(newLevel);
@@ -208,7 +208,7 @@ export default function MassEditCapitalPage() {
     setIsDirty(true);
   }
 
-  function handleDistrictHallChange(districtId: string, newLevel: number) {
+  const handleDistrictHallChange = (districtId: string, newLevel: number)=> {
     setDistrictHallDrafts((prev) => ({ ...prev, [districtId]: newLevel }));
     const newDefenses = getDistrictBuildings(districtId, newLevel);
     const newTraps = getDistrictTraps(districtId, newLevel);
@@ -233,15 +233,15 @@ export default function MassEditCapitalPage() {
     setIsDirty(true);
   }
 
-  function setBuilding(key: string, val: number) { setBuildingLevels((p) => ({ ...p, [key]: val })); setIsDirty(true); }
-  function setWall(districtId: string, level: string, count: number) {
+  const setBuilding = (key: string, val: number)=> { setBuildingLevels((p) => ({ ...p, [key]: val })); setIsDirty(true); }
+  const setWall = (districtId: string, level: string, count: number)=> {
     setWallCounts((p) => ({ ...p, [districtId]: { ...(p[districtId] ?? {}), [level]: count } }));
     setIsDirty(true);
   }
-  function setTroop(name: string, val: number) { setTroopLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
-  function setSpell(name: string, val: number) { setSpellLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
+  const setTroop = (name: string, val: number)=> { setTroopLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
+  const setSpell = (name: string, val: number)=> { setSpellLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
 
-  function handleSave() {
+  const handleSave = ()=> {
     if (!activePlaythrough) return;
 
     const wallErrors: string[] = [];
@@ -267,10 +267,10 @@ export default function MassEditCapitalPage() {
 
     const cap = activePlaythrough.data.clanCapital;
 
-    function rebuildDistrictBuildings(
+    const rebuildDistrictBuildings = (
       districtId: string,
       buildings: BuildingEditData[]
-    ): CapitalBuildingRecord {
+    ): CapitalBuildingRecord => {
       const result: CapitalBuildingRecord = {};
       for (const b of buildings) {
         result[b.id] = [];
@@ -281,7 +281,7 @@ export default function MassEditCapitalPage() {
       return result;
     }
 
-    function rebuildItems(editItems: ItemEditData[], levelMap: LevelMap, existing: TrackedItem[]): TrackedItem[] {
+    const rebuildItems = (editItems: ItemEditData[], levelMap: LevelMap, existing: TrackedItem[]): TrackedItem[] => {
       return editItems.map((item) => ({
         name: item.name,
         level: levelMap[item.name] ?? 0,
@@ -400,3 +400,4 @@ export default function MassEditCapitalPage() {
     </div>
   );
 }
+export default MassEditCapitalPage;

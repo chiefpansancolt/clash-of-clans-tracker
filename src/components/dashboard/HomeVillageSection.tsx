@@ -24,9 +24,7 @@ import {
   regularTroopNames,
 } from "@/lib/utils/progressHelpers";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
-
-type RawItem = { name: string; images: { icon?: string }; levels: any[] };
-type RawTroop = RawItem & { levels: Array<{ researchCostResource?: string }> };
+import type { RawItem, RawTroop, RawResourceBuilding } from "@/types/app/rawData";
 const _h = home();
 const _troops = _h.troops().get() as RawTroop[];
 // Precompute sort order: Elixir troops first, Dark Elixir second
@@ -43,13 +41,12 @@ const _heroes = _h.heroes().get() as RawItem[];
 const _equip = _h.heroEquipment().get() as RawItem[];
 const _leagues = rankedBattles();
 
-type RawResourceBuilding = { id: string; levels: Array<{ level: number; capacity?: number; productionRate?: number; townHallRequired: number }> };
+import type { HomeVillageSectionProps } from "@/types/components/dashboard";
+
 const _resourceBuildings = _h.resourceBuildings().get() as RawResourceBuilding[];
 const _rbMap = new Map(_resourceBuildings.map((b) => [b.id, b]));
 
-import type { HomeVillageSectionProps } from "@/types/components/dashboard";
-
-export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps) {
+export const HomeVillageSection = ({ hv, playthrough }: HomeVillageSectionProps) => {
   const thLevel = hv.townHallLevel;
   const thImageUrl = toPublicImageUrl(`images/home/town-hall/normal/level-${thLevel}.png`);
   const days = calcDaysAt(playthrough.thChangedAt);

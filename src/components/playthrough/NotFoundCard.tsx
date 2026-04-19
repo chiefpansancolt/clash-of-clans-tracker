@@ -4,10 +4,10 @@ import { HiHome } from "react-icons/hi";
 
 import type { NotFoundCardProps } from "@/types/components/playthrough";
 
-export default function NotFoundCard({
+const NotFoundCard = ({
 	title = "Not Found",
 	message = "The item you are looking for does not exist.",
-}: NotFoundCardProps) {
+}: NotFoundCardProps) => {
 	return (
 		<div className="flex items-center justify-center p-8">
 			<Card className="max-w-md text-center">
@@ -21,3 +21,4 @@ export default function NotFoundCard({
 		</div>
 	);
 }
+export default NotFoundCard;

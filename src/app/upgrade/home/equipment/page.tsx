@@ -15,7 +15,7 @@ const ORE_ICONS: Record<string, string> = {
   starry: "/images/other/ore/starry-ore.png",
 };
 
-function OreCost({ icon, amount, highlight }: { icon: string; amount: number; highlight?: boolean }) {
+const OreCost = ({ icon, amount, highlight }: { icon: string; amount: number; highlight?: boolean }) => {
   if (amount <= 0) return null;
   return (
     <span className="flex items-center gap-0.5">
@@ -29,7 +29,7 @@ function OreCost({ icon, amount, highlight }: { icon: string; amount: number; hi
   );
 }
 
-export default function EquipmentUpgradePage() {
+const EquipmentUpgradePage = () => {
   const router = useRouter();
   const { activePlaythrough, isLoaded, updatePlaythrough } = usePlaythrough();
   const [hideMax, setHideMax] = usePersistedToggle("upgrade:equipment:hideMax");
@@ -46,7 +46,7 @@ export default function EquipmentUpgradePage() {
 
   if (!activePlaythrough || !hv) return null;
 
-  function upgradeEquipment(heroName: string, equipName: string, toLevel: number) {
+  const upgradeEquipment = (heroName: string, equipName: string, toLevel: number)=> {
     const newHeroes = hv!.heroes.map((hero) => {
       if (hero.name !== heroName) return hero;
       const newEquip = (hero.equipment ?? []).map((eq) =>
@@ -191,3 +191,4 @@ export default function EquipmentUpgradePage() {
     </div>
   );
 }
+export default EquipmentUpgradePage;

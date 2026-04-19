@@ -32,11 +32,11 @@ const DISTRICTS: { key: keyof Omit<ClanCapitalData, "clanCapitalContributions" |
 ];
 
 
-function computeDistrictProgress(
+const computeDistrictProgress = (
   district: ClanCapitalDistrictData,
   buildings: BuildingEditData[],
   wallInfo: CapitalWallInfo
-): ProgressResult {
+): ProgressResult  => {
   let current = 0;
   let max = 0;
 
@@ -62,7 +62,7 @@ function computeDistrictProgress(
   };
 }
 
-function progressColor(pct: number): string {
+const progressColor = (pct: number): string  => {
   if (pct >= 100) return "bg-green-500";
   if (pct >= 80)  return "bg-blue-400";
   if (pct >= 60)  return "bg-accent";
@@ -70,7 +70,7 @@ function progressColor(pct: number): string {
 }
 
 
-function DistrictCard({
+const DistrictCard = ({
   label,
   district,
   isCapital,
@@ -82,7 +82,7 @@ function DistrictCard({
   isCapital: boolean;
   progress: ProgressResult;
   unlocksAtCapitalHall: number;
-}) {
+}) => {
   const hallLevel = district.hallLevel;
   const isLocked = hallLevel === 0;
 
@@ -150,7 +150,7 @@ function DistrictCard({
 
 import type { ClanCapitalSectionProps } from "@/types/components/dashboard";
 
-export function ClanCapitalSection({ data }: ClanCapitalSectionProps) {
+export const ClanCapitalSection = ({ data }: ClanCapitalSectionProps) => {
   const capitalHallLevel = data.capitalPeak.hallLevel;
   const capitalImageUrl = toPublicImageUrl(
     `images/clan-capital/halls/capital-hall/normal/level-${capitalHallLevel || 1}.png`

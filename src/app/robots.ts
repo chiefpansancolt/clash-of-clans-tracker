@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-export default function robots(): MetadataRoute.Robots {
+const robots = (): MetadataRoute.Robots  => {
 	return {
 		rules: {
 			userAgent: "*",
@@ -9,3 +9,4 @@ export default function robots(): MetadataRoute.Robots {
 		sitemap: "https://coc.gamerdex.app/sitemap.xml",
 	};
 }
+export default robots;

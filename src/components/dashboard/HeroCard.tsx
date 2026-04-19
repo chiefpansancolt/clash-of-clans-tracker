@@ -7,13 +7,13 @@ import { HiClock, HiLockClosed } from "react-icons/hi";
 import type { TrackedEquipment } from "@/types/app/game";
 import type { HeroCardProps } from "@/types/components/dashboard";
 
-function EquipChip({
+const EquipChip = ({
   eq,
   data,
 }: {
   eq: TrackedEquipment;
   data: { iconUrl: string; maxLevel: number } | undefined;
-}) {
+}) => {
   const [imgError, setImgError] = useState(false);
   const isMaxed = data && data.maxLevel > 0 && eq.level >= data.maxLevel;
   const badgeBg = isMaxed ? "bg-green-500 text-white" : "bg-accent text-primary";
@@ -46,7 +46,7 @@ function EquipChip({
   );
 }
 
-export function HeroCard({ hero, heroIconUrl, maxHeroLevel, getEquipmentData }: HeroCardProps) {
+export const HeroCard = ({ hero, heroIconUrl, maxHeroLevel, getEquipmentData }: HeroCardProps) => {
   const [imgError, setImgError] = useState(false);
   const isLocked = hero.level === 0;
   const isMaxed = !isLocked && maxHeroLevel > 0 && hero.level >= maxHeroLevel;

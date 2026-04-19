@@ -1,62 +1,50 @@
-// ─── Shared base ─────────────────────────────────────────────────────────────
-
 interface BaseQueueItem {
-  id: string;           // nanoid — stable key for drag-and-drop
-  name: string;         // display name
-  targetLevel: number;  // the level being upgraded to
-  durationMs: number;   // from upgradeHelpers step
+  id: string;
+  name: string;
+  targetLevel: number;
+  durationMs: number;
   cost: number;
-  costResource: string; // "Gold" | "Elixir" | "Dark Elixir"
+  costResource: string;
   imageUrl: string;
 }
 
-// ─── Builder queue ────────────────────────────────────────────────────────────
-
 export interface BuilderQueueItem extends BaseQueueItem {
   category: "defenses" | "armyBuildings" | "resourceBuildings" | "traps" | "heroes" | "townHall" | "craftedDefenses";
-  buildingId: string;    // clash-of-clans-data id e.g. "cannon"; for craftedDefenses: defenseId
-  instanceIndex: number; // 0-based — which instance; for craftedDefenses: moduleIndex
+  buildingId: string;
+  instanceIndex: number;
   isSupercharge?: boolean;
 }
-
-// ─── Research queue ───────────────────────────────────────────────────────────
 
 export interface ResearchQueueItem extends BaseQueueItem {
   category: "troops" | "spells" | "siegeMachines";
 }
 
-// ─── Pet queue ────────────────────────────────────────────────────────────────
-
 export interface PetQueueItem extends BaseQueueItem {}
-
-// ─── Validation ───────────────────────────────────────────────────────────────
 
 export interface QueueConflict {
   queueItemId: string;
-  message: string; // e.g. "Cannon #1 lvl 14→15 must finish first"
+  message: string;
 }
 
-// ─── Resource Planner ─────────────────────────────────────────────────────────
-
 export interface ResourceEvent {
-  builderLabel: string;   // "Builder 1" | "Laboratory"
-  completingItem: string; // "Cannon #1  14→15"
+  builderLabel: string;
+  completingItem: string;
   completesAt: Date;
-  nextItem: string;       // "X-Bow #1  11→12"
+  nextItem: string;
   cost: number;
   costResource: string;
 }
 
 export interface ResourceGroup {
-  dayOffset: number; // days from now, rounded
+  dayOffset: number;
   date: Date;
   events: ResourceEvent[];
 }
 
-// ─── Timeline ─────────────────────────────────────────────────────────────────
+export type AnyQueueItem = BuilderQueueItem | ResearchQueueItem | PetQueueItem;
 
 export interface TimelineBlock {
-  label: string;    // "Cannon #1  14→15"
+  label: string;
   imageUrl: string;
   startsAt: Date;
   endsAt: Date;

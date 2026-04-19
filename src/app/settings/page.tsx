@@ -13,7 +13,7 @@ import {
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 
-export default function Settings() {
+const Settings = () => {
 	const { playthroughs, exportData, importData, clearAllData, appSettings, updateSettings } = usePlaythrough();
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -237,3 +237,4 @@ export default function Settings() {
 		</>
 	);
 }
+export default Settings;

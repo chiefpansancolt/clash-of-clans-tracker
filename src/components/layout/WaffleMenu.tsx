@@ -71,7 +71,7 @@ const APP_ITEMS: AppItem[] = [
   },
 ];
 
-export function WaffleMenu() {
+export const WaffleMenu = () => {
   const { activePlaythrough } = usePlaythrough();
   const thLevel = activePlaythrough?.data.homeVillage.townHallLevel ?? 0;
   const [open, setOpen] = useState(false);
@@ -79,7 +79,7 @@ export function WaffleMenu() {
 
   useEffect(() => {
     if (!open) return;
-    function handleClickOutside(e: MouseEvent) {
+    const handleClickOutside = (e: MouseEvent)=> {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
       }

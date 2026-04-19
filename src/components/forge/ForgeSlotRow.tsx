@@ -13,7 +13,7 @@ import {
 import type { AutoForgeData, ForgeResourceType } from "@/types/app/playthrough";
 import type { ForgeSlotRowProps } from "@/types/components/forge";
 
-export function ForgeSlotRow({
+export const ForgeSlotRow = ({
   label,
   slot,
   isAuto = false,
@@ -25,7 +25,7 @@ export function ForgeSlotRow({
   bhLevel,
   onStart,
   onStop,
-}: ForgeSlotRowProps) {
+}: ForgeSlotRowProps) => {
   const isRunning = !!slot.endsAt;
   const [display, setDisplay] = useState(() =>
     slot.endsAt ? Math.max(0, new Date(slot.endsAt).getTime() - Date.now()) : 0
@@ -53,13 +53,13 @@ export function ForgeSlotRow({
     (slot.resourceType as ForgeResourceType | null) ?? "gold"
   );
 
-  function isResourceAvailable(rt: ForgeResourceType): boolean {
+  const isResourceAvailable = (rt: ForgeResourceType): boolean => {
     if (rt === "darkElixir") return thLevel >= 13;
     if (rt === "builderGold" || rt === "builderElixir") return bhLevel >= 8;
     return true;
   }
 
-  function getRate(rt: ForgeResourceType): ConversionRate | undefined {
+  const getRate = (rt: ForgeResourceType): ConversionRate | undefined => {
     return rates.find((r) => r.resourceType === rt);
   }
 

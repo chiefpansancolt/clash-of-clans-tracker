@@ -14,7 +14,7 @@ import {
 import type { AutoForgeData, DailiesData, DailyTimerData, ForgeResourceType, GoldPassData, HelpersData } from "@/types/app/playthrough";
 import type { AutoForgeChipProps, DailiesSectionProps, GoldPassItem, TimerChipProps } from "@/types/components/dashboard";
 
-function getCurrentMonthKey(): string {
+const getCurrentMonthKey = (): string  => {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 }
@@ -52,7 +52,7 @@ export const defaultDailies: DailiesData = {
 
 
 
-function TimerChip({ label, imageUrl, timer, onCollect, onAdjust }: TimerChipProps) {
+const TimerChip = ({ label, imageUrl, timer, onCollect, onAdjust }: TimerChipProps) => {
   const available = isAvailable(timer);
   const counting = !available && !!timer.resetTime;
 
@@ -80,7 +80,7 @@ function TimerChip({ label, imageUrl, timer, onCollect, onAdjust }: TimerChipPro
   const [adjustValue, setAdjustValue] = useState(timer.resetTime ?? "");
   const [setupTime, setSetupTime] = useState("");
 
-  function handleCollect() {
+  const handleCollect = ()=> {
     if (!timer.resetTime && setupTime) {
       onCollect(setupTime);
       setSetupTime("");
@@ -89,7 +89,7 @@ function TimerChip({ label, imageUrl, timer, onCollect, onAdjust }: TimerChipPro
     }
   }
 
-  function handleAdjustConfirm() {
+  const handleAdjustConfirm = ()=> {
     if (adjustValue) onAdjust(adjustValue);
     setShowAdjust(false);
   }
@@ -192,7 +192,7 @@ function TimerChip({ label, imageUrl, timer, onCollect, onAdjust }: TimerChipPro
 }
 
 
-function LockedChip({ label, imageUrl }: { label: string; imageUrl: string }) {
+const LockedChip = ({ label, imageUrl }: { label: string; imageUrl: string }) => {
   return (
     <div className="flex flex-col items-center gap-1.5 min-w-18 opacity-40">
       <div className="relative h-10 w-10">
@@ -210,7 +210,7 @@ function LockedChip({ label, imageUrl }: { label: string; imageUrl: string }) {
 }
 
 
-function Divider() {
+const Divider = () => {
   return <div className="w-px self-stretch bg-secondary/80" />;
 }
 
@@ -218,7 +218,7 @@ function Divider() {
 const GP_BASE = "images/season-pass/pass-items/";
 
 
-function GoldPassDisplay({ goldPass }: { goldPass: GoldPassData }) {
+const GoldPassDisplay = ({ goldPass }: { goldPass: GoldPassData }) => {
   const col1: GoldPassItem[] = [
     { type: "pct",  label: "Builder",     image: `${GP_BASE}perk-builder-boost.png`,          value: goldPass.builderBoostPct },
     { type: "pct",  label: "Research",    image: `${GP_BASE}perk-research-boost.png`,         value: goldPass.researchBoostPct },
@@ -230,7 +230,7 @@ function GoldPassDisplay({ goldPass }: { goldPass: GoldPassData }) {
     { type: "bool", label: "Req. Reduce", image: `${GP_BASE}perk-request-time-reduction.png`, unlocked: goldPass.requestTimeReductionUnlocked },
   ];
 
-  function renderItem(item: GoldPassItem, idx: number) {
+  const renderItem = (item: GoldPassItem, idx: number)=> {
     const locked = item.type === "bool" && !item.unlocked;
     return (
       <div key={idx} className={`flex items-center gap-1.5 ${locked ? "opacity-40" : ""}`}>
@@ -277,7 +277,7 @@ const RESOURCE_META: Record<ForgeResourceType, { label: string; image: string }>
 };
 
 
-function formatMsDhm(ms: number): string {
+const formatMsDhm = (ms: number): string  => {
   const totalMins = Math.ceil(ms / 60_000);
   const d = Math.floor(totalMins / 1440);
   const h = Math.floor((totalMins % 1440) / 60);
@@ -289,7 +289,7 @@ function formatMsDhm(ms: number): string {
   return parts.join(" ");
 }
 
-function AutoForgeChip({ autoForge, onStop }: AutoForgeChipProps) {
+const AutoForgeChip = ({ autoForge, onStop }: AutoForgeChipProps) => {
   const [display, setDisplay] = useState(() =>
     autoForge.endsAt ? Math.max(0, new Date(autoForge.endsAt).getTime() - Date.now()) : 0
   );
@@ -380,7 +380,7 @@ const DAILY_CHIPS: { key: "starBonus" | "capitalGold"; label: string; image: str
   { key: "capitalGold", label: "Capital Gold",  image: "images/other/gold-c.png" },
 ];
 
-export function DailiesSection({ dailies, playthroughId, thLevel, helperHutLevel }: DailiesSectionProps) {
+export const DailiesSection = ({ dailies, playthroughId, thLevel, helperHutLevel }: DailiesSectionProps) => {
   const { updatePlaythrough } = usePlaythrough();
 
   const showHelpers = helperHutLevel > 0;
@@ -388,8 +388,6 @@ export function DailiesSection({ dailies, playthroughId, thLevel, helperHutLevel
   const showCapitalGold = thLevel >= 6;
   const showGoldPass = thLevel >= 7;
   const hasDailyChips = showStarBonus || showCapitalGold;
-
-  if (!showHelpers && !hasDailyChips && !showGoldPass) return null;
 
   // Auto-reset Gold Pass if month has changed
   useEffect(() => {
@@ -405,7 +403,9 @@ export function DailiesSection({ dailies, playthroughId, thLevel, helperHutLevel
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function updateHelper(key: Exclude<keyof HelpersData, "prospectorUnlocked">, patch: Partial<DailyTimerData>) {
+  if (!showHelpers && !hasDailyChips && !showGoldPass) return null;
+
+  const updateHelper = (key: Exclude<keyof HelpersData, "prospectorUnlocked">, patch: Partial<DailyTimerData>)=> {
     const existing = dailies.helpers[key] as DailyTimerData;
     updatePlaythrough(playthroughId, {
       dailies: {
@@ -415,20 +415,20 @@ export function DailiesSection({ dailies, playthroughId, thLevel, helperHutLevel
     });
   }
 
-  function updateDaily(key: "starBonus" | "capitalGold", patch: Partial<DailyTimerData>) {
+  const updateDaily = (key: "starBonus" | "capitalGold", patch: Partial<DailyTimerData>)=> {
     updatePlaythrough(playthroughId, {
       dailies: { ...dailies, [key]: { ...dailies[key], ...patch } },
     });
   }
 
-  function handleHelperCollect(key: Exclude<keyof HelpersData, "prospectorUnlocked">, resetTime: string | null) {
+  const handleHelperCollect = (key: Exclude<keyof HelpersData, "prospectorUnlocked">, resetTime: string | null)=> {
     updateHelper(key, {
       lastCollectedAt: new Date().toISOString(),
       ...(resetTime !== null ? { resetTime } : {}),
     });
   }
 
-  function handleDailyCollect(key: "starBonus" | "capitalGold", resetTime: string | null) {
+  const handleDailyCollect = (key: "starBonus" | "capitalGold", resetTime: string | null)=> {
     updateDaily(key, {
       lastCollectedAt: new Date().toISOString(),
       ...(resetTime !== null ? { resetTime } : {}),

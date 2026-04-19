@@ -5,7 +5,7 @@ import { HiMenu, HiX } from "react-icons/hi";
 import { useUI } from "@/lib/contexts/UIContext";
 import { WaffleMenu } from "@/components/layout/WaffleMenu";
 
-export function AppNavbar() {
+export const AppNavbar = () => {
 	const { sidebarOpen, toggleSidebar } = useUI();
 
 	return (

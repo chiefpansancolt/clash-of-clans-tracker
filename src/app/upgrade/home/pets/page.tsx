@@ -11,7 +11,7 @@ import { getPetUpgradeSteps, getPetSlots } from "@/lib/utils/upgradeHelpers";
 import { startPetUpgrade, finishPetUpgrade, cancelPetUpgrade, adjustPetUpgrade } from "@/lib/utils/upgradeActions";
 import { UpgradeRow } from "@/components/upgrade/UpgradeRow";
 
-export default function PetsUpgradePage() {
+const PetsUpgradePage = () => {
   const router = useRouter();
   const { activePlaythrough, isLoaded, updatePlaythrough } = usePlaythrough();
   const researchBoostPct = (activePlaythrough?.dailies?.goldPass.researchBoostPct ?? 0) as 0 | 10 | 15 | 20;
@@ -27,7 +27,7 @@ export default function PetsUpgradePage() {
   const pets = useMemo(() => getPetsAtTH(thLevel), [thLevel]);
   const slots = hv ? getPetSlots(hv) : [];
 
-  function save(newHv: typeof hv) {
+  const save = (newHv: typeof hv)=> {
     if (!activePlaythrough || !newHv) return;
     updatePlaythrough(activePlaythrough.id, {
       data: { ...activePlaythrough.data, homeVillage: newHv },
@@ -94,3 +94,4 @@ export default function PetsUpgradePage() {
     </div>
   );
 }
+export default PetsUpgradePage;

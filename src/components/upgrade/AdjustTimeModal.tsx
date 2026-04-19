@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Modal, ModalBody, ModalHeader } from "flowbite-react";
 import type { AdjustTimeModalProps } from "@/types/components/upgrade";
 
-function parseRemaining(finishesAt: string) {
+const parseRemaining = (finishesAt: string) => {
   const totalSec = Math.max(0, Math.floor((new Date(finishesAt).getTime() - Date.now()) / 1000));
   return {
     days: Math.floor(totalSec / 86400),
@@ -14,21 +14,21 @@ function parseRemaining(finishesAt: string) {
   };
 }
 
-export function AdjustTimeModal({
+export const AdjustTimeModal = ({
   isOpen,
   onClose,
   onConfirm,
   itemName,
   nextLevel,
   currentFinishesAt,
-}: AdjustTimeModalProps) {
+}: AdjustTimeModalProps) => {
   const parsed = parseRemaining(currentFinishesAt);
   const [days, setDays] = useState(parsed.days);
   const [hours, setHours] = useState(parsed.hours);
   const [minutes, setMinutes] = useState(parsed.minutes);
   const [seconds, setSeconds] = useState(parsed.seconds);
 
-  function handleConfirm() {
+  const handleConfirm = ()=> {
     const durationMs = (days * 86400 + hours * 3600 + minutes * 60 + seconds) * 1000;
     onConfirm(new Date(Date.now() + durationMs).toISOString());
     onClose();

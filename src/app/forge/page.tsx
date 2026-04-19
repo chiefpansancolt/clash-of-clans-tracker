@@ -19,7 +19,7 @@ import { ForgeSlotRow } from "@/components/forge/ForgeSlotRow";
 import { ConversionTables } from "@/components/forge/ConversionTables";
 import type { DailiesData, ForgeResourceType, ForgeSlotData } from "@/types/app/playthrough";
 
-export default function ForgePage() {
+const ForgePage = () => {
   const router = useRouter();
   const { activePlaythrough, updatePlaythrough } = usePlaythrough();
 
@@ -44,11 +44,11 @@ export default function ForgePage() {
     return existing ?? { resourceType: null, endsAt: null, durationMs: 0, capitalGoldOutput: 0, resourceCost: 0 };
   });
 
-  function updateDailies(patch: Partial<DailiesData>) {
+  const updateDailies = (patch: Partial<DailiesData>)=> {
     updatePlaythrough(playthroughId, { dailies: { ...dailies, ...patch } });
   }
 
-  function handleCapGoldCollect(resetTime: string | null) {
+  const handleCapGoldCollect = (resetTime: string | null)=> {
     updateDailies({
       capitalGold: {
         ...dailies.capitalGold,
@@ -58,11 +58,11 @@ export default function ForgePage() {
     });
   }
 
-  function handleCapGoldAdjust(newResetTime: string) {
+  const handleCapGoldAdjust = (newResetTime: string)=> {
     updateDailies({ capitalGold: { ...dailies.capitalGold, resetTime: newResetTime } });
   }
 
-  function handleAutoStart(resourceType: ForgeResourceType, rate: ConversionRate) {
+  const handleAutoStart = (resourceType: ForgeResourceType, rate: ConversionRate)=> {
     const durationMs = getForgeDurationMs(builderBoostPct);
     updateDailies({
       autoForge: {
@@ -76,11 +76,11 @@ export default function ForgePage() {
     });
   }
 
-  function handleAutoStop() {
+  const handleAutoStop = ()=> {
     updateDailies({ autoForge: { ...dailies.autoForge, endsAt: null } });
   }
 
-  function handleSlotStart(index: number, resourceType: ForgeResourceType, rate: ConversionRate) {
+  const handleSlotStart = (index: number, resourceType: ForgeResourceType, rate: ConversionRate)=> {
     const durationMs = getForgeDurationMs(builderBoostPct);
     const newSlots = forgeSlots.map((s, i) =>
       i === index
@@ -90,7 +90,7 @@ export default function ForgePage() {
     updateDailies({ forgeSlots: newSlots });
   }
 
-  function handleSlotStop(index: number) {
+  const handleSlotStop = (index: number)=> {
     const newSlots = forgeSlots.map((s, i) =>
       i === index
         ? { ...s, endsAt: null, resourceType: null, durationMs: 0, capitalGoldOutput: 0, resourceCost: 0 }
@@ -186,3 +186,4 @@ export default function ForgePage() {
     </div>
   );
 }
+export default ForgePage;

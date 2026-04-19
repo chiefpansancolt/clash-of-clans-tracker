@@ -13,7 +13,7 @@ import {
 } from "@/lib/utils/upgradeActions";
 import { UpgradeRow } from "@/components/upgrade/UpgradeRow";
 
-export default function ArmyUpgradePage() {
+const ArmyUpgradePage = () => {
   const router = useRouter();
   const { activePlaythrough, appSettings, isLoaded, updatePlaythrough } = usePlaythrough();
 
@@ -27,7 +27,7 @@ export default function ArmyUpgradePage() {
   const buildings = useMemo(() => getArmyBuildingsAtTH(thLevel), [thLevel]);
   const slots = hv ? getBuilderSlots(hv, appSettings.goblinBuilderEnabled) : [];
 
-  function save(newHv: typeof hv) {
+  const save = (newHv: typeof hv)=> {
     if (!activePlaythrough || !newHv) return;
     updatePlaythrough(activePlaythrough.id, {
       data: { ...activePlaythrough.data, homeVillage: newHv },
@@ -84,3 +84,4 @@ export default function ArmyUpgradePage() {
     </div>
   );
 }
+export default ArmyUpgradePage;

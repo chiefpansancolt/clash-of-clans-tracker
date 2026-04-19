@@ -27,16 +27,14 @@ import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { isExportDataFormat, mapExportDataToVillageData } from "@/lib/utils/exportDataMapper";
 import { mapPlayerApiToVillageData, mergeWithBuildingData } from "@/lib/utils/playerApiMapper";
 import { createDefaultVillageData } from "@/lib/utils/villageHelpers";
-import type { CreatePlaythroughModalProps } from "@/types/components";
+import type { CreatePlaythroughModalProps, CreationMode } from "@/types/components/modals";
 import type { PlayerApiResponse } from "@/types/app";
 import type { VillageData } from "@/types/app/game";
-
-type CreationMode = "fresh" | "import";
 
 const TH_LEVELS = Array.from({ length: 18 }, (_, i) => i + 1);
 const BH_LEVELS = Array.from({ length: 10 }, (_, i) => i + 1);
 
-export function CreatePlaythroughModal({ isOpen, onClose }: CreatePlaythroughModalProps) {
+export const CreatePlaythroughModal = ({ isOpen, onClose }: CreatePlaythroughModalProps) => {
 	const { addPlaythrough } = usePlaythrough();
 
 	const [mode, setMode] = useState<CreationMode>("fresh");

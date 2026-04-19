@@ -7,7 +7,7 @@ import { HiClock, HiLockClosed } from "react-icons/hi";
 import type { TrackedItem } from "@/types/app/game";
 import type { ItemGridProps } from "@/types/components/dashboard";
 
-function ItemCell({
+const ItemCell = ({
   item,
   iconUrl,
   maxLevel,
@@ -17,7 +17,7 @@ function ItemCell({
   iconUrl: string;
   maxLevel: number;
   small: boolean;
-}) {
+}) => {
   const [imgError, setImgError] = useState(false);
   const isLocked = item.level === 0;
   const isMaxed = maxLevel > 0 && item.level >= maxLevel;
@@ -68,7 +68,7 @@ function ItemCell({
   );
 }
 
-export function ItemGrid({ items, getItemData, small = false }: ItemGridProps) {
+export const ItemGrid = ({ items, getItemData, small = false }: ItemGridProps) => {
   if (items.length === 0) return null;
 
   return (

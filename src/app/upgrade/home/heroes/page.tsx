@@ -8,7 +8,7 @@ import { getHeroUpgradeSteps, getBuilderSlots } from "@/lib/utils/upgradeHelpers
 import { startHeroUpgrade, finishHeroUpgrade, cancelHeroUpgrade, adjustHeroUpgrade } from "@/lib/utils/upgradeActions";
 import { UpgradeRow } from "@/components/upgrade/UpgradeRow";
 
-export default function HeroesUpgradePage() {
+const HeroesUpgradePage = () => {
   const router = useRouter();
   const { activePlaythrough, appSettings, isLoaded, updatePlaythrough } = usePlaythrough();
 
@@ -22,7 +22,7 @@ export default function HeroesUpgradePage() {
   const heroes = useMemo(() => getHeroesAtTH(thLevel), [thLevel]);
   const slots = hv ? getBuilderSlots(hv, appSettings.goblinBuilderEnabled) : [];
 
-  function save(newHv: typeof hv) {
+  const save = (newHv: typeof hv)=> {
     if (!activePlaythrough || !newHv) return;
     updatePlaythrough(activePlaythrough.id, {
       data: { ...activePlaythrough.data, homeVillage: newHv },
@@ -73,3 +73,4 @@ export default function HeroesUpgradePage() {
     </div>
   );
 }
+export default HeroesUpgradePage;

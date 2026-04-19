@@ -32,7 +32,7 @@ import {
 import type { LevelMap } from "@/types/app/massEdit";
 import type { BuildingInstance, BuildingRecord, HomeVillageData, TrackedItem } from "@/types/app/game";
 
-export default function MassEditHomePage() {
+const MassEditHomePage = () => {
   const { activePlaythrough, updatePlaythrough, isLoaded } = usePlaythrough();
   const router = useRouter();
 
@@ -74,7 +74,7 @@ export default function MassEditHomePage() {
     if (!activePlaythrough) return;
     const hv = activePlaythrough.data.homeVillage;
 
-    function initBuildings(editItems: BuildingEditData[], record: BuildingRecord) {
+    const initBuildings = (editItems: BuildingEditData[], record: BuildingRecord)=> {
       const bLevels: LevelMap = {};
       const scLevels: LevelMap = {};
       for (const b of editItems) {
@@ -149,17 +149,17 @@ export default function MassEditHomePage() {
     };
   }, [isDirty]);
 
-  function setBuilding(key: string, val: number) { setBuildingLevels((p) => ({ ...p, [key]: val })); setIsDirty(true); }
-  function setSupercharge(key: string, val: number) { setSuperchargeLevels((p) => ({ ...p, [key]: val })); setIsDirty(true); }
-  function setTroop(name: string, val: number) { setTroopLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
-  function setSpell(name: string, val: number) { setSpellLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
-  function setSiege(name: string, val: number) { setSiegeLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
-  function setPet(name: string, val: number) { setPetLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
-  function setHero(name: string, val: number) { setHeroLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
-  function setEquip(name: string, val: number) { setEquipLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
-  function setCrafted(key: string, val: number) { setCraftedLevels((p) => ({ ...p, [key]: val })); setIsDirty(true); }
+  const setBuilding = (key: string, val: number)=> { setBuildingLevels((p) => ({ ...p, [key]: val })); setIsDirty(true); }
+  const setSupercharge = (key: string, val: number)=> { setSuperchargeLevels((p) => ({ ...p, [key]: val })); setIsDirty(true); }
+  const setTroop = (name: string, val: number)=> { setTroopLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
+  const setSpell = (name: string, val: number)=> { setSpellLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
+  const setSiege = (name: string, val: number)=> { setSiegeLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
+  const setPet = (name: string, val: number)=> { setPetLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
+  const setHero = (name: string, val: number)=> { setHeroLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
+  const setEquip = (name: string, val: number)=> { setEquipLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
+  const setCrafted = (key: string, val: number)=> { setCraftedLevels((p) => ({ ...p, [key]: val })); setIsDirty(true); }
 
-  function setWall(levelStr: string, newCount: number) {
+  const setWall = (levelStr: string, newCount: number)=> {
     setWallCounts((prev) => {
       const allocated = Object.values(prev).reduce((s, c) => s + c, 0);
       const current = prev[levelStr] ?? 0;
@@ -170,11 +170,11 @@ export default function MassEditHomePage() {
     setIsDirty(true);
   }
 
-  function handleSave() {
+  const handleSave = ()=> {
     if (!activePlaythrough) return;
     const hv = activePlaythrough.data.homeVillage;
 
-    function rebuildRecord(editItems: BuildingEditData[], existing: BuildingRecord): BuildingRecord {
+    const rebuildRecord = (editItems: BuildingEditData[], existing: BuildingRecord): BuildingRecord => {
       const result: BuildingRecord = {};
       for (const b of editItems) {
         result[b.id] = [];
@@ -192,7 +192,7 @@ export default function MassEditHomePage() {
       return result;
     }
 
-    function rebuildItems(editItems: ItemEditData[], levelMap: LevelMap, existing: TrackedItem[]): TrackedItem[] {
+    const rebuildItems = (editItems: ItemEditData[], levelMap: LevelMap, existing: TrackedItem[]): TrackedItem[] => {
       return editItems.map((item) => ({
         name: item.name,
         level: levelMap[item.name] ?? 0,
@@ -465,3 +465,4 @@ export default function MassEditHomePage() {
     </div>
   );
 }
+export default MassEditHomePage;

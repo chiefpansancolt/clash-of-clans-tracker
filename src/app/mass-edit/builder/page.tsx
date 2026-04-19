@@ -26,7 +26,7 @@ import type {
 import type { LevelMap } from "@/types/app/massEdit";
 import type { BuilderBaseData, BuildingInstance, BuildingRecord, TrackedItem } from "@/types/app/game";
 
-export default function MassEditBuilderPage() {
+const MassEditBuilderPage = () => {
   const { activePlaythrough, updatePlaythrough, isLoaded } = usePlaythrough();
   const router = useRouter();
 
@@ -55,7 +55,7 @@ export default function MassEditBuilderPage() {
     if (!activePlaythrough) return;
     const bb = activePlaythrough.data.builderBase;
 
-    function initBuildings(editItems: BuildingEditData[], record: BuildingRecord) {
+    const initBuildings = (editItems: BuildingEditData[], record: BuildingRecord)=> {
       const bLevels: LevelMap = {};
       for (const b of editItems) {
         const existing = record[b.id] ?? [];
@@ -106,11 +106,11 @@ export default function MassEditBuilderPage() {
     };
   }, [isDirty]);
 
-  function setBuilding(key: string, val: number) { setBuildingLevels((p) => ({ ...p, [key]: val })); setIsDirty(true); }
-  function setTroop(name: string, val: number) { setTroopLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
-  function setHero(name: string, val: number) { setHeroLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
+  const setBuilding = (key: string, val: number)=> { setBuildingLevels((p) => ({ ...p, [key]: val })); setIsDirty(true); }
+  const setTroop = (name: string, val: number)=> { setTroopLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
+  const setHero = (name: string, val: number)=> { setHeroLevels((p) => ({ ...p, [name]: val })); setIsDirty(true); }
 
-  function setWall(levelStr: string, newCount: number) {
+  const setWall = (levelStr: string, newCount: number)=> {
     setWallCounts((prev) => {
       const allocated = Object.values(prev).reduce((s, c) => s + c, 0);
       const current = prev[levelStr] ?? 0;
@@ -121,11 +121,11 @@ export default function MassEditBuilderPage() {
     setIsDirty(true);
   }
 
-  function handleSave() {
+  const handleSave = ()=> {
     if (!activePlaythrough) return;
     const bb = activePlaythrough.data.builderBase;
 
-    function rebuildRecord(editItems: BuildingEditData[], existing: BuildingRecord): BuildingRecord {
+    const rebuildRecord = (editItems: BuildingEditData[], existing: BuildingRecord): BuildingRecord => {
       const result: BuildingRecord = {};
       for (const b of editItems) {
         result[b.id] = [];
@@ -140,7 +140,7 @@ export default function MassEditBuilderPage() {
       return result;
     }
 
-    function rebuildItems(editItems: ItemEditData[], levelMap: LevelMap, existing: TrackedItem[]): TrackedItem[] {
+    const rebuildItems = (editItems: ItemEditData[], levelMap: LevelMap, existing: TrackedItem[]): TrackedItem[] => {
       return editItems.map((item) => ({
         name: item.name,
         level: levelMap[item.name] ?? 0,
@@ -310,3 +310,4 @@ export default function MassEditBuilderPage() {
     </div>
   );
 }
+export default MassEditBuilderPage;

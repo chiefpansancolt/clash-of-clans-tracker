@@ -3,7 +3,7 @@ import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
 import { RESOURCE_META } from "@/lib/utils/forgeHelpers";
 import type { RateTableProps } from "@/types/components/forge";
 
-export function RateTable({ title, rates }: RateTableProps) {
+export const RateTable = ({ title, rates }: RateTableProps) => {
   return (
     <div className="rounded-xl border border-secondary/80 bg-primary overflow-hidden">
       <div className="px-4 py-3 border-b border-secondary/80">

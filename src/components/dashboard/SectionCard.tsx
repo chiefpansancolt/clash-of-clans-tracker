@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { SectionCardProps } from "@/types/components/dashboard";
 
-export function SectionCard({ title, children, className = "", queueHref }: SectionCardProps) {
+export const SectionCard = ({ title, children, className = "", queueHref }: SectionCardProps) => {
   return (
     <div className={`overflow-hidden rounded-lg border border-secondary/80 bg-primary ${className}`}>
       <div className="flex items-center bg-secondary px-3 py-2">

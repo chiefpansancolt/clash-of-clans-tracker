@@ -42,7 +42,8 @@ export interface AutoForgeData {
 }
 
 export interface ForgeSlotData {
-  resourceType: ForgeResourceType | null; // null = slot idle
+  // null = slot idle
+  resourceType: ForgeResourceType | null;
   /** ISO 8601; null = not running */
   endsAt: string | null;
   /** Effective duration in ms at start time (accounts for builder boost) */
@@ -67,8 +68,8 @@ export interface Playthrough {
   id: string;
   name: string;
   description?: string;
-  createdAt: string; // ISO 8601
-  lastModified: string; // ISO 8601
+  createdAt: string;
+  lastModified: string;
   /** ISO 8601 — set when TH level is assigned/changed; used for "Days at TH" counter */
   thChangedAt?: string;
   /** ISO 8601 — set when BH level is assigned/changed; used for "Days at BH" counter */

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { HiHome, HiTemplate } from "react-icons/hi";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 
-export default function NotFound() {
+const NotFound = () => {
 	const { activePlaythrough } = usePlaythrough();
 
 	return (
@@ -35,3 +35,4 @@ export default function NotFound() {
 		</div>
 	);
 }
+export default NotFound;
