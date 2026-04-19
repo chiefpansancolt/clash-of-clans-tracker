@@ -17,6 +17,7 @@ import {
   getResourceBuildingsAtTH,
   getTrapsAtTH,
   getGuardiansAtTH,
+  getOtherBuildingsAtTH,
   getTroopsAtTH,
   getSpellsAtTH,
   getSiegeMachinesAtTH,
@@ -44,6 +45,7 @@ export default function MassEditHomePage() {
 
   const defenseData     = useMemo(() => getDefensesAtTH(thLevel),         [thLevel]);
   const armyData        = useMemo(() => getArmyBuildingsAtTH(thLevel),     [thLevel]);
+  const otherData       = useMemo(() => getOtherBuildingsAtTH(thLevel),    [thLevel]);
   const resourceData    = useMemo(() => getResourceBuildingsAtTH(thLevel), [thLevel]);
   const trapData        = useMemo(() => getTrapsAtTH(thLevel),             [thLevel]);
   const guardianData    = useMemo(() => getGuardiansAtTH(thLevel),         [thLevel]);
@@ -87,7 +89,7 @@ export default function MassEditHomePage() {
       return { bLevels, scLevels };
     }
 
-    const allBuildingData = [...defenseData, ...guardianData, ...armyData, ...resourceData, ...trapData];
+    const allBuildingData = [...defenseData, ...guardianData, ...armyData, ...otherData, ...resourceData, ...trapData];
     const allRecords: BuildingRecord = { ...hv.defenses, ...hv.armyBuildings, ...hv.resourceBuildings, ...hv.traps };
     const { bLevels, scLevels } = initBuildings(allBuildingData, allRecords);
     setBuildingLevels(bLevels);
@@ -230,7 +232,7 @@ export default function MassEditHomePage() {
     const newHV: HomeVillageData = {
       ...hv,
       defenses:          rebuildRecord(combinedDefenseData, hv.defenses),
-      armyBuildings:     rebuildRecord(armyData,            hv.armyBuildings),
+      armyBuildings:     rebuildRecord([...armyData, ...otherData], hv.armyBuildings),
       resourceBuildings: rebuildRecord(resourceData,        hv.resourceBuildings),
       traps:             rebuildRecord(trapData,            hv.traps),
       troops:            rebuildItems(troopData,   troopLevels, hv.troops),
@@ -284,7 +286,7 @@ export default function MassEditHomePage() {
 
           <TabItem title="Army">
             <BuildingTab
-              buildings={armyData}
+              buildings={[...armyData, ...otherData]}
               buildingLevels={buildingLevels}
               superchargeLevels={superchargeLevels}
               onBuildingChange={setBuilding}
@@ -302,6 +304,30 @@ export default function MassEditHomePage() {
               onSuperchargeChange={setSupercharge}
             />
           </TabItem>
+
+          {thLevel >= 18 && (
+            <TabItem title="Crafted Defenses">
+              <div>
+                {craftedData.map((cd) => (
+                  <div key={cd.id} className="mt-6 first:mt-0">
+                    <SectionHeader>{cd.name}</SectionHeader>
+                    <div className="grid grid-cols-1 gap-1 lg:grid-cols-2">
+                      {cd.modules.map((mod, mi) => (
+                        <SliderRow
+                          key={mi}
+                          label={mod.name}
+                          imageUrl={cd.imageUrl}
+                          currentLevel={craftedLevels[`${cd.id}-${mi}`] ?? 0}
+                          maxLevel={mod.maxLevel}
+                          onChange={(val) => setCrafted(`${cd.id}-${mi}`, val)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabItem>
+          )}
 
           <TabItem title="Traps">
             <BuildingTab
@@ -424,30 +450,6 @@ export default function MassEditHomePage() {
               </div>
             </div>
           </TabItem>
-
-          {thLevel >= 18 && (
-            <TabItem title="Crafted">
-              <div>
-                {craftedData.map((cd) => (
-                  <div key={cd.id} className="mt-6 first:mt-0">
-                    <SectionHeader>{cd.name}</SectionHeader>
-                    <div className="grid grid-cols-1 gap-1 lg:grid-cols-2">
-                      {cd.modules.map((mod, mi) => (
-                        <SliderRow
-                          key={mi}
-                          label={mod.name}
-                          imageUrl={cd.imageUrl}
-                          currentLevel={craftedLevels[`${cd.id}-${mi}`] ?? 0}
-                          maxLevel={mod.maxLevel}
-                          onChange={(val) => setCrafted(`${cd.id}-${mi}`, val)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </TabItem>
-          )}
 
         </Tabs>
       </div>

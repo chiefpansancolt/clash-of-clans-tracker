@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ProgressCardProps } from "@/types/components/dashboard";
 
 function progressColor(pct: number): string {
@@ -7,12 +8,20 @@ function progressColor(pct: number): string {
   return "bg-orange-400";
 }
 
-export function ProgressCard({ label, result, sub }: ProgressCardProps) {
+export function ProgressCard({ label, result, sub, queueHref }: ProgressCardProps) {
   const trackColor = progressColor(result.pct);
   return (
     <div className="overflow-hidden rounded-lg border border-secondary/80">
-      <div className="bg-secondary px-3 py-2">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-accent">{label}</span>
+      <div className="flex items-center bg-secondary px-3 py-2">
+        <span className="flex-1 text-[10px] font-bold uppercase tracking-widest text-accent">{label}</span>
+        {queueHref && (
+          <Link
+            href={queueHref}
+            className="rounded px-1.5 py-0.5 text-[10px] font-bold text-white/80 hover:bg-white/10 hover:text-accent transition-colors"
+          >
+            Queue
+          </Link>
+        )}
       </div>
       <div className="bg-primary p-3">
         <div className="text-2xl font-extrabold leading-none text-accent">{result.pct}%</div>

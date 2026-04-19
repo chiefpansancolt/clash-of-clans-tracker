@@ -8,7 +8,6 @@ import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import {
   getResearchSlots,
   getResearchTimeline,
-  isActiveUpgrade,
   getResearchUpgradeSteps,
 } from "@/lib/utils/upgradeHelpers";
 import {
@@ -43,6 +42,7 @@ export default function ResearchQueuePage() {
   const hv = activePlaythrough?.data.homeVillage;
   const thLevel = hv?.townHallLevel ?? 1;
   const slots = hv ? getResearchSlots(hv, appSettings.goblinResearchEnabled) : [];
+  const researchBoostPct = (activePlaythrough?.dailies?.goldPass.researchBoostPct ?? 0) as 0 | 10 | 15 | 20;
 
   const timeline = useMemo(
     () => (hv ? getResearchTimeline(hv, slots) : {}),
@@ -83,7 +83,7 @@ export default function ResearchQueuePage() {
     ];
     for (const [item, key] of entries) {
       const u = (item as any).upgrade;
-      if (u && isActiveUpgrade(u.finishesAt)) {
+      if (u) {
         const imageUrl = getResearchUpgradeSteps(item.name, item.level, thLevel)[0]?.imageUrl ?? "";
         map.set(u.builderId, {
           label: `${item.name} ${item.level}→${item.level + 1}`,
@@ -223,6 +223,7 @@ export default function ResearchQueuePage() {
           hv={hv}
           slots={slots}
           targetSlotId={panelSlotId}
+          researchBoostPct={researchBoostPct}
           onAdd={handleAddItem}
           onUnlock={handleUnlock}
           onClose={() => setPanelOpen(false)}

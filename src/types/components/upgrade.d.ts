@@ -5,6 +5,7 @@ export interface InstanceData {
   currentLevel: number;
   maxLevel: number;
   upgradeState?: UpgradeState;
+  superchargeLevel?: number;
 }
 
 export interface UpgradeRowProps {
@@ -14,6 +15,8 @@ export interface UpgradeRowProps {
   getAllSteps: (currentLevel: number, instanceIndex?: number) => UpgradeStep[];
   slots: BuilderSlot[];
   noQueue?: boolean;
+  hideIfComplete?: boolean;
+  boostPct?: 0 | 10 | 15 | 20;
   onStartUpgrade: (instanceIndex: number, step: UpgradeStep, builderId: number) => void;
   onFinishUpgrade: (instanceIndex: number) => void;
   onCancelUpgrade: (instanceIndex: number) => void;

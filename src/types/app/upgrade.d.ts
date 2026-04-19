@@ -5,6 +5,7 @@ export interface UpgradeStep {
   buildTime: { days: number; hours: number; minutes: number; seconds: number };
   durationMs: number;
   imageUrl?: string;
+  isSupercharge?: boolean;
 }
 
 export interface BuilderSlot {

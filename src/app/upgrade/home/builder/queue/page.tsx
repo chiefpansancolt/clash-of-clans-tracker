@@ -19,12 +19,15 @@ import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import {
   getBuilderSlots,
   getBuilderTimeline,
-  isActiveUpgrade,
   formatFullNumber,
   getBuildingUpgradeSteps,
   getHeroUpgradeSteps,
   getTownHallImageUrl,
   getTownHallWeaponUpgradeSteps,
+  getCraftedDefenseUpgradeSteps,
+  getCraftedDefenseName,
+  getCraftedDefenseModuleName,
+  getCraftedDefenseImageUrl,
 } from "@/lib/utils/upgradeHelpers";
 import {
   getHeroesAtTH,
@@ -54,6 +57,10 @@ import {
   finishTownHallWeaponUpgrade,
   cancelTownHallWeaponUpgrade,
   adjustTownHallWeaponUpgrade,
+  startCraftedDefenseUpgrade,
+  finishCraftedDefenseUpgrade,
+  cancelCraftedDefenseUpgrade,
+  adjustCraftedDefenseUpgrade,
 } from "@/lib/utils/upgradeActions";
 import { QueueTimeline } from "@/components/upgrade/queue/QueueTimeline";
 import { BuilderQueueCard } from "@/components/upgrade/queue/BuilderQueueCard";
@@ -95,6 +102,7 @@ export default function BuilderQueuePage() {
   const hv = activePlaythrough?.data.homeVillage;
   const thLevel = hv?.townHallLevel ?? 1;
   const slots = hv ? getBuilderSlots(hv, appSettings.goblinBuilderEnabled) : [];
+  const builderBoostPct = (activePlaythrough?.dailies?.goldPass.builderBoostPct ?? 0) as 0 | 10 | 15 | 20;
 
   const timeline = useMemo(
     () => (hv ? getBuilderTimeline(hv, slots) : {}),
@@ -110,6 +118,17 @@ export default function BuilderQueuePage() {
     () => new Set(conflicts.map((c) => c.queueItemId)),
     [conflicts]
   );
+
+  const multiInstanceBuildingIds = useMemo(() => {
+    if (!hv) return new Set<string>();
+    const multi = new Set<string>();
+    for (const record of [hv.defenses, hv.armyBuildings, hv.resourceBuildings, hv.traps] as Array<Record<string, unknown[]>>) {
+      for (const [id, instances] of Object.entries(record)) {
+        if (instances.length > 1) multi.add(id);
+      }
+    }
+    return multi;
+  }, [hv]);
 
   const resourceGroups = useMemo(
     () => (hv ? getBuilderResourceEvents(hv, slots) : []),
@@ -136,7 +155,7 @@ export default function BuilderQueuePage() {
       const record = hv[recordKey] as Record<string, Array<{ level: number; upgrade?: { finishesAt: string; builderId: number } }>>;
       for (const [id, instances] of Object.entries(record)) {
         instances.forEach((inst, idx) => {
-          if (inst.upgrade && isActiveUpgrade(inst.upgrade.finishesAt)) {
+          if (inst.upgrade) {
             const instanceLabel = instances.length > 1 ? ` #${idx + 1}` : "";
             const imageUrl = getBuildingUpgradeSteps(id, inst.level, thLevel, idx)[0]?.imageUrl ?? "";
             const displayName = buildingNameMap.get(id) ?? id;
@@ -160,7 +179,7 @@ export default function BuilderQueuePage() {
     checkRecord("traps");
 
     for (const hero of hv.heroes) {
-      if (hero.upgrade && isActiveUpgrade(hero.upgrade.finishesAt)) {
+      if (hero.upgrade) {
         const heroId = heroIdMap.get(hero.name) ?? hero.name.toLowerCase().replace(/ /g, "-");
         const imageUrl = getHeroUpgradeSteps(heroId, hero.level, thLevel)[0]?.imageUrl ?? "";
         map.set(hero.upgrade.builderId, {
@@ -175,7 +194,7 @@ export default function BuilderQueuePage() {
       }
     }
 
-    if (hv.townHallUpgrade && isActiveUpgrade(hv.townHallUpgrade.finishesAt)) {
+    if (hv.townHallUpgrade) {
       map.set(hv.townHallUpgrade.builderId, {
         label: `Town Hall ${hv.townHallLevel}→${hv.townHallLevel + 1}`,
         imageUrl: getTownHallImageUrl(hv.townHallLevel + 1),
@@ -187,7 +206,7 @@ export default function BuilderQueuePage() {
       });
     }
 
-    if (hv.townHallWeaponUpgrade && isActiveUpgrade(hv.townHallWeaponUpgrade.finishesAt)) {
+    if (hv.townHallWeaponUpgrade) {
       const wl = hv.townHallWeaponLevel ?? 1;
       const imageUrl = getTownHallWeaponUpgradeSteps(thLevel, wl)[0]?.imageUrl ?? "";
       map.set(hv.townHallWeaponUpgrade.builderId, {
@@ -198,6 +217,26 @@ export default function BuilderQueuePage() {
         onFinish: () => saveHv(finishTownHallWeaponUpgrade(hv)),
         onCancel: () => saveHv(cancelTownHallWeaponUpgrade(hv)),
         onAdjust: (f) => saveHv(adjustTownHallWeaponUpgrade(hv, f)),
+      });
+    }
+
+    for (const [defenseId, cd] of Object.entries(hv.craftedDefenses ?? {})) {
+      if (!cd.moduleUpgrades) continue;
+      cd.moduleUpgrades.forEach((u, moduleIndex) => {
+        if (!u) return;
+        const defName = getCraftedDefenseName(defenseId);
+        const modName = getCraftedDefenseModuleName(defenseId, moduleIndex);
+        const currentLevel = cd.modules[moduleIndex] ?? 0;
+        const imageUrl = getCraftedDefenseUpgradeSteps(defenseId, moduleIndex, currentLevel)[0]?.imageUrl ?? getCraftedDefenseImageUrl(defenseId);
+        map.set(u.builderId, {
+          label: `${defName} ${modName} ${currentLevel}→${currentLevel + 1}`,
+          imageUrl,
+          finishesAt: u.finishesAt,
+          level: currentLevel,
+          onFinish: () => saveHv(finishCraftedDefenseUpgrade(hv, defenseId, moduleIndex)),
+          onCancel: () => saveHv(cancelCraftedDefenseUpgrade(hv, defenseId, moduleIndex)),
+          onAdjust: (f) => saveHv(adjustCraftedDefenseUpgrade(hv, defenseId, moduleIndex, f)),
+        });
       });
     }
 
@@ -243,6 +282,8 @@ export default function BuilderQueuePage() {
       newHv = startTownHallUpgrade(hv, step, slotId);
     } else if (item.buildingId === "town-hall-weapon") {
       newHv = startTownHallWeaponUpgrade(hv, step, slotId);
+    } else if (item.category === "craftedDefenses") {
+      newHv = startCraftedDefenseUpgrade(hv, item.buildingId, item.instanceIndex, step, slotId);
     } else {
       newHv = startBuildingUpgrade(hv, item.category as "defenses" | "armyBuildings" | "resourceBuildings" | "traps", item.buildingId, item.instanceIndex, step, slotId);
     }
@@ -254,6 +295,8 @@ export default function BuilderQueuePage() {
         newHv = finishTownHallUpgrade(newHv);
       } else if (item.buildingId === "town-hall-weapon") {
         newHv = finishTownHallWeaponUpgrade(newHv);
+      } else if (item.category === "craftedDefenses") {
+        newHv = finishCraftedDefenseUpgrade(newHv, item.buildingId, item.instanceIndex);
       } else {
         newHv = finishBuildingUpgrade(newHv, item.category as "defenses" | "armyBuildings" | "resourceBuildings" | "traps", item.buildingId, item.instanceIndex);
       }
@@ -392,6 +435,7 @@ export default function BuilderQueuePage() {
                   conflicts={conflicts.filter((c) =>
                     (hv.builderQueues?.[String(slot.id)] ?? []).some((i) => i.id === c.queueItemId)
                   )}
+                  multiInstanceBuildingIds={multiInstanceBuildingIds}
                   onQueueChange={(q) => handleQueueChange(slot.id, q)}
                   onAddClick={(id) => openPanel(id)}
                   onStartFirst={(item) => handleStartFirst(item, slot.id)}
@@ -411,6 +455,7 @@ export default function BuilderQueuePage() {
           hv={hv}
           slots={slots}
           targetSlotId={panelSlotId}
+          builderBoostPct={builderBoostPct}
           onAdd={handleAddItem}
           onClose={() => setPanelOpen(false)}
         />

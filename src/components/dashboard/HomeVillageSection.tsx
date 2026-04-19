@@ -43,6 +43,10 @@ const _heroes = _h.heroes().get() as RawItem[];
 const _equip = _h.heroEquipment().get() as RawItem[];
 const _leagues = rankedBattles();
 
+type RawResourceBuilding = { id: string; levels: Array<{ level: number; capacity?: number; productionRate?: number; townHallRequired: number }> };
+const _resourceBuildings = _h.resourceBuildings().get() as RawResourceBuilding[];
+const _rbMap = new Map(_resourceBuildings.map((b) => [b.id, b]));
+
 import type { HomeVillageSectionProps } from "@/types/components/dashboard";
 
 export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps) {
@@ -142,6 +146,26 @@ export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps)
 
   const homeLeague = hv.leagueName ? getHomeLeagueData(hv.leagueName) : null;
 
+  const sumInstanceField = (buildingId: string, field: "capacity" | "productionRate") => {
+    const building = _rbMap.get(buildingId);
+    if (!building) return 0;
+    const instances = hv.resourceBuildings[buildingId] ?? [];
+    return instances.reduce((sum, inst) => {
+      if (inst.level === 0) return sum;
+      const lvl = building.levels.find((l) => l.level === inst.level && (l as any).townHallRequired <= thLevel);
+      return sum + (lvl?.[field] ?? 0);
+    }, 0);
+  };
+
+  const goldProduction = sumInstanceField("gold-mine", "productionRate");
+  const elixirProduction = sumInstanceField("elixir-collector", "productionRate");
+  const deProduction = sumInstanceField("dark-elixir-drill", "productionRate");
+  const goldStorage = sumInstanceField("gold-storage", "capacity");
+  const elixirStorage = sumInstanceField("elixir-storage", "capacity");
+  const deStorage = sumInstanceField("dark-elixir-storage", "capacity");
+
+  const hasResourceData = goldStorage > 0 || elixirStorage > 0 || deStorage > 0;
+
   return (
     <section className="mb-8">
       <LeagueRewardsModal league={leagueModal} onClose={() => setLeagueModal(null)} />
@@ -156,6 +180,62 @@ export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps)
             Town Hall {thLevel}
           </div>
         </div>
+        {hasResourceData && (
+          <div className="shrink-0 flex gap-2">
+            <div className="flex flex-col gap-0.5">
+              {goldProduction > 0 && (
+                <div className="flex items-center gap-1">
+                  <div className="relative h-3.5 w-3.5 shrink-0">
+                    <Image src="/images/other/gold.png" alt="Gold" fill sizes="14px" className="object-contain" />
+                  </div>
+                  <span className="text-[10px] text-white/80">{goldProduction.toLocaleString()}/h</span>
+                </div>
+              )}
+              {elixirProduction > 0 && (
+                <div className="flex items-center gap-1">
+                  <div className="relative h-3.5 w-3.5 shrink-0">
+                    <Image src="/images/other/elixir.png" alt="Elixir" fill sizes="14px" className="object-contain" />
+                  </div>
+                  <span className="text-[10px] text-white/80">{elixirProduction.toLocaleString()}/h</span>
+                </div>
+              )}
+              {deProduction > 0 && (
+                <div className="flex items-center gap-1">
+                  <div className="relative h-3.5 w-3.5 shrink-0">
+                    <Image src="/images/other/dark-elixir.png" alt="Dark Elixir" fill sizes="14px" className="object-contain" />
+                  </div>
+                  <span className="text-[10px] text-white/80">{deProduction.toLocaleString()}/h</span>
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col gap-0.5">
+              {goldStorage > 0 && (
+                <div className="flex items-center gap-1">
+                  <div className="relative h-3.5 w-3.5 shrink-0">
+                    <Image src="/images/other/gold.png" alt="Gold" fill sizes="14px" className="object-contain" />
+                  </div>
+                  <span className="text-[10px] font-bold text-white/80">{goldStorage.toLocaleString()}</span>
+                </div>
+              )}
+              {elixirStorage > 0 && (
+                <div className="flex items-center gap-1">
+                  <div className="relative h-3.5 w-3.5 shrink-0">
+                    <Image src="/images/other/elixir.png" alt="Elixir" fill sizes="14px" className="object-contain" />
+                  </div>
+                  <span className="text-[10px] font-bold text-white/80">{elixirStorage.toLocaleString()}</span>
+                </div>
+              )}
+              {deStorage > 0 && (
+                <div className="flex items-center gap-1">
+                  <div className="relative h-3.5 w-3.5 shrink-0">
+                    <Image src="/images/other/dark-elixir.png" alt="Dark Elixir" fill sizes="14px" className="object-contain" />
+                  </div>
+                  <span className="text-[10px] font-bold text-white/80">{deStorage.toLocaleString()}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         {homeLeague && (
           <button
             type="button"
@@ -178,31 +258,31 @@ export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps)
 
       <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
         {structuresProg.max > 0 && (
-          <ProgressCard label="Structures" result={structuresProg} sub="Defenses · Army · Resource" />
+          <ProgressCard label="Structures" result={structuresProg} sub="Defenses · Army · Resource" queueHref="/upgrade/home/builder/queue" />
         )}
         {trapsProg.max > 0 && (
-          <ProgressCard label="Traps" result={trapsProg} />
+          <ProgressCard label="Traps" result={trapsProg} queueHref="/upgrade/home/builder/queue" />
         )}
         {superchargeProg.max > 0 && (
-          <ProgressCard label="Supercharge" result={superchargeProg} />
+          <ProgressCard label="Supercharge" result={superchargeProg} queueHref="/upgrade/home/builder/queue" />
         )}
         {craftedProg.max > 0 && (
-          <ProgressCard label="Crafted Defenses" result={craftedProg} />
+          <ProgressCard label="Crafted Defenses" result={craftedProg} queueHref="/upgrade/home/builder/queue" />
         )}
         {labProg.max > 0 && (
-          <ProgressCard label="Lab" result={labProg} sub="Troops · Spells · Siege" />
+          <ProgressCard label="Lab" result={labProg} sub="Troops · Spells · Siege" queueHref="/upgrade/home/research/queue" />
         )}
         {heroesProg.max > 0 && (
-          <ProgressCard label="Heroes" result={heroesProg} />
+          <ProgressCard label="Heroes" result={heroesProg} queueHref="/upgrade/home/builder/queue" />
         )}
         {equipProg.max > 0 && (
-          <ProgressCard label="Equipment" result={equipProg} />
+          <ProgressCard label="Equipment" result={equipProg} queueHref="/upgrade/home/equipment" />
         )}
         {petsProg.max > 0 && (
-          <ProgressCard label="Pets" result={petsProg} />
+          <ProgressCard label="Pets" result={petsProg} queueHref="/upgrade/home/pets/queue" />
         )}
         {wallsProg.max > 0 && (
-          <ProgressCard label="Walls" result={wallsProg} sub={wallSub} />
+          <ProgressCard label="Walls" result={wallsProg} sub={wallSub} queueHref="/upgrade/home/walls" />
         )}
       </div>
 
@@ -213,12 +293,12 @@ export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps)
         return (regularTroops.length > 0 || hv.spells.length > 0) && (
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {regularTroops.length > 0 && (
-              <SectionCard title="Troops">
+              <SectionCard title="Troops" queueHref="/upgrade/home/research/queue">
                 <ItemGrid items={regularTroops} getItemData={getTroopData} />
               </SectionCard>
             )}
             {hv.spells.length > 0 && (
-              <SectionCard title="Spells">
+              <SectionCard title="Spells" queueHref="/upgrade/home/research/queue">
                 <ItemGrid items={hv.spells} getItemData={getSpellData} />
               </SectionCard>
             )}
@@ -229,7 +309,7 @@ export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps)
       {(hv.heroes.length > 0 || hv.siegeMachines.length > 0 || hv.pets.length > 0) && (
         <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
           {hv.heroes.length > 0 && (
-            <SectionCard title="Heroes">
+            <SectionCard title="Heroes" queueHref="/upgrade/home/builder/queue">
               <div className="flex flex-wrap gap-2">
                 {hv.heroes.map((hero) => {
                   const d = getHeroData(hero.name.toLowerCase());
@@ -250,12 +330,12 @@ export function HomeVillageSection({ hv, playthrough }: HomeVillageSectionProps)
           {(hv.siegeMachines.length > 0 || hv.pets.length > 0) && (
             <div className="flex flex-col gap-3">
               {hv.pets.length > 0 && (
-                <SectionCard title="Pets">
+                <SectionCard title="Pets" queueHref="/upgrade/home/pets/queue">
                   <ItemGrid items={hv.pets} getItemData={getPetData} small />
                 </SectionCard>
               )}
               {hv.siegeMachines.length > 0 && (
-                <SectionCard title="Siege Machines">
+                <SectionCard title="Siege Machines" queueHref="/upgrade/home/research/queue">
                   <ItemGrid items={hv.siegeMachines} getItemData={getSiegeData} small />
                 </SectionCard>
               )}

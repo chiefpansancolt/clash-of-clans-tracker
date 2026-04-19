@@ -1,10 +1,11 @@
 "use client";
 
 import { useMemo, useEffect } from "react";
+import { usePersistedToggle } from "@/lib/hooks/usePersistedToggle";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { TabItem, Tabs } from "flowbite-react";
+import { TabItem, Tabs, ToggleSwitch } from "flowbite-react";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import {
   getDefensesAtTH,
@@ -18,6 +19,8 @@ import {
 import {
   getBuildingUpgradeSteps,
   getHeroUpgradeSteps,
+  getCraftedDefenseUpgradeSteps,
+  getCraftedDefenseImageUrl,
   getBuilderSlots,
   countActiveInRecord,
   countActiveHeroes,
@@ -45,6 +48,10 @@ import {
   finishTownHallWeaponUpgrade,
   cancelTownHallWeaponUpgrade,
   adjustTownHallWeaponUpgrade,
+  startCraftedDefenseUpgrade,
+  finishCraftedDefenseUpgrade,
+  cancelCraftedDefenseUpgrade,
+  adjustCraftedDefenseUpgrade,
 } from "@/lib/utils/upgradeActions";
 import { massEditTabsTheme } from "@/lib/constants/massEditTheme";
 import { UpgradeRow } from "@/components/upgrade/UpgradeRow";
@@ -69,6 +76,8 @@ function TabTitle({ label, count }: { label: string; count: number }) {
 export default function BuilderUpgradePage() {
   const router = useRouter();
   const { activePlaythrough, appSettings, isLoaded, updatePlaythrough } = usePlaythrough();
+  const builderBoostPct = (activePlaythrough?.dailies?.goldPass.builderBoostPct ?? 0) as 0 | 10 | 15 | 20;
+  const [hideCompleted, setHideCompleted] = usePersistedToggle("upgrade:builder:hideMax");
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -106,7 +115,7 @@ export default function BuilderUpgradePage() {
         {buildings.map((b) => {
           const instances = Array.from({ length: b.instanceCount }, (_, i) => {
             const inst = (hv![recordKey][b.id] ?? [])[i] ?? { level: 0 };
-            return { currentLevel: inst.level, maxLevel: b.maxLevel, upgradeState: inst.upgrade };
+            return { currentLevel: inst.level, maxLevel: b.maxLevel, upgradeState: inst.upgrade, superchargeLevel: inst.superchargeLevel };
           });
           return (
             <UpgradeRow
@@ -114,8 +123,13 @@ export default function BuilderUpgradePage() {
               name={b.name}
               imageUrl={b.imageUrl}
               instances={instances}
-              getAllSteps={(level, instanceIndex) => getBuildingUpgradeSteps(b.id, level, thLevel, instanceIndex)}
+              getAllSteps={(level, instanceIndex) => {
+                const inst = (hv![recordKey][b.id] ?? [])[instanceIndex ?? 0] ?? { level: 0 };
+                return getBuildingUpgradeSteps(b.id, level, thLevel, instanceIndex, inst.superchargeLevel ?? 0);
+              }}
               slots={slots}
+              hideIfComplete={hideCompleted}
+              boostPct={builderBoostPct}
               onStartUpgrade={(idx, step, builderId) =>
                 save(startBuildingUpgrade(hv!, recordKey, b.id, idx, step, builderId))
               }
@@ -137,7 +151,11 @@ export default function BuilderUpgradePage() {
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-extrabold text-gray-900">Builder</h1>
           <span className="text-sm text-gray-500">TH{thLevel}</span>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">Hide Max</span>
+              <ToggleSwitch checked={hideCompleted} onChange={setHideCompleted} label="" />
+            </div>
             <Link
               href="/upgrade/home/builder/queue"
               className="rounded-lg bg-primary/80 px-3 py-1.5 text-xs font-bold text-accent hover:bg-primary"
@@ -164,6 +182,46 @@ export default function BuilderUpgradePage() {
             {renderBuildings(resources, "resourceBuildings")}
           </TabItem>
 
+          {thLevel >= 18 && (
+            <TabItem title={<TabTitle label="Crafted Defenses" count={
+              craftedData.reduce((n, cd) => {
+                const saved = hv.craftedDefenses[cd.id];
+                return n + (saved?.moduleUpgrades?.filter((u) => u && isActiveUpgrade(u.finishesAt)).length ?? 0);
+              }, 0)
+            } />}>
+              <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
+                {craftedData.flatMap((cd) => {
+                  const saved = hv.craftedDefenses[cd.id];
+                  const imageUrl = getCraftedDefenseImageUrl(cd.id);
+                  return cd.modules.map((mod, mi) => {
+                    const currentLevel = saved?.modules[mi] ?? 0;
+                    const upgradeState = saved?.moduleUpgrades?.[mi];
+                    return (
+                      <UpgradeRow
+                        key={`${cd.id}-${mi}`}
+                        name={`${cd.name} — ${mod.name}`}
+                        imageUrl={imageUrl}
+                        instances={[{ currentLevel, maxLevel: mod.maxLevel, upgradeState }]}
+                        getAllSteps={(level) => getCraftedDefenseUpgradeSteps(cd.id, mi, level)}
+                        slots={slots}
+                        hideIfComplete={hideCompleted}
+                        boostPct={builderBoostPct}
+                        onStartUpgrade={(_idx, step, builderId) =>
+                          save(startCraftedDefenseUpgrade(hv!, cd.id, mi, step, builderId))
+                        }
+                        onFinishUpgrade={() => save(finishCraftedDefenseUpgrade(hv!, cd.id, mi))}
+                        onCancelUpgrade={() => save(cancelCraftedDefenseUpgrade(hv!, cd.id, mi))}
+                        onAdjustUpgrade={(_idx, finishesAt) =>
+                          save(adjustCraftedDefenseUpgrade(hv!, cd.id, mi, finishesAt))
+                        }
+                      />
+                    );
+                  });
+                })}
+              </div>
+            </TabItem>
+          )}
+
           <TabItem title={<TabTitle label="Traps" count={countActiveInRecord(hv.traps as BuildingRecord)} />}>
             {renderBuildings(traps, "traps")}
           </TabItem>
@@ -185,6 +243,8 @@ export default function BuilderUpgradePage() {
                       instances={[{ currentLevel, maxLevel: h.maxLevel, upgradeState: saved?.upgrade }]}
                       getAllSteps={(level) => getHeroUpgradeSteps(h.id, level, thLevel)}
                       slots={slots}
+                      hideIfComplete={hideCompleted}
+                      boostPct={builderBoostPct}
                       onStartUpgrade={(_idx, step, builderId) =>
                         save(startHeroUpgrade(hv!, h.name, step, builderId))
                       }
@@ -207,7 +267,7 @@ export default function BuilderUpgradePage() {
                 {guardians.map((g) => {
                   const instances = Array.from({ length: g.instanceCount }, (_, i) => {
                     const inst = (hv!.defenses[g.id] ?? [])[i] ?? { level: 0 };
-                    return { currentLevel: inst.level, maxLevel: g.maxLevel, upgradeState: inst.upgrade };
+                    return { currentLevel: inst.level, maxLevel: g.maxLevel, upgradeState: inst.upgrade, superchargeLevel: inst.superchargeLevel };
                   });
                   return (
                     <UpgradeRow
@@ -215,8 +275,13 @@ export default function BuilderUpgradePage() {
                       name={g.name}
                       imageUrl={g.imageUrl}
                       instances={instances}
-                      getAllSteps={(level, instanceIndex) => getBuildingUpgradeSteps(g.id, level, thLevel, instanceIndex)}
+                      getAllSteps={(level, instanceIndex) => {
+                        const inst = (hv!.defenses[g.id] ?? [])[instanceIndex ?? 0] ?? { level: 0 };
+                        return getBuildingUpgradeSteps(g.id, level, thLevel, instanceIndex, inst.superchargeLevel ?? 0);
+                      }}
                       slots={slots}
+                      hideIfComplete={hideCompleted}
+                      boostPct={builderBoostPct}
                       onStartUpgrade={(idx, step, builderId) =>
                         save(startBuildingUpgrade(hv!, "defenses", g.id, idx, step, builderId))
                       }
@@ -240,57 +305,10 @@ export default function BuilderUpgradePage() {
               hv={hv}
               thLevel={thLevel}
               slots={slots}
+              boostPct={builderBoostPct}
               onSave={save}
             />
           </TabItem>
-
-          {thLevel >= 18 && (
-            <TabItem title={<TabTitle label="Crafted" count={0} />}>
-              <p className="mb-3 text-sm text-white/80">
-                Module levels are set in{" "}
-                <Link href="/mass-edit/home" className="text-accent underline">
-                  Mass Edit
-                </Link>
-                .
-              </p>
-              <div className="flex flex-col gap-2">
-                {craftedData.map((cd) => {
-                  const saved = hv.craftedDefenses[cd.id];
-                  return (
-                    <div key={cd.id} className="overflow-hidden rounded-lg border border-secondary/80 bg-primary">
-                      <div className="flex items-center gap-3 border-b border-secondary/80 px-3 py-2">
-                        {cd.imageUrl && (
-                          <div className="relative h-10 w-10 shrink-0">
-                            <Image src={cd.imageUrl} alt={cd.name} fill className="object-contain" sizes="40px" />
-                          </div>
-                        )}
-                        <span className="font-bold text-white">{cd.name}</span>
-                      </div>
-                      <div className="divide-y divide-secondary/80">
-                        {cd.modules.map((mod, mi) => {
-                          const currentLevel = saved?.modules[mi] ?? 0;
-                          return (
-                            <div key={mi} className="flex items-center gap-3 px-3 py-2">
-                              <span className="flex-1 text-sm text-white/80">{mod.name}</span>
-                              <span className="text-sm text-white/80">
-                                Lvl {currentLevel}
-                                <span className="text-white/80"> / {mod.maxLevel}</span>
-                              </span>
-                              {currentLevel >= mod.maxLevel && (
-                                <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[11px] font-bold text-accent">
-                                  Max
-                                </span>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </TabItem>
-          )}
 
         </Tabs>
       </div>

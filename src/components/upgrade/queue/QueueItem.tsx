@@ -22,6 +22,7 @@ interface Props {
   item: AnyQueueItem;
   isConflict?: boolean;
   conflictMessage?: string;
+  multiInstanceBuildingIds?: Set<string>;
   onRemove: () => void;
   onStart?: () => void;
 }
@@ -40,7 +41,7 @@ function ResourceIcon({ resource, cost }: { resource: string; cost: number }) {
   );
 }
 
-export function QueueItemOverlay({ item }: { item: AnyQueueItem }) {
+export function QueueItemOverlay({ item, multiInstanceBuildingIds }: { item: AnyQueueItem; multiInstanceBuildingIds?: Set<string> }) {
   const totalMinutes = Math.floor(item.durationMs / 60_000);
   const durationLabel = formatBuildTime({
     days: Math.floor(totalMinutes / 1440),
@@ -59,7 +60,7 @@ export function QueueItemOverlay({ item }: { item: AnyQueueItem }) {
       <div className="flex-1 min-w-0">
         <p className="text-[11px] font-bold text-white truncate">
           {item.name}
-          {"instanceIndex" in item ? ` #${(item as BuilderQueueItem).instanceIndex + 1}` : ""}{" "}
+          {"instanceIndex" in item && multiInstanceBuildingIds?.has((item as BuilderQueueItem).buildingId) ? ` #${(item as BuilderQueueItem).instanceIndex + 1}` : ""}{" "}
           {item.targetLevel - 1}→{item.targetLevel}
         </p>
         <p className="text-[10px] text-white/80">{durationLabel}</p>
@@ -68,7 +69,7 @@ export function QueueItemOverlay({ item }: { item: AnyQueueItem }) {
   );
 }
 
-export function QueueItem({ item, isConflict, conflictMessage, onRemove, onStart }: Props) {
+export function QueueItem({ item, isConflict, conflictMessage, multiInstanceBuildingIds, onRemove, onStart }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
   });
@@ -118,7 +119,7 @@ export function QueueItem({ item, isConflict, conflictMessage, onRemove, onStart
           }`}
         >
           {item.name}
-          {"instanceIndex" in item ? ` #${(item as BuilderQueueItem).instanceIndex + 1}` : ""}{" "}
+          {"instanceIndex" in item && multiInstanceBuildingIds?.has((item as BuilderQueueItem).buildingId) ? ` #${(item as BuilderQueueItem).instanceIndex + 1}` : ""}{" "}
           {item.targetLevel - 1}→{item.targetLevel}
         </p>
         <p className="text-[10px] text-white/80 flex items-center gap-1.5 flex-wrap">

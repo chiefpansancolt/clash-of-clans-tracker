@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useEffect } from "react";
+import { usePersistedToggle } from "@/lib/hooks/usePersistedToggle";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ToggleSwitch } from "flowbite-react";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { getPetsAtTH } from "@/lib/utils/massEditHelpers";
 import { getPetUpgradeSteps, getPetSlots } from "@/lib/utils/upgradeHelpers";
@@ -12,6 +14,8 @@ import { UpgradeRow } from "@/components/upgrade/UpgradeRow";
 export default function PetsUpgradePage() {
   const router = useRouter();
   const { activePlaythrough, isLoaded, updatePlaythrough } = usePlaythrough();
+  const researchBoostPct = (activePlaythrough?.dailies?.goldPass.researchBoostPct ?? 0) as 0 | 10 | 15 | 20;
+  const [hideCompleted, setHideCompleted] = usePersistedToggle("upgrade:pets:hideMax");
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -38,7 +42,11 @@ export default function PetsUpgradePage() {
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-extrabold text-gray-900">Pets</h1>
           <span className="text-sm text-gray-500">TH{thLevel}</span>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">Hide Max</span>
+              <ToggleSwitch checked={hideCompleted} onChange={setHideCompleted} label="" />
+            </div>
             <Link
               href="/upgrade/home/pets/queue"
               className="rounded-lg bg-primary/80 px-3 py-1.5 text-xs font-bold text-accent hover:bg-primary"
@@ -53,7 +61,7 @@ export default function PetsUpgradePage() {
         {pets.length === 0 ? (
           <p className="py-8 text-center text-sm text-gray-400">Pets unlock at TH14.</p>
         ) : (
-          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
             {pets.map((pet) => {
               const saved = hv.pets.find((p) => p.name === pet.name);
               const currentLevel = saved?.level ?? 0;
@@ -67,6 +75,8 @@ export default function PetsUpgradePage() {
                   ]}
                   getAllSteps={(level) => getPetUpgradeSteps(pet.name, level)}
                   slots={slots}
+                  hideIfComplete={hideCompleted}
+                  boostPct={researchBoostPct}
                   onStartUpgrade={(_idx, step, builderId) =>
                     save(startPetUpgrade(hv, pet.name, step, builderId))
                   }

@@ -49,6 +49,13 @@ const APP_ITEMS: AppItem[] = [
     disabled: true,
   },
   {
+    id: "season-pass",
+    label: "Season Pass",
+    image: "/images/season-pass/other/season-challenges-gold.png",
+    href: "/season-pass",
+    minTH: 7,
+  },
+  {
     id: "forge",
     label: "Forge",
     image: "/images/season-pass/pass-items/perk-auto-forge.png",

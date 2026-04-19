@@ -21,9 +21,11 @@ import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
 
 type RawItem = { name: string; images: { icon?: string }; levels: any[] };
 type RawLeague = { name: string; image: string };
+type RawResourceBuilding = { id: string; levels: Array<{ level: number; capacity?: number; productionRate?: number }> };
 const _b = builder();
 const _troops = _b.troops().get() as unknown as RawItem[];
 const _heroes = _b.heroes().get() as unknown as RawItem[];
+const _rbMap = new Map((_b.resourceBuildings().get() as RawResourceBuilding[]).map((b) => [b.id, b]));
 
 function getBuilderLeague(leagueName: string): RawLeague | undefined {
   // API stores "Titanium League I"; package uses "Titanium I"
@@ -62,6 +64,23 @@ export function BuilderBaseSection({ bb, playthrough }: BuilderBaseSectionProps)
     };
   };
 
+  const sumInstanceField = (buildingId: string, field: "capacity" | "productionRate") => {
+    const building = _rbMap.get(buildingId);
+    if (!building) return 0;
+    const instances = bb.resourceBuildings[buildingId] ?? [];
+    return instances.reduce((sum, inst) => {
+      if (inst.level === 0) return sum;
+      const lvl = building.levels.find((l) => l.level === inst.level && (l as any).builderHallRequired <= bhLevel);
+      return sum + (lvl?.[field] ?? 0);
+    }, 0);
+  };
+
+  const goldProduction = sumInstanceField("gold-mine", "productionRate");
+  const elixirProduction = sumInstanceField("elixir-collector", "productionRate");
+  const goldStorage = sumInstanceField("gold-storage", "capacity");
+  const elixirStorage = sumInstanceField("elixir-storage", "capacity");
+  const hasResourceData = goldStorage > 0 || elixirStorage > 0;
+
   const builderLeague: BuilderLeagueData | null = bb.builderBaseLeagueName
     ? (() => {
         const raw = getBuilderLeague(bb.builderBaseLeagueName);
@@ -93,6 +112,46 @@ export function BuilderBaseSection({ bb, playthrough }: BuilderBaseSectionProps)
             {bb.builderBaseTrophies > 0 ? ` · ${bb.builderBaseTrophies.toLocaleString()} trophies` : ""}
           </div>
         </div>
+        {hasResourceData && (
+          <div className="shrink-0 flex gap-2">
+            <div className="flex flex-col gap-0.5">
+              {goldProduction > 0 && (
+                <div className="flex items-center gap-1">
+                  <div className="relative h-3.5 w-3.5 shrink-0">
+                    <Image src="/images/other/gold-b.png" alt="Gold" fill sizes="14px" className="object-contain" />
+                  </div>
+                  <span className="text-[10px] text-white/80">{goldProduction.toLocaleString()}/h</span>
+                </div>
+              )}
+              {elixirProduction > 0 && (
+                <div className="flex items-center gap-1">
+                  <div className="relative h-3.5 w-3.5 shrink-0">
+                    <Image src="/images/other/elixir-b.png" alt="Elixir" fill sizes="14px" className="object-contain" />
+                  </div>
+                  <span className="text-[10px] text-white/80">{elixirProduction.toLocaleString()}/h</span>
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col gap-0.5">
+              {goldStorage > 0 && (
+                <div className="flex items-center gap-1">
+                  <div className="relative h-3.5 w-3.5 shrink-0">
+                    <Image src="/images/other/gold-b.png" alt="Gold" fill sizes="14px" className="object-contain" />
+                  </div>
+                  <span className="text-[10px] font-bold text-white/80">{goldStorage.toLocaleString()}</span>
+                </div>
+              )}
+              {elixirStorage > 0 && (
+                <div className="flex items-center gap-1">
+                  <div className="relative h-3.5 w-3.5 shrink-0">
+                    <Image src="/images/other/elixir-b.png" alt="Elixir" fill sizes="14px" className="object-contain" />
+                  </div>
+                  <span className="text-[10px] font-bold text-white/80">{elixirStorage.toLocaleString()}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         {builderLeague && (
           <button
             type="button"

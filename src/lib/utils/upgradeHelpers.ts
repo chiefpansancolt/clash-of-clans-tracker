@@ -1,4 +1,4 @@
-import { home } from "clash-of-clans-data";
+import { home, calculators, GemsCalculator } from "clash-of-clans-data";
 import { getMaxHeroHallLevel } from "@/lib/utils/progressHelpers";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
 import type { HomeVillageData } from "@/types/app/game";
@@ -21,6 +21,47 @@ function timeToDurationMs(t: RawBuildTime): number {
 
 function normalizeTime(t: RawBuildTime): Required<RawBuildTime> {
   return { days: t.days ?? 0, hours: t.hours ?? 0, minutes: t.minutes ?? 0, seconds: t.seconds ?? 0 };
+}
+
+/** Apply builder or research boost to a durationMs value. Returns original ms unchanged if boostPct is 0. */
+export function applyBoost(durationMs: number, boostPct: 0 | 10 | 15 | 20): number {
+  if (boostPct === 0 || durationMs <= 0) return durationMs;
+  const totalSecs = Math.floor(durationMs / 1000);
+  const raw: RawBuildTime = {
+    days: Math.floor(totalSecs / 86400),
+    hours: Math.floor((totalSecs % 86400) / 3600),
+    minutes: Math.floor((totalSecs % 3600) / 60),
+    seconds: totalSecs % 60,
+  };
+  const boosted = calculators().boost().builderBoost(normalizeTime(raw), boostPct);
+  return timeToDurationMs(boosted);
+}
+
+/** Apply builder boost to a cost value. Returns original cost unchanged if boostPct is 0. */
+export function applyBuilderBoostCost(cost: number, boostPct: 0 | 10 | 15 | 20): number {
+  if (boostPct === 0 || cost <= 0) return cost;
+  return calculators().boost().builderBoostCost(cost, "Gold" as any, boostPct);
+}
+
+/** Apply research boost to a cost value. Returns original cost unchanged if boostPct is 0. */
+export function applyResearchBoostCost(cost: number, boostPct: 0 | 10 | 15 | 20): number {
+  if (boostPct === 0 || cost <= 0) return cost;
+  return calculators().boost().researchBoostCost(cost, "Elixir" as any, boostPct);
+}
+
+export function msToBuildTime(ms: number): RawBuildTime {
+  const totalSecs = Math.floor(ms / 1000);
+  return {
+    days: Math.floor(totalSecs / 86400),
+    hours: Math.floor((totalSecs % 86400) / 3600),
+    minutes: Math.floor((totalSecs % 3600) / 60),
+    seconds: totalSecs % 60,
+  };
+}
+
+/** Calculate the gem cost to instantly complete an upgrade of the given duration in ms. */
+export function getGemCost(durationMs: number): number {
+  return new GemsCalculator().cost(msToBuildTime(durationMs));
 }
 
 /** Format a build time object as "Xd Yh Zm" (omits zero segments, always shows at least "0m"). */
@@ -82,6 +123,7 @@ function allHomeBuildings(): RawBuilding[] {
   }
   return [
     ...(_home.defenses().get() as RawBuilding[]),
+    ...(_home.guardians().get() as RawBuilding[]),
     ...(_home.resourceBuildings().get() as RawBuilding[]),
     ...(_home.traps().get() as RawBuilding[]),
     ...armyBuildings,
@@ -100,43 +142,44 @@ export function getBuildingUpgradeSteps(
   buildingId: string,
   currentLevel: number,
   thLevel: number,
-  instanceIndex = 0
+  instanceIndex = 0,
+  currentSuperchargeLevel = 0
 ): UpgradeStep[] {
   const building = _buildingMap.get(buildingId);
   if (!building) return [];
-  return building.levels
-    .filter(
-      (l) =>
-        !l.supercharge &&
-        l.level > currentLevel &&
-        (l.townHallRequired ?? 0) <= thLevel &&
-        l.buildCost !== undefined
-    )
+
+  const normalLevels = building.levels.filter((l) => !l.supercharge);
+  const normalMax = normalLevels.length > 0 ? Math.max(...normalLevels.map((l) => l.level)) : 0;
+
+  const normalSteps = normalLevels
+    .filter((l) => l.level > currentLevel && (l.townHallRequired ?? 0) <= thLevel && l.buildCost !== undefined)
     .map((l) => {
       const durationMs = timeToDurationMs(l.buildTime ?? {});
-      // For the initial placement (level 0 → 1), use placementCosts if available
       if (l.level === 1 && currentLevel === 0 && building.placementCosts) {
         const placement = building.placementCosts.find((p) => p.instance === instanceIndex + 1);
         if (placement) {
-          return {
-            level: l.level,
-            cost: placement.cost,
-            costResource: placement.costResource,
-            buildTime: normalizeTime(l.buildTime ?? {}),
-            durationMs,
-            imageUrl: toPublicImageUrl(l.images?.normal),
-          };
+          return { level: l.level, cost: placement.cost, costResource: placement.costResource, buildTime: normalizeTime(l.buildTime ?? {}), durationMs, imageUrl: toPublicImageUrl(l.images?.normal) };
         }
       }
-      return {
-        level: l.level,
-        cost: l.buildCost!,
-        costResource: l.buildCostResource ?? "Gold",
-        buildTime: normalizeTime(l.buildTime ?? {}),
-        durationMs,
-        imageUrl: toPublicImageUrl(l.images?.normal),
-      };
+      return { level: l.level, cost: l.buildCost!, costResource: l.buildCostResource ?? "Gold", buildTime: normalizeTime(l.buildTime ?? {}), durationMs, imageUrl: toPublicImageUrl(l.images?.normal) };
     });
+
+  // Only show supercharge steps once normal upgrades are complete
+  const superchargeSteps = currentLevel >= normalMax
+    ? building.levels
+        .filter((l) => l.supercharge && l.level > currentSuperchargeLevel && (l.townHallRequired ?? 0) <= thLevel && l.buildCost !== undefined)
+        .map((l) => ({
+          level: l.level,
+          cost: l.buildCost!,
+          costResource: l.buildCostResource ?? "Gold",
+          buildTime: normalizeTime(l.buildTime ?? {}),
+          durationMs: timeToDurationMs(l.buildTime ?? {}),
+          imageUrl: toPublicImageUrl(l.images?.normal),
+          isSupercharge: true as const,
+        }))
+    : [];
+
+  return [...normalSteps, ...superchargeSteps];
 }
 
 // ─── Troops / Spells / Siege ──────────────────────────────────────────────────
@@ -197,13 +240,13 @@ export function getResearchUpgradeSteps(
 type RawPetLevel = {
   level: number;
   townHallRequired?: number;
-  researchCost?: number;
-  researchCostResource?: string;
-  researchTime?: RawBuildTime;
+  upgradeCost?: number;
+  upgradeCostResource?: string;
+  upgradeTime?: RawBuildTime;
   images?: { normal?: string };
 };
 
-type RawPet = { name: string; levels: RawPetLevel[] };
+type RawPet = { name: string; levels: RawPetLevel[]; images?: { icon?: string } };
 
 const _petMap = new Map<string, RawPet>(
   (_home.pets().get() as RawPet[]).map((p) => [p.name.toLowerCase(), p])
@@ -214,15 +257,66 @@ export function getPetUpgradeSteps(name: string, currentLevel: number): UpgradeS
   const item = _petMap.get(name.toLowerCase());
   if (!item) return [];
   return item.levels
-    .filter((l) => l.level > currentLevel && l.researchCost !== undefined)
+    .filter((l) => l.level > currentLevel && l.upgradeCost !== undefined && l.upgradeCost > 0)
     .map((l) => ({
       level: l.level,
-      cost: l.researchCost!,
-      costResource: l.researchCostResource ?? "Dark Elixir",
-      buildTime: normalizeTime(l.researchTime ?? {}),
-      durationMs: timeToDurationMs(l.researchTime ?? {}),
+      cost: l.upgradeCost!,
+      costResource: l.upgradeCostResource ?? "Dark Elixir",
+      buildTime: normalizeTime(l.upgradeTime ?? {}),
+      durationMs: timeToDurationMs(l.upgradeTime ?? {}),
       imageUrl: toPublicImageUrl(l.images?.normal),
     }));
+}
+
+// ─── Crafted Defenses ────────────────────────────────────────────────────────
+
+type RawCraftedModule = {
+  name: string;
+  upgrades: Array<{ level: number; buildCost?: number; buildCostResource?: string; buildTime?: RawBuildTime }>;
+};
+type RawCraftedDefense = {
+  id: string;
+  name: string;
+  modules: RawCraftedModule[];
+  images: Array<{ fromEffectiveLevel?: number; toEffectiveLevel?: number; normal?: string }>;
+};
+
+const _craftedMap = new Map<string, RawCraftedDefense>(
+  (_home.craftedDefenses().current().get() as RawCraftedDefense[]).map((c) => [c.id, c])
+);
+
+export function getCraftedDefenseUpgradeSteps(
+  defenseId: string,
+  moduleIndex: number,
+  currentLevel: number
+): UpgradeStep[] {
+  const defense = _craftedMap.get(defenseId);
+  if (!defense) return [];
+  const module = defense.modules[moduleIndex];
+  if (!module) return [];
+  const imageUrl = toPublicImageUrl(defense.images[0]?.normal);
+  return module.upgrades
+    .filter((u) => u.level > currentLevel && (u.buildCost ?? 0) > 0)
+    .map((u) => ({
+      level: u.level,
+      cost: u.buildCost!,
+      costResource: u.buildCostResource ?? "Elixir",
+      buildTime: normalizeTime(u.buildTime ?? {}),
+      durationMs: timeToDurationMs(u.buildTime ?? {}),
+      imageUrl,
+    }));
+}
+
+export function getCraftedDefenseName(defenseId: string): string {
+  return _craftedMap.get(defenseId)?.name ?? defenseId;
+}
+
+export function getCraftedDefenseModuleName(defenseId: string, moduleIndex: number): string {
+  return _craftedMap.get(defenseId)?.modules[moduleIndex]?.name ?? `Module ${moduleIndex + 1}`;
+}
+
+export function getCraftedDefenseImageUrl(defenseId: string): string {
+  return toPublicImageUrl(_craftedMap.get(defenseId)?.images[0]?.normal);
 }
 
 // ─── Heroes ───────────────────────────────────────────────────────────────────
@@ -236,7 +330,7 @@ type RawHeroLevel = {
   images?: { normal?: string };
 };
 
-type RawHero = { id: string; name: string; levels: RawHeroLevel[] };
+type RawHero = { id: string; name: string; images?: { icon?: string }; levels: RawHeroLevel[] };
 
 const _heroMap = new Map<string, RawHero>(
   (_home.heroes().get() as RawHero[]).map((h) => [h.id, h])
@@ -264,7 +358,7 @@ export function getHeroUpgradeSteps(
       costResource: l.upgradeCostResource ?? "Dark Elixir",
       buildTime: normalizeTime(l.upgradeTime ?? {}),
       durationMs: timeToDurationMs(l.upgradeTime ?? {}),
-      imageUrl: toPublicImageUrl(l.images?.normal),
+      imageUrl: toPublicImageUrl(hero.images?.icon),
     }));
 }
 
@@ -751,4 +845,31 @@ export function formatTimeRemaining(finishesAt: string): string {
   if (h > 0) return `${h}h ${m}m`;
   if (m > 0) return `${m}m ${s}s`;
   return `${s}s`;
+}
+
+// ─── Equipment ────────────────────────────────────────────────────────────────
+
+export interface EquipmentUpgradeStep {
+  level: number;
+  shinyOre: number;
+  glowyOre: number;
+  starryOre: number;
+}
+
+const _equipMap = new Map<string, any>(
+  (_home.heroEquipment().get() as any[]).map((e: any) => [e.name, e])
+);
+
+/** Returns upgrade steps from currentLevel+1 to max for the given equipment. */
+export function getEquipmentUpgradeSteps(name: string, currentLevel: number): EquipmentUpgradeStep[] {
+  const eq = _equipMap.get(name);
+  if (!eq) return [];
+  return (eq.levels as any[])
+    .filter((l) => l.level > currentLevel && (l.upgradeShinyOre > 0 || l.upgradeGlowingOre > 0 || l.upgradeStarryOre > 0))
+    .map((l) => ({
+      level: l.level,
+      shinyOre: l.upgradeShinyOre ?? 0,
+      glowyOre: l.upgradeGlowingOre ?? 0,
+      starryOre: l.upgradeStarryOre ?? 0,
+    }));
 }

@@ -27,6 +27,11 @@ export default function WallsUpgradePage() {
   const allocated = Object.values(hv.walls).reduce((s, c) => s + c, 0);
   const remaining = wallInfo.totalAtTH - allocated;
 
+  const lowestOccupied = wallInfo.levels.find((wl) => (hv.walls[String(wl.level)] ?? 0) > 0)?.level
+    ?? wallInfo.levels[0]?.level
+    ?? 0;
+  const visibleLevels = wallInfo.levels.filter((wl) => wl.level >= lowestOccupied);
+
   function upgradeWalls(fromLevel: number, count: number) {
     const fromCount = hv!.walls[String(fromLevel)] ?? 0;
     const actual = Math.min(count, fromCount);
@@ -99,7 +104,7 @@ export default function WallsUpgradePage() {
         </p>
 
         <div className="flex flex-col gap-2">
-          {wallInfo.levels.map((wl) => {
+          {visibleLevels.map((wl) => {
             const count = hv.walls[String(wl.level)] ?? 0;
             const canUpgrade = count > 0 && wl.level < maxWallLevel;
             const customVal = customCounts[wl.level] ?? "";

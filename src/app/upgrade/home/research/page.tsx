@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useEffect } from "react";
+import { usePersistedToggle } from "@/lib/hooks/usePersistedToggle";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { TabItem, Tabs } from "flowbite-react";
+import { TabItem, Tabs, ToggleSwitch } from "flowbite-react";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { getTroopsAtTH, getSpellsAtTH, getSiegeMachinesAtTH } from "@/lib/utils/massEditHelpers";
 import { getResearchUpgradeSteps, getResearchSlots, isActiveUpgrade } from "@/lib/utils/upgradeHelpers";
@@ -35,6 +36,8 @@ function TabTitle({ label, count }: { label: string; count: number }) {
 export default function ResearchUpgradePage() {
   const router = useRouter();
   const { activePlaythrough, appSettings, isLoaded, updatePlaythrough } = usePlaythrough();
+  const researchBoostPct = (activePlaythrough?.dailies?.goldPass.researchBoostPct ?? 0) as 0 | 10 | 15 | 20;
+  const [hideCompleted, setHideCompleted] = usePersistedToggle("upgrade:research:hideMax");
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -80,9 +83,13 @@ export default function ResearchUpgradePage() {
         </p>
       );
     }
+    const sorted = [...items].sort((a, b) => {
+      const order = (r?: string) => r === "Dark Elixir" ? 1 : 0;
+      return order(a.costResource) - order(b.costResource);
+    });
     return (
-      <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-        {items.map((item) => {
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
+        {sorted.map((item) => {
           const saved = hv![key].find((t) => t.name === item.name);
           const currentLevel = saved?.level ?? 0;
 
@@ -126,6 +133,8 @@ export default function ResearchUpgradePage() {
               ]}
               getAllSteps={(level) => getResearchUpgradeSteps(item.name, level, thLevel)}
               slots={slots}
+              hideIfComplete={hideCompleted}
+              boostPct={researchBoostPct}
               onStartUpgrade={(_idx, step, builderId) =>
                 save(startResearchUpgrade(hv!, key, item.name, step, builderId))
               }
@@ -147,7 +156,11 @@ export default function ResearchUpgradePage() {
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-extrabold text-gray-900">Research</h1>
           <span className="text-sm text-gray-500">TH{thLevel}</span>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">Hide Max</span>
+              <ToggleSwitch checked={hideCompleted} onChange={setHideCompleted} label="" />
+            </div>
             <Link
               href="/upgrade/home/research/queue"
               className="rounded-lg bg-primary/80 px-3 py-1.5 text-xs font-bold text-accent hover:bg-primary"

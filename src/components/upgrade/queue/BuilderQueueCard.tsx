@@ -37,6 +37,7 @@ interface Props {
   queue: BuilderQueueItem[];
   activeUpgrade?: ActiveUpgrade;
   conflicts: QueueConflict[];
+  multiInstanceBuildingIds?: Set<string>;
   onQueueChange: (newQueue: BuilderQueueItem[]) => void;
   onAddClick: (slotId: number) => void;
   onStartFirst?: (item: BuilderQueueItem) => void;
@@ -134,7 +135,7 @@ function ActiveItem({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemPro
   );
 }
 
-export function BuilderQueueCard({ slot, queue, activeUpgrade, conflicts, onQueueChange, onAddClick, onStartFirst }: Props) {
+export function BuilderQueueCard({ slot, queue, activeUpgrade, conflicts, multiInstanceBuildingIds, onQueueChange, onAddClick, onStartFirst }: Props) {
   const conflictIds = new Set(conflicts.map((c) => c.queueItemId));
   const conflictMap = new Map(conflicts.map((c) => [c.queueItemId, c.message]));
   const hasErrors = conflicts.length > 0;
@@ -240,6 +241,7 @@ export function BuilderQueueCard({ slot, queue, activeUpgrade, conflicts, onQueu
                   item={item}
                   isConflict={conflictIds.has(item.id)}
                   conflictMessage={conflictMap.get(item.id)}
+                  multiInstanceBuildingIds={multiInstanceBuildingIds}
                   onRemove={() => removeItem(item.id)}
                   onStart={!activeUpgrade && idx === 0 && onStartFirst ? () => onStartFirst(item) : undefined}
                 />

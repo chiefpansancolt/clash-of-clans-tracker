@@ -47,6 +47,7 @@ export interface TrackedAchievement {
 /** Module levels for a single crafted defense (3 independent modules). */
 export interface CraftedDefenseData {
   modules: [number, number, number]; // upgrade level of each module (0 = not upgraded)
+  moduleUpgrades?: (UpgradeState | undefined)[]; // upgrade state per module index
 }
 
 export interface HomeVillageData {

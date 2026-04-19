@@ -275,3 +275,79 @@ export function adjustTownHallWeaponUpgrade(hv: HomeVillageData, finishesAt: str
   if (!hv.townHallWeaponUpgrade) return hv;
   return { ...hv, townHallWeaponUpgrade: { ...hv.townHallWeaponUpgrade, finishesAt } };
 }
+
+function patchCraftedModuleUpgrades(
+  hv: HomeVillageData,
+  defenseId: string,
+  moduleIndex: number,
+  patch: (upgrades: (import("@/types/app/game").UpgradeState | undefined)[]) => (import("@/types/app/game").UpgradeState | undefined)[]
+): HomeVillageData {
+  const existing = hv.craftedDefenses[defenseId] ?? { modules: [0, 0, 0] as [number, number, number] };
+  const upgrades = [...(existing.moduleUpgrades ?? [])];
+  return {
+    ...hv,
+    craftedDefenses: {
+      ...hv.craftedDefenses,
+      [defenseId]: { ...existing, moduleUpgrades: patch(upgrades) },
+    },
+  };
+}
+
+export function startCraftedDefenseUpgrade(
+  hv: HomeVillageData,
+  defenseId: string,
+  moduleIndex: number,
+  step: UpgradeStep,
+  builderId: number
+): HomeVillageData {
+  return patchCraftedModuleUpgrades(hv, defenseId, moduleIndex, (upgrades) => {
+    const next = [...upgrades];
+    next[moduleIndex] = {
+      upgradeStartedAt: new Date().toISOString(),
+      finishesAt: new Date(Date.now() + step.durationMs).toISOString(),
+      builderId,
+    };
+    return next;
+  });
+}
+
+export function finishCraftedDefenseUpgrade(
+  hv: HomeVillageData,
+  defenseId: string,
+  moduleIndex: number
+): HomeVillageData {
+  const existing = hv.craftedDefenses[defenseId] ?? { modules: [0, 0, 0] as [number, number, number] };
+  const newModules = [...existing.modules] as [number, number, number];
+  newModules[moduleIndex] = (newModules[moduleIndex] ?? 0) + 1;
+  return patchCraftedModuleUpgrades({ ...hv, craftedDefenses: { ...hv.craftedDefenses, [defenseId]: { ...existing, modules: newModules } } }, defenseId, moduleIndex, (upgrades) => {
+    const next = [...upgrades];
+    next[moduleIndex] = undefined;
+    return next;
+  });
+}
+
+export function cancelCraftedDefenseUpgrade(
+  hv: HomeVillageData,
+  defenseId: string,
+  moduleIndex: number
+): HomeVillageData {
+  return patchCraftedModuleUpgrades(hv, defenseId, moduleIndex, (upgrades) => {
+    const next = [...upgrades];
+    next[moduleIndex] = undefined;
+    return next;
+  });
+}
+
+export function adjustCraftedDefenseUpgrade(
+  hv: HomeVillageData,
+  defenseId: string,
+  moduleIndex: number,
+  finishesAt: string
+): HomeVillageData {
+  return patchCraftedModuleUpgrades(hv, defenseId, moduleIndex, (upgrades) => {
+    const next = [...upgrades];
+    if (next[moduleIndex]) next[moduleIndex] = { ...next[moduleIndex]!, finishesAt };
+    return next;
+  });
+}
+

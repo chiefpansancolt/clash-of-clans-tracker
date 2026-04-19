@@ -44,6 +44,7 @@ export interface ItemEditData {
   name: string;
   maxLevel: number;
   imageUrl: string;
+  costResource?: string;
 }
 
 export interface HeroEditData {
@@ -161,10 +162,34 @@ export function getGuardiansAtTH(thLevel: number): BuildingEditData[] {
   });
 }
 
+export function getOtherBuildingsAtTH(thLevel: number): BuildingEditData[] {
+  type RawOther = {
+    id: string;
+    name: string;
+    availablePerTownHall: Array<{ townHallLevel: number; count: number }>;
+    levels: Array<{ level: number; townHallRequired?: number; images?: { normal?: string } }>;
+  };
+  const entries: RawOther[] = [
+    _home.otherBuildings().bobsHut().data[0],
+    _home.otherBuildings().helperHut().data[0],
+  ].filter(Boolean);
+  return entries.flatMap((b) => {
+    const instanceCount = getCountAtTH(b.availablePerTownHall, thLevel);
+    if (instanceCount === 0) return [];
+    const eligible = b.levels.filter((l) => (l.townHallRequired ?? 0) <= thLevel);
+    if (eligible.length === 0) return [];
+    const maxLevel = eligible[eligible.length - 1].level;
+    const imageUrl = eligible[eligible.length - 1]?.images?.normal
+      ? toPublicImageUrl(eligible[eligible.length - 1].images!.normal!)
+      : "";
+    return [{ id: b.id, name: b.name, maxLevel, instanceCount, imageUrl, superchargeTiers: 0 }];
+  });
+}
+
 export function getTroopsAtTH(thLevel: number): ItemEditData[] {
   type RawTroop = {
     name: string;
-    levels: Array<{ level: number; townHallRequired?: number }>;
+    levels: Array<{ level: number; townHallRequired?: number; researchCostResource?: string }>;
     images?: { icon?: string };
   };
   const raw = _home.troops().get() as RawTroop[];
@@ -175,14 +200,15 @@ export function getTroopsAtTH(thLevel: number): ItemEditData[] {
     if (eligible.length === 0) return [];
     const maxLevel = eligible[eligible.length - 1].level;
     const imageUrl = t.images?.icon ? toPublicImageUrl(t.images.icon) : "";
-    return [{ name: t.name, maxLevel, imageUrl }];
+    const costResource = t.levels[0]?.researchCostResource;
+    return [{ name: t.name, maxLevel, imageUrl, costResource }];
   });
 }
 
 export function getSpellsAtTH(thLevel: number): ItemEditData[] {
   type RawSpell = {
     name: string;
-    levels: Array<{ level: number; townHallRequired?: number }>;
+    levels: Array<{ level: number; townHallRequired?: number; researchCostResource?: string }>;
     images?: { icon?: string };
   };
   const raw = _home.spells().get() as RawSpell[];
@@ -191,7 +217,8 @@ export function getSpellsAtTH(thLevel: number): ItemEditData[] {
     if (eligible.length === 0) return [];
     const maxLevel = eligible[eligible.length - 1].level;
     const imageUrl = s.images?.icon ? toPublicImageUrl(s.images.icon) : "";
-    return [{ name: s.name, maxLevel, imageUrl }];
+    const costResource = s.levels[0]?.researchCostResource;
+    return [{ name: s.name, maxLevel, imageUrl, costResource }];
   });
 }
 

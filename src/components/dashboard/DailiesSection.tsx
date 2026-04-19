@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
-import { getForgeDurationMs } from "@/lib/utils/forgeHelpers";
 import {
   isAvailable,
   msUntilNextReset,
@@ -274,13 +274,6 @@ function GoldPassDisplay({ goldPass }: { goldPass: GoldPassData }) {
 }
 
 
-function formatMs(ms: number): string {
-  const totalSecs = Math.ceil(ms / 1000);
-  const h = Math.floor(totalSecs / 3600);
-  const m = Math.floor((totalSecs % 3600) / 60);
-  const s = totalSecs % 60;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
 
 const RESOURCE_META: Record<ForgeResourceType, { label: string; image: string }> = {
   gold:          { label: "Gold",          image: "images/other/gold.png" },
@@ -291,7 +284,19 @@ const RESOURCE_META: Record<ForgeResourceType, { label: string; image: string }>
 };
 
 
-function AutoForgeChip({ autoForge, builderBoostPct, onStart, onStop }: AutoForgeChipProps) {
+function formatMsDhm(ms: number): string {
+  const totalMins = Math.ceil(ms / 60_000);
+  const d = Math.floor(totalMins / 1440);
+  const h = Math.floor((totalMins % 1440) / 60);
+  const m = totalMins % 60;
+  const parts: string[] = [];
+  if (d > 0) parts.push(`${d}d`);
+  if (h > 0) parts.push(`${h}h`);
+  if (m > 0 || parts.length === 0) parts.push(`${m}m`);
+  return parts.join(" ");
+}
+
+function AutoForgeChip({ autoForge, onStop }: AutoForgeChipProps) {
   const [display, setDisplay] = useState(() =>
     autoForge.endsAt ? Math.max(0, new Date(autoForge.endsAt).getTime() - Date.now()) : 0
   );
@@ -300,40 +305,16 @@ function AutoForgeChip({ autoForge, builderBoostPct, onStart, onStop }: AutoForg
 
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    if (!autoForge.endsAt) { return; }
+    if (!autoForge.endsAt) return;
     const remaining = Math.max(0, new Date(autoForge.endsAt).getTime() - Date.now());
     if (remaining <= 0) return;
     intervalRef.current = setInterval(() => {
       const r = Math.max(0, new Date(autoForge.endsAt!).getTime() - Date.now());
       setDisplay(r);
       if (r <= 0 && intervalRef.current) clearInterval(intervalRef.current);
-    }, 1000);
+    }, 60_000);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [autoForge.endsAt]);
-
-  // Form state — pre-fill duration from effective forge time (accounts for builder boost)
-  const effectiveDurationMs = getForgeDurationMs(builderBoostPct);
-  const defaultH = Math.floor(effectiveDurationMs / 3600000);
-  const defaultM = Math.floor((effectiveDurationMs % 3600000) / 60000);
-  const [durH, setDurH] = useState(String(defaultH));
-  const [durM, setDurM] = useState(String(defaultM));
-  const [resourceType, setResourceType] = useState<ForgeResourceType>(autoForge.resourceType);
-  const [resourceAmount, setResourceAmount] = useState(autoForge.resourceAmount > 0 ? String(autoForge.resourceAmount) : "");
-  const [capitalGoldOutput, setCapitalGoldOutput] = useState(autoForge.capitalGoldOutput > 0 ? String(autoForge.capitalGoldOutput) : "");
-
-  function handleStart() {
-    const h = Math.max(0, parseInt(durH) || 0);
-    const m = Math.max(0, Math.min(59, parseInt(durM) || 0));
-    const durationMs = (h * 3600 + m * 60) * 1000;
-    if (durationMs <= 0) return;
-    onStart({
-      endsAt: new Date(Date.now() + durationMs).toISOString(),
-      resourceType,
-      resourceAmount: parseInt(resourceAmount) || 0,
-      capitalGoldOutput: parseInt(capitalGoldOutput) || 0,
-      durationMs,
-    });
-  }
 
   const resourceImg = RESOURCE_META[autoForge.resourceType].image;
 
@@ -358,71 +339,12 @@ function AutoForgeChip({ autoForge, builderBoostPct, onStart, onStop }: AutoForg
   return (
     <div className="flex flex-col gap-1.5 min-w-36">
       <span className="text-[9px] font-bold uppercase tracking-widest text-accent">Auto Forge</span>
-
       {!autoForge.endsAt ? (
-        <div className="flex flex-col gap-1.5">
-          <div className="flex gap-1">
-            {(Object.keys(RESOURCE_META) as ForgeResourceType[]).map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => setResourceType(type)}
-                title={RESOURCE_META[type].label}
-                className={`cursor-pointer relative h-5 w-5 rounded transition-opacity ${resourceType === type ? "opacity-100 ring-1 ring-accent" : "opacity-50 hover:opacity-80"}`}
-              >
-                <Image src={toPublicImageUrl(RESOURCE_META[type].image)} alt={RESOURCE_META[type].label} fill sizes="20px" className="object-contain" />
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="relative h-4 w-4 shrink-0">
-              <Image src={toPublicImageUrl(RESOURCE_META[resourceType].image)} alt="resource" fill sizes="16px" className="object-contain" />
-            </div>
-            <input
-              type="number"
-              min={0}
-              value={resourceAmount}
-              onChange={(e) => setResourceAmount(e.target.value)}
-              className="w-14 rounded border border-secondary/80 bg-white/10 px-1 py-0.5 text-[10px] text-white focus:outline-none focus:ring-1 focus:ring-accent/80"
-              placeholder="amount"
-            />
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="relative h-4 w-4 shrink-0">
-              <Image src={toPublicImageUrl("images/other/gold-c.png")} alt="Capital Gold" fill sizes="16px" className="object-contain" />
-            </div>
-            <input
-              type="number"
-              min={0}
-              value={capitalGoldOutput}
-              onChange={(e) => setCapitalGoldOutput(e.target.value)}
-              className="w-14 rounded border border-secondary/80 bg-white/10 px-1 py-0.5 text-[10px] text-white focus:outline-none focus:ring-1 focus:ring-accent/80"
-              placeholder="output"
-            />
-          </div>
-          <div className="flex items-center gap-1">
-            <input
-              type="number" min={0} max={99} value={durH}
-              onChange={(e) => setDurH(e.target.value)}
-              className="w-10 rounded border border-secondary/80 bg-white/10 px-1 py-0.5 text-center text-[10px] text-white focus:outline-none focus:ring-1 focus:ring-accent/80"
-              placeholder="HH"
-            />
-            <span className="text-[10px] text-white/80">h</span>
-            <input
-              type="number" min={0} max={59} value={durM}
-              onChange={(e) => setDurM(e.target.value)}
-              className="w-10 rounded border border-secondary/80 bg-white/10 px-1 py-0.5 text-center text-[10px] text-white focus:outline-none focus:ring-1 focus:ring-accent/80"
-              placeholder="MM"
-            />
-            <span className="text-[10px] text-white/80">m</span>
-          </div>
-          <button
-            type="button"
-            onClick={handleStart}
-            className="cursor-pointer w-full rounded bg-accent px-2 py-1 text-[10px] font-bold text-primary hover:bg-accent/80"
-          >
-            Start
-          </button>
+        <div className="flex flex-col gap-1">
+          <span className="text-[10px] text-white/80">Not running</span>
+          <Link href="/forge" className="text-[10px] font-bold text-accent hover:underline">
+            Go to Forge →
+          </Link>
         </div>
       ) : isDone ? (
         <div className="flex flex-col gap-1">
@@ -436,11 +358,16 @@ function AutoForgeChip({ autoForge, builderBoostPct, onStart, onStop }: AutoForg
       ) : (
         <div className="flex flex-col gap-1">
           {conversionRow}
-          <span className="text-[11px] font-extrabold tabular-nums text-white">{formatMs(display)}</span>
-          <button type="button" onClick={onStop}
-            className="cursor-pointer w-full rounded bg-white/10 px-2 py-1 text-[10px] text-white/80 hover:bg-white/20">
-            Stop
-          </button>
+          <span className="text-[11px] font-extrabold tabular-nums text-white">{formatMsDhm(display)}</span>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={onStop}
+              className="cursor-pointer rounded bg-white/10 px-2 py-1 text-[10px] text-white/80 hover:bg-white/20">
+              Stop
+            </button>
+            <Link href="/forge" className="text-[10px] font-bold text-accent hover:underline">
+              Forge →
+            </Link>
+          </div>
         </div>
       )}
     </div>
@@ -574,12 +501,6 @@ export function DailiesSection({ dailies, playthroughId, thLevel, helperHutLevel
                 <div className="shrink-0">
                   <AutoForgeChip
                     autoForge={dailies.autoForge}
-                    builderBoostPct={dailies.goldPass.builderBoostPct}
-                    onStart={(data) =>
-                      updatePlaythrough(playthroughId, {
-                        dailies: { ...dailies, autoForge: data },
-                      })
-                    }
                     onStop={() =>
                       updatePlaythrough(playthroughId, {
                         dailies: { ...dailies, autoForge: { ...dailies.autoForge, endsAt: null } },

@@ -10,6 +10,8 @@ import {
   getResourceBuildingsAtTH,
   getTrapsAtTH,
   getHeroesAtTH,
+  getGuardiansAtTH,
+  getCraftedDefenses,
   getTroopsAtTH,
   getSpellsAtTH,
   getSiegeMachinesAtTH,
@@ -20,9 +22,14 @@ import {
   getHeroUpgradeSteps,
   getResearchUpgradeSteps,
   getPetUpgradeSteps,
+  getCraftedDefenseUpgradeSteps,
+  getCraftedDefenseImageUrl,
   isActiveUpgrade,
   formatFullNumber,
   formatBuildTime,
+  applyBoost,
+  applyBuilderBoostCost,
+  applyResearchBoostCost,
   getTownHallUpgradeStep,
   getTownHallWeaponInfo,
   getTownHallWeaponUpgradeSteps,
@@ -44,7 +51,7 @@ const RESOURCE_ICONS: Record<string, string> = {
 
 type PanelMode = "builder" | "research" | "pet";
 
-type BuilderCategory = "all" | "defenses" | "armyBuildings" | "resourceBuildings" | "traps" | "heroes" | "townHall";
+type BuilderCategory = "all" | "defenses" | "guardians" | "armyBuildings" | "resourceBuildings" | "traps" | "heroes" | "townHall" | "craftedDefenses" | "supercharges";
 type ResearchCategory = "all" | "troops" | "spells" | "siegeMachines";
 
 interface AvailableBuilderItem {
@@ -58,6 +65,9 @@ interface AvailableBuilderItem {
   cost: number;
   costResource: string;
   durationMs: number;
+  isGuardian?: boolean;
+  isCrafted?: boolean;
+  isSupercharge?: boolean;
 }
 
 interface AvailableResearchItem {
@@ -86,6 +96,7 @@ interface BuilderPanelProps {
   hv: HomeVillageData;
   slots: BuilderSlot[];
   targetSlotId?: number;
+  builderBoostPct?: 0 | 10 | 15 | 20;
   onAdd: (item: BuilderQueueItem, slotId: number) => void;
   onClose: () => void;
 }
@@ -94,6 +105,7 @@ interface ResearchPanelProps {
   hv: HomeVillageData;
   slots: BuilderSlot[];
   targetSlotId?: number;
+  researchBoostPct?: 0 | 10 | 15 | 20;
   onAdd: (item: ResearchQueueItem, slotId: number) => void;
   onUnlock: (name: string, category: ResearchQueueItem["category"]) => void;
   onClose: () => void;
@@ -107,7 +119,7 @@ interface PetPanelProps {
 
 // ─── Builder Panel ────────────────────────────────────────────────────────────
 
-export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, onAdd, onClose }: BuilderPanelProps) {
+export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, builderBoostPct = 0, onAdd, onClose }: BuilderPanelProps) {
   const [category, setCategory] = useState<BuilderCategory>("all");
   const [search, setSearch] = useState("");
   const [selectedSlotId, setSelectedSlotId] = useState<number>(targetSlotId ?? slots[0]?.id ?? 1);
@@ -136,27 +148,31 @@ export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, onAdd, 
     const queuedKeys = new Set<string>();
     for (const queue of Object.values(hv.builderQueues ?? {})) {
       for (const qi of queue) {
-        queuedKeys.add(`${qi.buildingId}:${qi.instanceIndex}:${qi.targetLevel}`);
+        queuedKeys.add(`${qi.buildingId}:${qi.instanceIndex}:${qi.targetLevel}${qi.isSupercharge ? ":sc" : ""}`);
       }
     }
 
     const items: AvailableBuilderItem[] = [];
 
+    const guardianIds = new Set(getGuardiansAtTH(thLevel).map((g) => g.id));
+
     const addBuildings = (
       defs: ReturnType<typeof getDefensesAtTH>,
       catKey: BuilderQueueItem["category"],
-      recordKey: keyof HomeVillageData
+      recordKey: keyof HomeVillageData,
+      isGuardian = false
     ) => {
       for (const b of defs) {
-        const record = hv[recordKey] as Record<string, Array<{ level: number; upgrade?: any }>>;
+        const record = hv[recordKey] as Record<string, Array<{ level: number; upgrade?: any; superchargeLevel?: number }>>;
         const instances = record[b.id] ?? [];
         for (let i = 0; i < b.instanceCount; i++) {
           const inst = instances[i] ?? { level: 0 };
-          if (inst.level >= b.maxLevel) continue;
-          if (inst.upgrade && isActiveUpgrade(inst.upgrade.finishesAt)) continue;
-          const steps = getBuildingUpgradeSteps(b.id, inst.level, thLevel, i);
+          const effectiveBuildingLevel = (inst.upgrade && isActiveUpgrade(inst.upgrade.finishesAt)) ? inst.level + 1 : inst.level;
+          const superchargeLevel = inst.superchargeLevel ?? 0;
+          const steps = getBuildingUpgradeSteps(b.id, effectiveBuildingLevel, thLevel, i, superchargeLevel);
           for (const step of steps) {
-            if (queuedKeys.has(`${b.id}:${i}:${step.level}`)) continue;
+            const scKey = step.isSupercharge ? ":sc" : "";
+            if (queuedKeys.has(`${b.id}:${i}:${step.level}${scKey}`)) continue;
             items.push({
               buildingId: b.id,
               instanceIndex: i,
@@ -168,6 +184,8 @@ export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, onAdd, 
               cost: step.cost,
               costResource: step.costResource,
               durationMs: step.durationMs,
+              isGuardian,
+              isSupercharge: step.isSupercharge,
             });
           }
         }
@@ -178,13 +196,14 @@ export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, onAdd, 
     addBuildings(getArmyBuildingsAtTH(thLevel), "armyBuildings", "armyBuildings");
     addBuildings(getResourceBuildingsAtTH(thLevel), "resourceBuildings", "resourceBuildings");
     addBuildings(getTrapsAtTH(thLevel), "traps", "traps");
+    addBuildings(getGuardiansAtTH(thLevel), "defenses", "defenses", true);
 
     for (const h of getHeroesAtTH(thLevel)) {
       const saved = hv.heroes.find((hero) => hero.name === h.name);
       const currentLevel = saved?.level ?? 0;
-      if (currentLevel >= h.maxLevel) continue;
-      if (saved?.upgrade && isActiveUpgrade(saved.upgrade.finishesAt)) continue;
-      const steps = getHeroUpgradeSteps(h.id, currentLevel, thLevel);
+      const effectiveHeroLevel = (saved?.upgrade && isActiveUpgrade(saved.upgrade.finishesAt)) ? currentLevel + 1 : currentLevel;
+      if (effectiveHeroLevel >= h.maxLevel) continue;
+      const steps = getHeroUpgradeSteps(h.id, effectiveHeroLevel, thLevel);
       for (const step of steps) {
         if (queuedKeys.has(`${h.id}:0:${step.level}`)) continue;
         items.push({
@@ -244,25 +263,74 @@ export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, onAdd, 
       }
     }
 
+    if (thLevel >= 18) {
+      for (const cd of getCraftedDefenses()) {
+        const saved = hv.craftedDefenses?.[cd.id];
+        const imageUrl = getCraftedDefenseImageUrl(cd.id);
+        cd.modules.forEach((mod, moduleIndex) => {
+          const activeUpgrade = saved?.moduleUpgrades?.[moduleIndex];
+          if (activeUpgrade) return;
+          const currentLevel = saved?.modules[moduleIndex] ?? 0;
+          if (currentLevel >= mod.maxLevel) return;
+          const steps = getCraftedDefenseUpgradeSteps(cd.id, moduleIndex, currentLevel);
+          for (const step of steps) {
+            if (queuedKeys.has(`${cd.id}:${moduleIndex}:${step.level}`)) continue;
+            items.push({
+              buildingId: cd.id,
+              instanceIndex: moduleIndex,
+              name: `${cd.name} — ${mod.name}`,
+              imageUrl: step.imageUrl || imageUrl,
+              category: "craftedDefenses",
+              currentLevel: step.level - 1,
+              nextLevel: step.level,
+              cost: step.cost,
+              costResource: step.costResource,
+              durationMs: step.durationMs,
+              isCrafted: true,
+            });
+          }
+        });
+      }
+    }
+
     return items;
   }, [hv, thLevel]);
 
   const filtered = useMemo(() => {
     return available.filter((it) => {
-      if (category !== "all" && it.category !== category) return false;
+      if (category === "guardians") return it.isGuardian === true && (!search || it.name.toLowerCase().includes(search.toLowerCase()));
+      if (category === "craftedDefenses") return it.isCrafted === true && (!search || it.name.toLowerCase().includes(search.toLowerCase()));
+      if (category === "supercharges") return it.isSupercharge === true && (!search || it.name.toLowerCase().includes(search.toLowerCase()));
+      if (category === "defenses") { if (it.isGuardian || it.isCrafted || it.isSupercharge || it.category !== "defenses") return false; }
+      else if (category !== "all" && it.category !== category) return false;
       if (search && !it.name.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
   }, [available, category, search]);
 
+  const multiInstanceIds = useMemo(() => {
+    const seen = new Set<string>();
+    const multi = new Set<string>();
+    for (const it of available) {
+      if (seen.has(it.buildingId)) multi.add(it.buildingId);
+      else seen.add(it.buildingId);
+    }
+    return multi;
+  }, [available]);
+
+  const hasSupercharges = available.some((it) => it.isSupercharge);
+
   const categories: { key: BuilderCategory; label: string }[] = [
     { key: "all", label: "All" },
     { key: "defenses", label: "Defenses" },
+    ...(thLevel >= 18 ? [{ key: "guardians" as BuilderCategory, label: "Guardians" }] : []),
+    ...(thLevel >= 18 ? [{ key: "craftedDefenses" as BuilderCategory, label: "Crafted Defenses" }] : []),
     { key: "armyBuildings", label: "Army" },
     { key: "resourceBuildings", label: "Resources" },
     { key: "traps", label: "Traps" },
     { key: "heroes", label: "Heroes" },
     { key: "townHall", label: "Town Hall" },
+    ...(hasSupercharges ? [{ key: "supercharges" as BuilderCategory, label: "Supercharge" }] : []),
   ];
 
   function handleAdd(it: AvailableBuilderItem) {
@@ -270,13 +338,14 @@ export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, onAdd, 
       id: nanoid(),
       name: it.name,
       targetLevel: it.nextLevel,
-      durationMs: it.durationMs,
-      cost: it.cost,
+      durationMs: applyBoost(it.durationMs, builderBoostPct),
+      cost: applyBuilderBoostCost(it.cost, builderBoostPct),
       costResource: it.costResource,
       imageUrl: it.imageUrl,
       category: it.category,
       buildingId: it.buildingId,
       instanceIndex: it.instanceIndex,
+      isSupercharge: it.isSupercharge,
     };
     onAdd(item, selectedSlotId);
   }
@@ -319,19 +388,26 @@ export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, onAdd, 
           <div className="grid grid-cols-2 gap-1.5">
             {filtered.map((it) => (
               <div
-                key={`${it.buildingId}-${it.instanceIndex}-${it.nextLevel}`}
-                className="flex items-center gap-2 rounded-lg px-2.5 py-2 hover:bg-white/5 transition-colors"
+                key={`${it.buildingId}-${it.instanceIndex}-${it.nextLevel}${it.isSupercharge ? ":sc" : ""}`}
+                className={`flex items-center gap-2 rounded-lg px-2.5 py-2 transition-colors ${it.isSupercharge ? "hover:bg-cyan-400/5" : "hover:bg-white/5"}`}
               >
-                {it.imageUrl ? (
-                  <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded border border-white/10">
-                    <Image src={it.imageUrl} alt={it.name} fill className="object-contain" sizes="44px" />
-                  </div>
-                ) : (
-                  <div className="h-11 w-11 shrink-0 rounded bg-white/6 border border-white/10" />
-                )}
+                <div className="relative shrink-0">
+                  {it.imageUrl ? (
+                    <div className={`relative h-11 w-11 overflow-hidden rounded border ${it.isSupercharge ? "border-cyan-400/30" : "border-white/10"}`}>
+                      <Image src={it.imageUrl} alt={it.name} fill className="object-contain" sizes="44px" />
+                    </div>
+                  ) : (
+                    <div className="h-11 w-11 shrink-0 rounded bg-white/6 border border-white/10" />
+                  )}
+                  {it.isSupercharge && (
+                    <div className="absolute -top-1 -right-1 h-4 w-4">
+                      <Image src="/images/other/supercharge.png" alt="Supercharge" fill className="object-contain" sizes="16px" />
+                    </div>
+                  )}
+                </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[11px] font-bold text-white truncate">
-                    {it.name}{it.instanceIndex > 0 ? ` #${it.instanceIndex + 1}` : ""}
+                  <p className={`text-[11px] font-bold truncate ${it.isSupercharge ? "text-cyan-300" : "text-white"}`}>
+                    {it.name}{multiInstanceIds.has(it.buildingId) ? ` #${it.instanceIndex + 1}` : ""}
                   </p>
                   <p className="text-[10px] text-white/80">{it.currentLevel}→{it.nextLevel}</p>
                   <p className="flex items-center gap-0.5 text-[10px] text-white/80">
@@ -340,8 +416,24 @@ export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, onAdd, 
                         <Image src={RESOURCE_ICONS[it.costResource]} alt={it.costResource} fill className="object-contain" sizes="12px" />
                       </span>
                     )}
-                    <span>{it.costResource === "Gems" ? "Gems" : formatFullNumber(it.cost)}</span>
+                    {it.costResource === "Gems" ? (
+                      <span>Gems</span>
+                    ) : builderBoostPct > 0 ? (
+                      <span className="text-accent font-bold">{formatFullNumber(applyBuilderBoostCost(it.cost, builderBoostPct))}</span>
+                    ) : (
+                      <span>{formatFullNumber(it.cost)}</span>
+                    )}
                   </p>
+                  {it.durationMs > 0 && (() => {
+                    const boostedMs = applyBoost(it.durationMs, builderBoostPct);
+                    const totalMins = Math.floor(boostedMs / 60_000);
+                    const label = formatBuildTime({ days: Math.floor(totalMins / 1440), hours: Math.floor((totalMins % 1440) / 60), minutes: totalMins % 60 });
+                    return (
+                      <p className={`text-[10px] font-bold ${builderBoostPct > 0 ? "text-accent" : "text-white/80"}`}>
+                        {label}{builderBoostPct > 0 ? ` (−${builderBoostPct}%)` : ""}
+                      </p>
+                    );
+                  })()}
                 </div>
                 <button
                   onClick={() => handleAdd(it)}
@@ -381,7 +473,7 @@ export function AvailableBuilderUpgradesPanel({ hv, slots, targetSlotId, onAdd, 
 
 // ─── Research Panel ───────────────────────────────────────────────────────────
 
-export function AvailableResearchUpgradesPanel({ hv, slots, targetSlotId, onAdd, onUnlock, onClose }: ResearchPanelProps) {
+export function AvailableResearchUpgradesPanel({ hv, slots, targetSlotId, researchBoostPct = 0, onAdd, onUnlock, onClose }: ResearchPanelProps) {
   const [category, setCategory] = useState<ResearchCategory>("all");
   const [search, setSearch] = useState("");
   const [selectedSlotId, setSelectedSlotId] = useState<number>(targetSlotId ?? slots[0]?.id ?? 1);
@@ -457,8 +549,8 @@ export function AvailableResearchUpgradesPanel({ hv, slots, targetSlotId, onAdd,
       id: nanoid(),
       name: it.name,
       targetLevel: it.nextLevel,
-      durationMs: it.durationMs,
-      cost: it.cost,
+      durationMs: applyBoost(it.durationMs, researchBoostPct),
+      cost: applyResearchBoostCost(it.cost, researchBoostPct),
       costResource: it.costResource,
       imageUrl: it.imageUrl,
       category: it.category,
@@ -520,8 +612,22 @@ export function AvailableResearchUpgradesPanel({ hv, slots, targetSlotId, onAdd,
                         <Image src={RESOURCE_ICONS[it.costResource]} alt={it.costResource} fill className="object-contain" sizes="12px" />
                       </span>
                     )}
-                    <span>{formatFullNumber(it.cost)}</span>
+                    {researchBoostPct > 0 ? (
+                      <span className="text-accent font-bold">{formatFullNumber(applyResearchBoostCost(it.cost, researchBoostPct))}</span>
+                    ) : (
+                      <span>{formatFullNumber(it.cost)}</span>
+                    )}
                   </p>
+                  {it.durationMs > 0 && (() => {
+                    const boostedMs = applyBoost(it.durationMs, researchBoostPct);
+                    const totalMins = Math.floor(boostedMs / 60_000);
+                    const label = formatBuildTime({ days: Math.floor(totalMins / 1440), hours: Math.floor((totalMins % 1440) / 60), minutes: totalMins % 60 });
+                    return (
+                      <p className={`text-[10px] font-bold ${researchBoostPct > 0 ? "text-accent" : "text-white/80"}`}>
+                        {label}{researchBoostPct > 0 ? ` (−${researchBoostPct}%)` : ""}
+                      </p>
+                    );
+                  })()}
                 </div>
                 <button
                   onClick={() => handleAdd(it)}

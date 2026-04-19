@@ -61,8 +61,6 @@ export type GoldPassItem =
 
 export interface AutoForgeChipProps {
   autoForge: AutoForgeData;
-  builderBoostPct: 0 | 10 | 15 | 20;
-  onStart: (data: AutoForgeData) => void;
   onStop: () => void;
 }
 
@@ -89,12 +87,14 @@ export interface SectionCardProps {
   title: string;
   children: ReactNode;
   className?: string;
+  queueHref?: string;
 }
 
 export interface ProgressCardProps {
   label: string;
   result: ProgressResult;
   sub?: string;
+  queueHref?: string;
 }
 
 export interface ItemGridProps {

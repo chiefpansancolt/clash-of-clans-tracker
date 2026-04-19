@@ -13,9 +13,10 @@ interface BaseQueueItem {
 // ─── Builder queue ────────────────────────────────────────────────────────────
 
 export interface BuilderQueueItem extends BaseQueueItem {
-  category: "defenses" | "armyBuildings" | "resourceBuildings" | "traps" | "heroes" | "townHall";
-  buildingId: string;    // clash-of-clans-data id e.g. "cannon"
-  instanceIndex: number; // 0-based — which instance of this building
+  category: "defenses" | "armyBuildings" | "resourceBuildings" | "traps" | "heroes" | "townHall" | "craftedDefenses";
+  buildingId: string;    // clash-of-clans-data id e.g. "cannon"; for craftedDefenses: defenseId
+  instanceIndex: number; // 0-based — which instance; for craftedDefenses: moduleIndex
+  isSupercharge?: boolean;
 }
 
 // ─── Research queue ───────────────────────────────────────────────────────────
