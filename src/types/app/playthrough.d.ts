@@ -80,9 +80,17 @@ export interface Playthrough {
   data: VillageData;
 }
 
+export interface ActiveHours {
+  /** Minutes from midnight UTC when active window opens */
+  startUtcMinutes: number;
+  /** Minutes from midnight UTC when active window closes */
+  endUtcMinutes: number;
+}
+
 export interface AppSettings {
   goblinBuilderEnabled: boolean;
   goblinResearchEnabled: boolean;
+  activeHours?: ActiveHours;
 }
 
 export interface AppData {

@@ -1,10 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { RiArrowRightLine } from "react-icons/ri";
+import { RiArrowRightLine, RiTimeLine, RiEditLine, RiCheckLine, RiCloseLine } from "react-icons/ri";
 import { LabelWithArrow } from "@/components/common/LabelWithArrow";
 import { formatBuildTime } from "@/lib/utils/upgradeHelpers";
+import {
+  localTimeToUtcMinutes,
+  utcMinutesToLocalTimeStr,
+  formatActiveHoursDisplay,
+} from "@/lib/utils/activeHoursHelpers";
 import type { TimelineBlock } from "@/types/app/queue";
+import type { ActiveHours } from "@/types/app/playthrough";
 import type { QueueTimelineProps, HoveredBlock } from "@/types/components/queue";
 
 const ZOOM_OPTIONS = [
@@ -49,7 +55,100 @@ const BlockTooltip = ({ block }: { block: TimelineBlock }) => {
   );
 }
 
-export const QueueTimeline = ({ timeline, slots, conflictItemIds }: QueueTimelineProps) => {
+const ActiveHoursFooter = ({ activeHours, onActiveHoursChange }: {
+  activeHours?: ActiveHours;
+  onActiveHoursChange: (hours: ActiveHours | undefined) => void;
+}) => {
+  const [editing, setEditing] = useState(false);
+  const [startStr, setStartStr] = useState(() =>
+    activeHours ? utcMinutesToLocalTimeStr(activeHours.startUtcMinutes) : "07:00"
+  );
+  const [endStr, setEndStr] = useState(() =>
+    activeHours ? utcMinutesToLocalTimeStr(activeHours.endUtcMinutes) : "23:00"
+  );
+
+  const handleSave = () => {
+    onActiveHoursChange({
+      startUtcMinutes: localTimeToUtcMinutes(startStr),
+      endUtcMinutes: localTimeToUtcMinutes(endStr),
+    });
+    setEditing(false);
+  };
+
+  const handleClear = () => {
+    onActiveHoursChange(undefined);
+    setEditing(false);
+  };
+
+  const handleCancel = () => {
+    if (activeHours) {
+      setStartStr(utcMinutesToLocalTimeStr(activeHours.startUtcMinutes));
+      setEndStr(utcMinutesToLocalTimeStr(activeHours.endUtcMinutes));
+    }
+    setEditing(false);
+  };
+
+  return (
+    <div className="flex items-center gap-2 border-t border-secondary/80 px-1 pt-2 mt-2">
+      <RiTimeLine size={11} className="shrink-0 text-white/80" />
+      {editing ? (
+        <>
+          <span className="text-[10px] text-white/80">Active</span>
+          <input
+            type="time"
+            value={startStr}
+            onChange={(e) => setStartStr(e.target.value)}
+            className="rounded border border-secondary/80 bg-white/8 px-1.5 py-0.5 text-[10px] text-white scheme-dark"
+          />
+          <span className="text-[10px] text-white/80">–</span>
+          <input
+            type="time"
+            value={endStr}
+            onChange={(e) => setEndStr(e.target.value)}
+            className="rounded border border-secondary/80 bg-white/8 px-1.5 py-0.5 text-[10px] text-white scheme-dark"
+          />
+          <button onClick={handleSave} className="cursor-pointer rounded p-1 text-green-400 hover:bg-white/10 transition-colors" title="Save">
+            <RiCheckLine size={12} />
+          </button>
+          <button onClick={handleCancel} className="cursor-pointer rounded p-1 text-white/80 hover:bg-white/10 transition-colors" title="Cancel">
+            <RiCloseLine size={12} />
+          </button>
+          {activeHours && (
+            <button onClick={handleClear} className="cursor-pointer ml-1 text-[10px] text-red-400 hover:underline" title="Clear active hours">
+              Clear
+            </button>
+          )}
+        </>
+      ) : (
+        <>
+          {activeHours ? (
+            <span className="text-[10px] text-white/80">
+              Active{" "}
+              <span className="font-bold text-white">
+                {formatActiveHoursDisplay(activeHours.startUtcMinutes)}
+              </span>
+              {" – "}
+              <span className="font-bold text-white">
+                {formatActiveHoursDisplay(activeHours.endUtcMinutes)}
+              </span>
+            </span>
+          ) : (
+            <span className="text-[10px] text-white/80">No active hours set — queue assumes 24/7 availability</span>
+          )}
+          <button
+            onClick={() => setEditing(true)}
+            className="cursor-pointer rounded p-1 text-white/80 hover:bg-white/10 transition-colors ml-1"
+            title="Set active hours"
+          >
+            <RiEditLine size={11} />
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
+export const QueueTimeline = ({ timeline, slots, conflictItemIds, activeHours, onActiveHoursChange }: QueueTimelineProps) => {
   const [windowDays, setWindowDays] = useState(1);
   const [hovered, setHovered] = useState<HoveredBlock | null>(null);
 
@@ -101,10 +200,10 @@ export const QueueTimeline = ({ timeline, slots, conflictItemIds }: QueueTimelin
     return markers;
   }, [now, windowDays, windowStart, windowEnd, windowMs]);
 
-  const toLeftPct = (date: Date)=> {
+  const toLeftPct = (date: Date) => {
     return Math.max(0, Math.min(100, ((date.getTime() - windowStart) / windowMs) * 100));
   }
-  const toWidthPct = (start: Date, end: Date)=> {
+  const toWidthPct = (start: Date, end: Date) => {
     const l = toLeftPct(start);
     const r = Math.max(0, Math.min(100, ((end.getTime() - windowStart) / windowMs) * 100));
     return Math.max(0, r - l);
@@ -217,6 +316,8 @@ export const QueueTimeline = ({ timeline, slots, conflictItemIds }: QueueTimelin
               );
             })}
           </div>
+
+          <ActiveHoursFooter activeHours={activeHours} onActiveHoursChange={onActiveHoursChange} />
         </div>
       </div>
 

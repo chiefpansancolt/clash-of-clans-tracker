@@ -1,9 +1,11 @@
 import { home, calculators, GemsCalculator } from "clash-of-clans-data";
 import { getMaxHeroHallLevel } from "@/lib/utils/progressHelpers";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
+import { advanceToActiveWindow } from "@/lib/utils/activeHoursHelpers";
 import type { HomeVillageData } from "@/types/app/game";
 import type { BuilderSlot, UpgradeStep } from "@/types/app/upgrade";
 import type { BuilderQueueItem, ResearchQueueItem, PetQueueItem, TimelineBlock } from "@/types/app/queue";
+import type { ActiveHours } from "@/types/app/playthrough";
 
 const _home = home() as any;
 
@@ -226,7 +228,8 @@ export const getResearchUpgradeSteps = (
       costResource: l.researchCostResource ?? "Elixir",
       buildTime: normalizeTime(l.researchTime ?? {}),
       durationMs: timeToDurationMs(l.researchTime ?? {}),
-      imageUrl: toPublicImageUrl(l.images?.normal),
+      // data package sometimes maps wrong level number in image filename; override with actual level
+      imageUrl: toPublicImageUrl(l.images?.normal?.replace(/level-\d+\.png$/, `level-${l.level}.png`)),
     }));
 }
 
@@ -544,7 +547,9 @@ export const formatFullNumber = (n: number): string  => {
 export const getBuilderTimeline = (
   hv: HomeVillageData,
   slots: BuilderSlot[],
-  windowDays = 90
+  windowDays = 90,
+  activeHours?: ActiveHours,
+  builderBoostPct: 0 | 10 | 15 | 20 = 0
 ): Record<string, TimelineBlock[]>  => {
   const now = new Date();
   const windowEnd = new Date(now.getTime() + windowDays * 86400_000);
@@ -626,13 +631,13 @@ export const getBuilderTimeline = (
         isActive: true,
         isIdle: false,
       });
-      cursor = active.endsAt;
+      cursor = activeHours ? advanceToActiveWindow(active.endsAt, activeHours) : active.endsAt;
     }
 
     // Queued items
     const queued: BuilderQueueItem[] = hv.builderQueues?.[String(slot.id)] ?? [];
     for (const item of queued) {
-      const endsAt = new Date(cursor.getTime() + item.durationMs);
+      const endsAt = new Date(cursor.getTime() + applyBoost(item.durationMs, builderBoostPct));
       const instanceLabel = item.instanceIndex >= 0 ? ` #${item.instanceIndex + 1}` : "";
       blocks.push({
         label: `${item.name}${instanceLabel}  ${item.targetLevel - 1}→${item.targetLevel}`,
@@ -642,7 +647,7 @@ export const getBuilderTimeline = (
         isActive: false,
         isIdle: false,
       });
-      cursor = endsAt;
+      cursor = activeHours ? advanceToActiveWindow(endsAt, activeHours) : endsAt;
     }
 
     // Trailing idle block
@@ -669,7 +674,9 @@ export const getBuilderTimeline = (
 export const getResearchTimeline = (
   hv: HomeVillageData,
   slots: BuilderSlot[],
-  windowDays = 90
+  windowDays = 90,
+  activeHours?: ActiveHours,
+  researchBoostPct: 0 | 10 | 15 | 20 = 0
 ): Record<string, TimelineBlock[]>  => {
   const now = new Date();
   const windowEnd = new Date(now.getTime() + windowDays * 86400_000);
@@ -693,14 +700,14 @@ export const getResearchTimeline = (
     const active = activeBySlot.get(slot.id);
     if (active) {
       blocks.push({ label: active.label, imageUrl: "", startsAt: now, endsAt: active.endsAt, isActive: true, isIdle: false });
-      cursor = active.endsAt;
+      cursor = activeHours ? advanceToActiveWindow(active.endsAt, activeHours) : active.endsAt;
     }
 
     const queued: ResearchQueueItem[] = hv.researchQueue?.[String(slot.id)] ?? [];
     for (const item of queued) {
-      const endsAt = new Date(cursor.getTime() + item.durationMs);
+      const endsAt = new Date(cursor.getTime() + applyBoost(item.durationMs, researchBoostPct));
       blocks.push({ label: `${item.name} ${item.targetLevel - 1}→${item.targetLevel}`, imageUrl: item.imageUrl, startsAt: new Date(cursor), endsAt, isActive: false, isIdle: false });
-      cursor = endsAt;
+      cursor = activeHours ? advanceToActiveWindow(endsAt, activeHours) : endsAt;
     }
 
     if (cursor < windowEnd) {
@@ -718,7 +725,9 @@ export const getResearchTimeline = (
  */
 export const getPetTimeline = (
   hv: HomeVillageData,
-  windowDays = 90
+  windowDays = 90,
+  activeHours?: ActiveHours,
+  researchBoostPct: 0 | 10 | 15 | 20 = 0
 ): TimelineBlock[]  => {
   const now = new Date();
   const windowEnd = new Date(now.getTime() + windowDays * 86400_000);
@@ -730,16 +739,16 @@ export const getPetTimeline = (
     if (u && isActiveUpgrade(u.finishesAt)) {
       const endsAt = new Date(u.finishesAt);
       blocks.push({ label: `${pet.name} ${pet.level}→${pet.level + 1}`, imageUrl: "", startsAt: now, endsAt, isActive: true, isIdle: false });
-      cursor = endsAt;
+      cursor = activeHours ? advanceToActiveWindow(endsAt, activeHours) : endsAt;
       break;
     }
   }
 
   const queued: PetQueueItem[] = hv.petQueue ?? [];
   for (const item of queued) {
-    const endsAt = new Date(cursor.getTime() + item.durationMs);
+    const endsAt = new Date(cursor.getTime() + applyBoost(item.durationMs, researchBoostPct));
     blocks.push({ label: `${item.name} ${item.targetLevel - 1}→${item.targetLevel}`, imageUrl: item.imageUrl, startsAt: new Date(cursor), endsAt, isActive: false, isIdle: false });
-    cursor = endsAt;
+    cursor = activeHours ? advanceToActiveWindow(endsAt, activeHours) : endsAt;
   }
 
   if (cursor < windowEnd) {

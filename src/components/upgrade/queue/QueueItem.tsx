@@ -60,7 +60,7 @@ export const QueueItemOverlay = ({ item, multiInstanceBuildingIds }: { item: Any
   );
 }
 
-export const QueueItem = ({ item, isConflict, conflictMessage, multiInstanceBuildingIds, onRemove, onStart }: QueueItemProps) => {
+export const QueueItem = ({ item, isConflict, conflictMessage, multiInstanceBuildingIds, displayCost, displayDurationMs, onRemove, onStart }: QueueItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
   });
@@ -71,7 +71,11 @@ export const QueueItem = ({ item, isConflict, conflictMessage, multiInstanceBuil
     opacity: isDragging ? 0.4 : 1,
   };
 
-  const totalMinutes = Math.floor(item.durationMs / 60_000);
+  const renderedDurationMs = displayDurationMs ?? item.durationMs;
+  const renderedCost = displayCost ?? item.cost;
+  const isBoosted = displayCost !== undefined && displayCost !== item.cost;
+
+  const totalMinutes = Math.floor(renderedDurationMs / 60_000);
   const durationLabel = formatBuildTime({
     days: Math.floor(totalMinutes / 1440),
     hours: Math.floor((totalMinutes % 1440) / 60),
@@ -114,9 +118,11 @@ export const QueueItem = ({ item, isConflict, conflictMessage, multiInstanceBuil
           {item.targetLevel - 1}<RiArrowRightLine size={10} className="inline mx-0.5" />{item.targetLevel}
         </p>
         <p className="text-[10px] text-white/80 flex items-center gap-1.5 flex-wrap">
-          <ResourceIcon resource={item.costResource} cost={item.cost} />
+          <span className={isBoosted ? "text-accent font-bold" : ""}>
+            <ResourceIcon resource={item.costResource} cost={renderedCost} />
+          </span>
           <span className="text-white/80">·</span>
-          <span>{durationLabel}</span>
+          <span className={isBoosted ? "text-accent font-bold" : ""}>{durationLabel}</span>
         </p>
         {isConflict && conflictMessage && (
           <p className="text-[9px] font-bold text-red-400 mt-0.5 flex items-center gap-1">

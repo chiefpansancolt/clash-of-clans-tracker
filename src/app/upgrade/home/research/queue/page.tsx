@@ -12,7 +12,7 @@ import {
 } from "@/lib/utils/upgradeHelpers";
 import {
   getResearchQueueConflicts,
-  getResearchResourceEvents,
+  getAllResourceEvents,
 } from "@/lib/utils/queueHelpers";
 import {
   startResearchUpgrade,
@@ -29,7 +29,7 @@ import type { ResearchKey } from "@/types/app/game";
 
 const ResearchQueuePage = () => {
   const router = useRouter();
-  const { activePlaythrough, appSettings, isLoaded, updatePlaythrough } = usePlaythrough();
+  const { activePlaythrough, appSettings, isLoaded, updatePlaythrough, updateSettings } = usePlaythrough();
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -44,15 +44,18 @@ const ResearchQueuePage = () => {
   const thLevel = hv?.townHallLevel ?? 1;
   const slots = hv ? getResearchSlots(hv, appSettings.goblinResearchEnabled) : [];
   const researchBoostPct = (activePlaythrough?.dailies?.goldPass.researchBoostPct ?? 0) as 0 | 10 | 15 | 20;
+  const builderBoostPct = (activePlaythrough?.dailies?.goldPass.builderBoostPct ?? 0) as 0 | 10 | 15 | 20;
+
+  const activeHours = appSettings.activeHours;
 
   const timeline = useMemo(
-    () => (hv ? getResearchTimeline(hv, slots) : {}),
-    [hv, slots]
+    () => (hv ? getResearchTimeline(hv, slots, 90, activeHours, researchBoostPct) : {}),
+    [hv, slots, activeHours, researchBoostPct]
   );
 
   const conflicts = useMemo(
-    () => (hv ? getResearchQueueConflicts(hv, slots) : []),
-    [hv, slots]
+    () => (hv ? getResearchQueueConflicts(hv, slots, activeHours) : []),
+    [hv, slots, activeHours]
   );
 
   const conflictItemIds = useMemo(
@@ -61,8 +64,8 @@ const ResearchQueuePage = () => {
   );
 
   const resourceGroups = useMemo(
-    () => (hv ? getResearchResourceEvents(hv, slots) : []),
-    [hv, slots]
+    () => (hv ? getAllResourceEvents(hv, appSettings, builderBoostPct, researchBoostPct) : []),
+    [hv, appSettings, builderBoostPct, researchBoostPct]
   );
 
   const activeBySlot = useMemo(() => {
@@ -197,6 +200,8 @@ const ResearchQueuePage = () => {
           timeline={timeline}
           slots={slots}
           conflictItemIds={conflictItemIds}
+          activeHours={activeHours}
+          onActiveHoursChange={(h) => updateSettings({ activeHours: h })}
         />
 
         <div className="flex-1 p-4">
@@ -210,6 +215,7 @@ const ResearchQueuePage = () => {
                 conflicts={conflicts.filter((c) =>
                   (hv.researchQueue?.[String(slot.id)] ?? []).some((i) => i.id === c.queueItemId)
                 )}
+                researchBoostPct={researchBoostPct}
                 onQueueChange={(q) => handleQueueChange(slot.id, q)}
                 onAddClick={(id) => { setPanelSlotId(id); setPanelOpen(true); }}
                 onStartFirst={(item) => handleStartFirst(item, slot.id)}

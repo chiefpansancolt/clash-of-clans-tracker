@@ -7,7 +7,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { RiLockLine, RiAddLine } from "react-icons/ri";
 import { LabelWithArrow } from "@/components/common/LabelWithArrow";
 import { FiEdit2 } from "react-icons/fi";
-import { formatTimeRemaining, formatFullNumber, formatBuildTime, getGemCost } from "@/lib/utils/upgradeHelpers";
+import { formatTimeRemaining, formatFullNumber, formatBuildTime, getGemCost, applyBoost, applyBuilderBoostCost } from "@/lib/utils/upgradeHelpers";
 import { FinishEarlyModal } from "@/components/upgrade/FinishEarlyModal";
 import { AdjustTimeModal } from "@/components/upgrade/AdjustTimeModal";
 
@@ -124,7 +124,7 @@ const ActiveItem = ({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemPro
   );
 }
 
-export const BuilderQueueCard = ({ slot, queue, activeUpgrade, conflicts, multiInstanceBuildingIds, onQueueChange, onAddClick, onStartFirst }: BuilderQueueCardProps) => {
+export const BuilderQueueCard = ({ slot, queue, activeUpgrade, conflicts, multiInstanceBuildingIds, builderBoostPct = 0, onQueueChange, onAddClick, onStartFirst }: BuilderQueueCardProps) => {
   const conflictIds = new Set(conflicts.map((c) => c.queueItemId));
   const conflictMap = new Map(conflicts.map((c) => [c.queueItemId, c.message]));
   const hasErrors = conflicts.length > 0;
@@ -138,7 +138,7 @@ export const BuilderQueueCard = ({ slot, queue, activeUpgrade, conflicts, multiI
     onQueueChange(queue.filter((i) => i.id !== id));
   }
 
-  const totalMs = queue.reduce((s, i) => s + i.durationMs, 0);
+  const totalMs = queue.reduce((s, i) => s + applyBoost(i.durationMs, builderBoostPct), 0);
   const totalMinutes = Math.floor(totalMs / 60_000);
   const totalDuration = formatBuildTime({
     days: Math.floor(totalMinutes / 1440),
@@ -147,7 +147,7 @@ export const BuilderQueueCard = ({ slot, queue, activeUpgrade, conflicts, multiI
   });
 
   const resourceTotals = queue.reduce<Record<string, number>>((acc, item) => {
-    acc[item.costResource] = (acc[item.costResource] ?? 0) + item.cost;
+    acc[item.costResource] = (acc[item.costResource] ?? 0) + applyBuilderBoostCost(item.cost, builderBoostPct);
     return acc;
   }, {});
 
@@ -229,6 +229,8 @@ export const BuilderQueueCard = ({ slot, queue, activeUpgrade, conflicts, multiI
                   isConflict={conflictIds.has(item.id)}
                   conflictMessage={conflictMap.get(item.id)}
                   multiInstanceBuildingIds={multiInstanceBuildingIds}
+                  displayCost={applyBuilderBoostCost(item.cost, builderBoostPct)}
+                  displayDurationMs={applyBoost(item.durationMs, builderBoostPct)}
                   onRemove={() => removeItem(item.id)}
                   onStart={!activeUpgrade && idx === 0 && onStartFirst ? () => onStartFirst(item) : undefined}
                 />

@@ -1,6 +1,7 @@
 import type { BuilderQueueItem, ResearchQueueItem, PetQueueItem, QueueConflict, TimelineBlock, ResourceGroup } from "@/types/app/queue";
 import type { HomeVillageData } from "@/types/app/game";
 import type { BuilderSlot } from "@/types/app/upgrade";
+import type { ActiveHours } from "@/types/app/playthrough";
 
 export type PanelMode = "builder" | "research" | "pet";
 export type BuilderCategory = "all" | "defenses" | "guardians" | "armyBuildings" | "resourceBuildings" | "traps" | "heroes" | "townHall" | "craftedDefenses" | "supercharges";
@@ -25,6 +26,10 @@ export interface ActiveItemProps {
 export interface PetActiveUpgrade {
   label: string;
   finishesAt: string;
+  level: number;
+  onFinish: () => void;
+  onCancel: () => void;
+  onAdjust: (finishesAt: string) => void;
 }
 
 export interface BuilderQueueCardProps {
@@ -33,6 +38,7 @@ export interface BuilderQueueCardProps {
   activeUpgrade?: ActiveUpgradeWithControls;
   conflicts: QueueConflict[];
   multiInstanceBuildingIds?: Set<string>;
+  builderBoostPct?: 0 | 10 | 15 | 20;
   onQueueChange: (newQueue: BuilderQueueItem[]) => void;
   onAddClick: (slotId: number) => void;
   onStartFirst?: (item: BuilderQueueItem) => void;
@@ -43,6 +49,7 @@ export interface ResearchQueueCardProps {
   queue: ResearchQueueItem[];
   activeUpgrade?: ActiveUpgradeWithControls;
   conflicts: QueueConflict[];
+  researchBoostPct?: 0 | 10 | 15 | 20;
   onQueueChange: (newQueue: ResearchQueueItem[]) => void;
   onAddClick: (slotId: number) => void;
   onStartFirst?: (item: ResearchQueueItem) => void;
@@ -53,8 +60,10 @@ export interface PetQueueCardProps {
   activeUpgrade?: PetActiveUpgrade;
   isBusy: boolean;
   conflicts: QueueConflict[];
+  researchBoostPct?: 0 | 10 | 15 | 20;
   onQueueChange: (newQueue: PetQueueItem[]) => void;
   onAddClick: () => void;
+  onStartFirst?: (item: import("@/types/app/queue").PetQueueItem) => void;
 }
 
 export interface QueueItemProps {
@@ -62,6 +71,8 @@ export interface QueueItemProps {
   isConflict?: boolean;
   conflictMessage?: string;
   multiInstanceBuildingIds?: Set<string>;
+  displayCost?: number;
+  displayDurationMs?: number;
   onRemove: () => void;
   onStart?: () => void;
 }
@@ -70,6 +81,8 @@ export interface QueueTimelineProps {
   timeline: Record<string, TimelineBlock[]>;
   slots: BuilderSlot[];
   conflictItemIds?: Set<string>;
+  activeHours?: ActiveHours;
+  onActiveHoursChange: (hours: ActiveHours | undefined) => void;
 }
 
 export interface HoveredBlock {
@@ -143,6 +156,7 @@ export interface ResearchPanelProps {
 
 export interface PetPanelProps {
   hv: HomeVillageData;
+  researchBoostPct?: 0 | 10 | 15 | 20;
   onAdd: (item: PetQueueItem) => void;
   onClose: () => void;
 }

@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { RiArrowLeftLine } from "react-icons/ri";
+import { RiArrowLeftLine, RiBarChartLine } from "react-icons/ri";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import {
   getPetSlots,
@@ -12,17 +12,24 @@ import {
 } from "@/lib/utils/upgradeHelpers";
 import {
   getPetQueueConflicts,
-  getPetResourceEvents,
+  getAllResourceEvents,
 } from "@/lib/utils/queueHelpers";
+import {
+  startPetUpgrade,
+  finishPetUpgrade,
+  cancelPetUpgrade,
+  adjustPetUpgrade,
+} from "@/lib/utils/upgradeActions";
 import { QueueTimeline } from "@/components/upgrade/queue/QueueTimeline";
 import { PetQueueCard } from "@/components/upgrade/queue/PetQueueCard";
 import { AvailablePetUpgradesPanel } from "@/components/upgrade/queue/AvailableUpgradesPanel";
 import { ResourcePlannerModal } from "@/components/upgrade/queue/ResourcePlannerModal";
 import type { PetQueueItem } from "@/types/app/queue";
+import type { PetActiveUpgrade } from "@/types/components/queue";
 
 const PetsQueuePage = () => {
   const router = useRouter();
-  const { activePlaythrough, isLoaded, updatePlaythrough } = usePlaythrough();
+  const { activePlaythrough, appSettings, isLoaded, updatePlaythrough, updateSettings } = usePlaythrough();
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -35,19 +42,30 @@ const PetsQueuePage = () => {
   const hv = activePlaythrough?.data.homeVillage;
   const thLevel = hv?.townHallLevel ?? 1;
   const slots = hv ? getPetSlots(hv) : [];
+  const researchBoostPct = (activePlaythrough?.dailies?.goldPass.researchBoostPct ?? 0) as 0 | 10 | 15 | 20;
+  const builderBoostPct = (activePlaythrough?.dailies?.goldPass.builderBoostPct ?? 0) as 0 | 10 | 15 | 20;
 
-  const petTimelineBlocks = useMemo(() => (hv ? getPetTimeline(hv) : []), [hv]);
+  const activeHours = appSettings.activeHours;
+
+  const petTimelineBlocks = useMemo(() => (hv ? getPetTimeline(hv, 90, activeHours, researchBoostPct) : []), [hv, activeHours, researchBoostPct]);
   const timeline = useMemo<Record<string, import("@/types/app/queue").TimelineBlock[]>>(
     () => ({ "1": petTimelineBlocks }),
     [petTimelineBlocks]
   );
 
-  const conflicts = useMemo(() => (hv ? getPetQueueConflicts(hv) : []), [hv]);
+  const conflicts = useMemo(() => (hv ? getPetQueueConflicts(hv, activeHours) : []), [hv, activeHours]);
   const conflictItemIds = useMemo(() => new Set(conflicts.map((c) => c.queueItemId)), [conflicts]);
 
-  const resourceGroups = useMemo(() => (hv ? getPetResourceEvents(hv) : []), [hv]);
+  const resourceGroups = useMemo(() => (hv ? getAllResourceEvents(hv, appSettings, builderBoostPct, researchBoostPct) : []), [hv, appSettings, builderBoostPct, researchBoostPct]);
 
-  let activeUpgrade: { label: string; finishesAt: string } | undefined;
+  const saveHv = (newHv: NonNullable<typeof hv>) => {
+    if (!activePlaythrough) return;
+    updatePlaythrough(activePlaythrough.id, {
+      data: { ...activePlaythrough.data, homeVillage: newHv },
+    });
+  }
+
+  let activeUpgrade: PetActiveUpgrade | undefined;
   if (hv) {
     for (const pet of hv.pets) {
       const u = (pet as any).upgrade;
@@ -55,6 +73,10 @@ const PetsQueuePage = () => {
         activeUpgrade = {
           label: `${pet.name} ${pet.level}→${pet.level + 1}`,
           finishesAt: u.finishesAt,
+          level: pet.level,
+          onFinish: () => saveHv(finishPetUpgrade(hv, pet.name)),
+          onCancel: () => saveHv(cancelPetUpgrade(hv, pet.name)),
+          onAdjust: (f) => saveHv(adjustPetUpgrade(hv, pet.name, f)),
         };
         break;
       }
@@ -76,6 +98,20 @@ const PetsQueuePage = () => {
     handleQueueChange([...existing, item]);
   };
 
+  const handleStartFirst = (item: PetQueueItem) => {
+    if (!hv) return;
+    const step = {
+      level: item.targetLevel,
+      cost: item.cost,
+      costResource: item.costResource,
+      buildTime: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      durationMs: item.durationMs,
+    };
+    const newHv = startPetUpgrade(hv, item.name, step, slots[0]?.id ?? 1);
+    const remaining = (hv.petQueue ?? []).filter((q) => q.id !== item.id);
+    saveHv({ ...newHv, petQueue: remaining });
+  };
+
   if (!activePlaythrough || !hv) return null;
 
   return (
@@ -95,9 +131,10 @@ const PetsQueuePage = () => {
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => setPlannerOpen(true)}
-              className="cursor-pointer rounded-lg border border-primary/80 bg-primary/10 px-3 py-1.5 text-[12px] font-bold text-primary hover:bg-primary/20 transition-colors"
+              className="cursor-pointer flex items-center gap-1.5 rounded-lg border border-primary/80 bg-primary/10 px-3 py-1.5 text-[12px] font-bold text-primary hover:bg-primary/20 transition-colors"
             >
-              📊 Resource Planner
+              <RiBarChartLine size={14} />
+              Resource Planner
             </button>
             <button
               onClick={() => setPanelOpen(true)}
@@ -115,6 +152,8 @@ const PetsQueuePage = () => {
             timeline={timeline}
             slots={slots}
             conflictItemIds={conflictItemIds}
+            activeHours={activeHours}
+            onActiveHoursChange={(h) => updateSettings({ activeHours: h })}
           />
         )}
 
@@ -127,8 +166,10 @@ const PetsQueuePage = () => {
               activeUpgrade={activeUpgrade}
               isBusy={!!activeUpgrade}
               conflicts={conflicts}
+              researchBoostPct={researchBoostPct}
               onQueueChange={handleQueueChange}
               onAddClick={() => setPanelOpen(true)}
+              onStartFirst={handleStartFirst}
             />
           )}
         </div>
@@ -137,6 +178,7 @@ const PetsQueuePage = () => {
       {panelOpen && (
         <AvailablePetUpgradesPanel
           hv={hv}
+          researchBoostPct={researchBoostPct}
           onAdd={handleAddItem}
           onClose={() => setPanelOpen(false)}
         />

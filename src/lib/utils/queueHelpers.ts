@@ -1,6 +1,8 @@
-import { isActiveUpgrade } from "@/lib/utils/upgradeHelpers";
+import { isActiveUpgrade, getBuilderSlots, getResearchSlots, applyBoost, applyBuilderBoostCost, applyResearchBoostCost } from "@/lib/utils/upgradeHelpers";
+import { advanceToActiveWindow } from "@/lib/utils/activeHoursHelpers";
 import type { HomeVillageData } from "@/types/app/game";
 import type { BuilderSlot } from "@/types/app/upgrade";
+import type { ActiveHours, AppSettings } from "@/types/app/playthrough";
 import type {
   BuilderQueueItem,
   ResearchQueueItem,
@@ -22,7 +24,8 @@ interface AnnotatedBuilderItem {
  */
 export const getBuilderQueueConflicts = (
   hv: HomeVillageData,
-  slots: BuilderSlot[]
+  slots: BuilderSlot[],
+  activeHours?: ActiveHours
 ): QueueConflict[]  => {
   const allAnnotated: AnnotatedBuilderItem[] = [];
 
@@ -57,10 +60,12 @@ export const getBuilderQueueConflicts = (
   for (const slot of slots) {
     const queued = hv.builderQueues?.[String(slot.id)] ?? [];
     let cursor = activeFinishMap.get(slot.id) ?? new Date();
+    if (activeHours) cursor = advanceToActiveWindow(cursor, activeHours);
 
     for (const item of queued) {
       allAnnotated.push({ item, scheduledStartAt: new Date(cursor) });
-      cursor = new Date(cursor.getTime() + item.durationMs);
+      const endsAt = new Date(cursor.getTime() + item.durationMs);
+      cursor = activeHours ? advanceToActiveWindow(endsAt, activeHours) : endsAt;
     }
   }
 
@@ -101,7 +106,8 @@ export const getBuilderQueueConflicts = (
  */
 export const getResearchQueueConflicts = (
   hv: HomeVillageData,
-  slots: BuilderSlot[]
+  slots: BuilderSlot[],
+  activeHours?: ActiveHours
 ): QueueConflict[]  => {
   const allAnnotated: Array<{ item: ResearchQueueItem; scheduledStartAt: Date }> = [];
 
@@ -116,9 +122,12 @@ export const getResearchQueueConflicts = (
   for (const slot of slots) {
     const queued = hv.researchQueue?.[String(slot.id)] ?? [];
     let cursor = activeFinishMap.get(slot.id) ?? new Date();
+    if (activeHours) cursor = advanceToActiveWindow(cursor, activeHours);
+
     for (const item of queued) {
       allAnnotated.push({ item, scheduledStartAt: new Date(cursor) });
-      cursor = new Date(cursor.getTime() + item.durationMs);
+      const endsAt = new Date(cursor.getTime() + item.durationMs);
+      cursor = activeHours ? advanceToActiveWindow(endsAt, activeHours) : endsAt;
     }
   }
 
@@ -153,7 +162,7 @@ export const getResearchQueueConflicts = (
  * Detects ordering conflicts in the pet queue.
  * Same rule: lower level must complete before higher level starts.
  */
-export const getPetQueueConflicts = (hv: HomeVillageData): QueueConflict[]  => {
+export const getPetQueueConflicts = (hv: HomeVillageData, activeHours?: ActiveHours): QueueConflict[]  => {
   const queued = hv.petQueue ?? [];
   if (queued.length < 2) return [];
 
@@ -165,10 +174,12 @@ export const getPetQueueConflicts = (hv: HomeVillageData): QueueConflict[]  => {
       break;
     }
   }
+  if (activeHours) cursor = advanceToActiveWindow(cursor, activeHours);
 
   const annotated = queued.map((item) => {
     const start = new Date(cursor);
-    cursor = new Date(cursor.getTime() + item.durationMs);
+    const endsAt = new Date(cursor.getTime() + item.durationMs);
+    cursor = activeHours ? advanceToActiveWindow(endsAt, activeHours) : endsAt;
     return { item, scheduledStartAt: start };
   });
 
@@ -208,7 +219,8 @@ const ONE_HOUR_MS = 3_600_000;
  */
 export const getBuilderResourceEvents = (
   hv: HomeVillageData,
-  slots: BuilderSlot[]
+  slots: BuilderSlot[],
+  builderBoostPct: 0 | 10 | 15 | 20 = 0
 ): ResourceGroup[]  => {
   const rawEvents: ResourceEvent[] = [];
 
@@ -258,29 +270,27 @@ export const getBuilderResourceEvents = (
       const next = queued[i + 1];
 
       if (i === 0) {
-        // This item starts when the active upgrade finishes — emit event for starting it
         const instanceSuffix = ` #${current.instanceIndex + 1}`;
         rawEvents.push({
           builderLabel: slot.label,
           completingItem: completingLabel,
           completesAt: new Date(cursor),
           nextItem: `${current.name}${instanceSuffix}  ${current.targetLevel - 1}→${current.targetLevel}`,
-          cost: current.cost,
+          cost: applyBuilderBoostCost(current.cost, builderBoostPct),
           costResource: current.costResource,
         });
       } else {
-        const prevEnd = new Date(cursor);
         rawEvents.push({
           builderLabel: slot.label,
           completingItem: queued[i - 1] ? `${queued[i - 1].name} #${queued[i - 1].instanceIndex + 1}  ${queued[i - 1].targetLevel - 1}→${queued[i - 1].targetLevel}` : completingLabel,
-          completesAt: prevEnd,
+          completesAt: new Date(cursor),
           nextItem: `${current.name} #${current.instanceIndex + 1}  ${current.targetLevel - 1}→${current.targetLevel}`,
-          cost: current.cost,
+          cost: applyBuilderBoostCost(current.cost, builderBoostPct),
           costResource: current.costResource,
         });
       }
 
-      cursor = new Date(cursor.getTime() + current.durationMs);
+      cursor = new Date(cursor.getTime() + applyBoost(current.durationMs, builderBoostPct));
     }
   }
 
@@ -292,7 +302,8 @@ export const getBuilderResourceEvents = (
  */
 export const getResearchResourceEvents = (
   hv: HomeVillageData,
-  slots: BuilderSlot[]
+  slots: BuilderSlot[],
+  researchBoostPct: 0 | 10 | 15 | 20 = 0
 ): ResourceGroup[]  => {
   const rawEvents: ResourceEvent[] = [];
 
@@ -326,11 +337,11 @@ export const getResearchResourceEvents = (
         completingItem: prevLabel,
         completesAt: new Date(cursor),
         nextItem: `${current.name}  ${current.targetLevel - 1}→${current.targetLevel}`,
-        cost: current.cost,
+        cost: applyResearchBoostCost(current.cost, researchBoostPct),
         costResource: current.costResource,
       });
 
-      cursor = new Date(cursor.getTime() + current.durationMs);
+      cursor = new Date(cursor.getTime() + applyBoost(current.durationMs, researchBoostPct));
     }
   }
 
@@ -340,7 +351,7 @@ export const getResearchResourceEvents = (
 /**
  * Returns grouped resource events for the pet queue.
  */
-export const getPetResourceEvents = (hv: HomeVillageData): ResourceGroup[]  => {
+export const getPetResourceEvents = (hv: HomeVillageData, researchBoostPct: 0 | 10 | 15 | 20 = 0): ResourceGroup[]  => {
   const queued = hv.petQueue ?? [];
   if (queued.length === 0) return [];
 
@@ -368,11 +379,11 @@ export const getPetResourceEvents = (hv: HomeVillageData): ResourceGroup[]  => {
       completingItem: prevLabel,
       completesAt: new Date(cursor),
       nextItem: `${current.name}  ${current.targetLevel - 1}→${current.targetLevel}`,
-      cost: current.cost,
+      cost: applyResearchBoostCost(current.cost, researchBoostPct),
       costResource: current.costResource,
     });
 
-    cursor = new Date(cursor.getTime() + current.durationMs);
+    cursor = new Date(cursor.getTime() + applyBoost(current.durationMs, researchBoostPct));
   }
 
   return groupEvents(rawEvents);
@@ -406,4 +417,31 @@ const groupEvents = (events: ResourceEvent[]): ResourceGroup[]  => {
 const makeGroup = (events: ResourceEvent[], date: Date, nowMs: number): ResourceGroup  => {
   const dayOffset = Math.round((date.getTime() - nowMs) / 86400_000);
   return { dayOffset: Math.max(0, dayOffset), date, events };
+}
+
+/**
+ * Returns a combined, chronologically grouped resource plan across all queues
+ * (builder, research, and pets). Use this on any queue page so the planner
+ * always shows the full picture regardless of where it was opened.
+ */
+export const getAllResourceEvents = (
+  hv: HomeVillageData,
+  appSettings: AppSettings,
+  builderBoostPct: 0 | 10 | 15 | 20 = 0,
+  researchBoostPct: 0 | 10 | 15 | 20 = 0
+): ResourceGroup[] => {
+  const builderSlots = getBuilderSlots(hv, appSettings.goblinBuilderEnabled);
+  const researchSlots = getResearchSlots(hv, appSettings.goblinResearchEnabled);
+
+  const builderGroups = getBuilderResourceEvents(hv, builderSlots, builderBoostPct);
+  const researchGroups = getResearchResourceEvents(hv, researchSlots, researchBoostPct);
+  const petGroups = getPetResourceEvents(hv, researchBoostPct);
+
+  const allRaw = [
+    ...builderGroups.flatMap((g) => g.events),
+    ...researchGroups.flatMap((g) => g.events),
+    ...petGroups.flatMap((g) => g.events),
+  ];
+
+  return groupEvents(allRaw);
 }

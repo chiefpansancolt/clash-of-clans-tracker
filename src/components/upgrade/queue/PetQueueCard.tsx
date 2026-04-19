@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   DndContext,
   closestCenter,
@@ -16,43 +17,108 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { RiLockLine, RiAddLine } from "react-icons/ri";
-import { formatTimeRemaining, formatFullNumber, formatBuildTime } from "@/lib/utils/upgradeHelpers";
+import { FiEdit2 } from "react-icons/fi";
+import { formatTimeRemaining, formatFullNumber, formatBuildTime, getGemCost, applyBoost, applyResearchBoostCost } from "@/lib/utils/upgradeHelpers";
+import { FinishEarlyModal } from "@/components/upgrade/FinishEarlyModal";
+import { AdjustTimeModal } from "@/components/upgrade/AdjustTimeModal";
 import { QueueItem } from "@/components/upgrade/queue/QueueItem";
-import type { PetQueueItem, QueueConflict } from "@/types/app/queue";
 import type { PetQueueCardProps, PetActiveUpgrade } from "@/types/components/queue";
 
-const ActiveItem = ({ upgrade }: { upgrade: PetActiveUpgrade }) => {
+const RESOURCE_ICONS: Record<string, string> = {
+  "Dark Elixir": "/images/other/dark-elixir.png",
+  Gems: "/images/other/gem.png",
+};
+
+const ActiveItem = ({
+  upgrade,
+  onRequestFinish,
+  onRequestAdjust,
+}: {
+  upgrade: PetActiveUpgrade;
+  onRequestFinish: () => void;
+  onRequestAdjust: () => void;
+}) => {
   const [countdown, setCountdown] = useState(() => formatTimeRemaining(upgrade.finishesAt));
+  const [isReady, setIsReady] = useState(() => new Date(upgrade.finishesAt).getTime() <= Date.now());
+  const [gemCost, setGemCost] = useState(() => getGemCost(Math.max(0, new Date(upgrade.finishesAt).getTime() - Date.now())));
 
   useEffect(() => {
-    const id = setInterval(() => setCountdown(formatTimeRemaining(upgrade.finishesAt)), 1000);
+    const tick = () => {
+      const remaining = Math.max(0, new Date(upgrade.finishesAt).getTime() - Date.now());
+      setCountdown(formatTimeRemaining(upgrade.finishesAt));
+      setIsReady(remaining <= 0);
+      setGemCost(getGemCost(remaining));
+    };
+    tick();
+    const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [upgrade.finishesAt]);
 
   return (
-    <div className="px-3 py-2 border-b border-secondary/80 bg-accent/5">
-      <div className="flex items-center gap-2">
-        <RiLockLine size={11} className="shrink-0 text-white/80" />
-        <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-bold text-white truncate">{upgrade.label}</p>
-          <p className="text-[10px] text-accent font-bold">{countdown}</p>
-        </div>
+    <div className="flex items-center gap-2 px-3 py-2 border-b border-secondary/80 bg-accent/5">
+      <RiLockLine size={11} className="shrink-0 text-white/80" />
+      <div className="flex-1 min-w-0">
+        <p className="text-[11px] font-bold text-white truncate">{upgrade.label}</p>
+        <p className="flex items-center gap-1.5 text-[10px] text-white/80">
+          {isReady ? "Ready!" : countdown}
+          {!isReady && (
+            <span className="flex items-center gap-0.5 text-accent">
+              <span className="relative inline-block h-3 w-3 shrink-0">
+                <Image src={RESOURCE_ICONS.Gems} alt="Gems" fill className="object-contain" sizes="12px" />
+              </span>
+              {gemCost.toLocaleString()}
+            </span>
+          )}
+        </p>
       </div>
+      {isReady ? (
+        <button
+          onClick={upgrade.onFinish}
+          className="cursor-pointer rounded-md bg-green-600 px-2.5 py-0.5 text-[10px] font-bold text-white hover:bg-green-500 transition-colors"
+        >
+          Collect
+        </button>
+      ) : (
+        <div className="flex items-center gap-1">
+          <button
+            onClick={onRequestFinish}
+            className="cursor-pointer rounded-md bg-accent/15 border border-accent/80 px-2 py-0.5 text-[10px] font-bold text-accent hover:bg-accent/25 transition-colors"
+          >
+            Finish
+          </button>
+          <button
+            onClick={onRequestAdjust}
+            className="cursor-pointer rounded p-1 text-white/80 hover:bg-white/10 transition-colors"
+            title="Adjust time"
+          >
+            <FiEdit2 className="h-3 w-3" />
+          </button>
+          <button
+            onClick={upgrade.onCancel}
+            className="cursor-pointer rounded-md bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] font-bold text-white/80 hover:bg-white/15 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
-export const PetQueueCard = ({ queue, activeUpgrade, isBusy, conflicts, onQueueChange, onAddClick }: PetQueueCardProps) => {
+export const PetQueueCard = ({ queue, activeUpgrade, isBusy, conflicts, researchBoostPct = 0, onQueueChange, onAddClick, onStartFirst }: PetQueueCardProps) => {
   const conflictIds = new Set(conflicts.map((c) => c.queueItemId));
   const conflictMap = new Map(conflicts.map((c) => [c.queueItemId, c.message]));
   const hasErrors = conflicts.length > 0;
+
+  const [finishModalOpen, setFinishModalOpen] = useState(false);
+  const [adjustModalOpen, setAdjustModalOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
   );
 
-  const handleDragEnd = (event: DragEndEvent)=> {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
     const oldIdx = queue.findIndex((i) => i.id === active.id);
@@ -61,7 +127,7 @@ export const PetQueueCard = ({ queue, activeUpgrade, isBusy, conflicts, onQueueC
     onQueueChange(arrayMove(queue, oldIdx, newIdx));
   }
 
-  const totalMs = queue.reduce((s, i) => s + i.durationMs, 0);
+  const totalMs = queue.reduce((s, i) => s + applyBoost(i.durationMs, researchBoostPct), 0);
   const totalMinutes = Math.floor(totalMs / 60_000);
   const totalDuration = formatBuildTime({
     days: Math.floor(totalMinutes / 1440),
@@ -70,7 +136,7 @@ export const PetQueueCard = ({ queue, activeUpgrade, isBusy, conflicts, onQueueC
   });
 
   const resourceTotals = queue.reduce<Record<string, number>>((acc, item) => {
-    acc[item.costResource] = (acc[item.costResource] ?? 0) + item.cost;
+    acc[item.costResource] = (acc[item.costResource] ?? 0) + applyResearchBoostCost(item.cost, researchBoostPct);
     return acc;
   }, {});
 
@@ -78,11 +144,11 @@ export const PetQueueCard = ({ queue, activeUpgrade, isBusy, conflicts, onQueueC
     <div
       className={`w-full max-w-md rounded-xl overflow-hidden ${
         hasErrors ? "border border-red-600/60" : "border border-secondary/80"
-      } bg-primary/40`}
+      } bg-primary`}
     >
       <div
         className={`flex items-center gap-2 px-3 py-2 border-b border-secondary/80 ${
-          hasErrors ? "bg-red-900/12" : "bg-primary/60"
+          hasErrors ? "bg-red-900/12" : "bg-primary"
         }`}
       >
         <span className={`h-1.75 w-1.75 shrink-0 rounded-full ${isBusy ? "bg-accent" : "bg-white/20"}`} />
@@ -96,7 +162,31 @@ export const PetQueueCard = ({ queue, activeUpgrade, isBusy, conflicts, onQueueC
         </button>
       </div>
 
-      {activeUpgrade && <ActiveItem upgrade={activeUpgrade} />}
+      {activeUpgrade && (
+        <>
+          <ActiveItem
+            upgrade={activeUpgrade}
+            onRequestFinish={() => setFinishModalOpen(true)}
+            onRequestAdjust={() => setAdjustModalOpen(true)}
+          />
+          <FinishEarlyModal
+            isOpen={finishModalOpen}
+            onClose={() => setFinishModalOpen(false)}
+            onConfirm={() => { activeUpgrade.onFinish(); setFinishModalOpen(false); }}
+            itemName={activeUpgrade.label}
+            nextLevel={activeUpgrade.level + 1}
+            timeRemaining={formatTimeRemaining(activeUpgrade.finishesAt)}
+          />
+          <AdjustTimeModal
+            isOpen={adjustModalOpen}
+            onClose={() => setAdjustModalOpen(false)}
+            onConfirm={(f) => { activeUpgrade.onAdjust(f); setAdjustModalOpen(false); }}
+            itemName={activeUpgrade.label}
+            nextLevel={activeUpgrade.level + 1}
+            currentFinishesAt={activeUpgrade.finishesAt}
+          />
+        </>
+      )}
 
       {queue.length === 0 ? (
         <div className="flex flex-col items-center gap-2 px-3 py-6 text-center">
@@ -116,13 +206,16 @@ export const PetQueueCard = ({ queue, activeUpgrade, isBusy, conflicts, onQueueC
         >
           <SortableContext items={queue.map((i) => i.id)} strategy={verticalListSortingStrategy}>
             <div>
-              {queue.map((item) => (
+              {queue.map((item, idx) => (
                 <QueueItem
                   key={item.id}
                   item={item}
                   isConflict={conflictIds.has(item.id)}
                   conflictMessage={conflictMap.get(item.id)}
+                  displayCost={applyResearchBoostCost(item.cost, researchBoostPct)}
+                  displayDurationMs={applyBoost(item.durationMs, researchBoostPct)}
                   onRemove={() => onQueueChange(queue.filter((i) => i.id !== item.id))}
+                  onStart={!activeUpgrade && idx === 0 && onStartFirst ? () => onStartFirst(item) : undefined}
                 />
               ))}
             </div>

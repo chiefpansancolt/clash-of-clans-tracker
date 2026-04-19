@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ToggleSwitch } from "flowbite-react";
@@ -34,6 +34,7 @@ const EquipmentUpgradePage = () => {
   const router = useRouter();
   const { activePlaythrough, isLoaded, updatePlaythrough } = usePlaythrough();
   const [hideMax, setHideMax] = usePersistedToggle("upgrade:equipment:hideMax");
+  const [selectedHero, setSelectedHero] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -74,11 +75,38 @@ const EquipmentUpgradePage = () => {
             <ToggleSwitch checked={hideMax} onChange={setHideMax} label="" />
           </div>
         </div>
+        {heroes.length > 1 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            <button
+              onClick={() => setSelectedHero(null)}
+              className={`rounded-full px-3 py-1 text-[10px] font-bold cursor-pointer transition-colors border ${
+                selectedHero === null
+                  ? "bg-primary/80 border-accent/40 text-white"
+                  : "bg-white/6 border-white/10 text-gray-600 hover:bg-white/10"
+              }`}
+            >
+              All
+            </button>
+            {heroes.map((h) => (
+              <button
+                key={h.id}
+                onClick={() => setSelectedHero(selectedHero === h.name ? null : h.name)}
+                className={`rounded-full px-3 py-1 text-[10px] font-bold cursor-pointer transition-colors border ${
+                  selectedHero === h.name
+                    ? "bg-primary/80 border-accent/40 text-white"
+                    : "bg-white/6 border-white/10 text-gray-600 hover:bg-white/10"
+                }`}
+              >
+                {h.name}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto p-3">
         <div className="flex flex-col gap-5">
-          {heroes.map((h) => {
+          {heroes.filter((h) => !selectedHero || h.name === selectedHero).map((h) => {
             const heroEquip = allEquipment.filter((e) => e.heroId === h.id);
             if (heroEquip.length === 0) return null;
             const savedHero = hv.heroes.find((hero) => hero.name === h.name);

@@ -1,7 +1,8 @@
 "use client";
 
 import { Alert, Badge, Button, Card, FileInput, Label, ToggleSwitch } from "flowbite-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { localTimeToUtcMinutes, utcMinutesToLocalTimeStr } from "@/lib/utils/activeHoursHelpers";
 import {
 	HiCheckCircle,
 	HiDownload,
@@ -18,6 +19,35 @@ const Settings = () => {
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [resetModalOpen, setResetModalOpen] = useState(false);
+
+	const [activeStart, setActiveStart] = useState(() =>
+		appSettings.activeHours ? utcMinutesToLocalTimeStr(appSettings.activeHours.startUtcMinutes) : "07:00"
+	);
+	const [activeEnd, setActiveEnd] = useState(() =>
+		appSettings.activeHours ? utcMinutesToLocalTimeStr(appSettings.activeHours.endUtcMinutes) : "23:00"
+	);
+
+	useEffect(() => {
+		if (appSettings.activeHours) {
+			setActiveStart(utcMinutesToLocalTimeStr(appSettings.activeHours.startUtcMinutes));
+			setActiveEnd(utcMinutesToLocalTimeStr(appSettings.activeHours.endUtcMinutes));
+		}
+	}, [appSettings.activeHours]);
+
+	const handleSaveActiveHours = () => {
+		updateSettings({
+			activeHours: {
+				startUtcMinutes: localTimeToUtcMinutes(activeStart),
+				endUtcMinutes: localTimeToUtcMinutes(activeEnd),
+			},
+		});
+	};
+
+	const handleClearActiveHours = () => {
+		updateSettings({ activeHours: undefined });
+		setActiveStart("07:00");
+		setActiveEnd("23:00");
+	};
 	const [resetSuccess, setResetSuccess] = useState(false);
 	const [importStatus, setImportStatus] = useState<{
 		show: boolean;
@@ -150,6 +180,42 @@ const Settings = () => {
 							</div>
 						</div>
 					</Card>
+				</div>
+
+				<div className="mb-4">
+				<Card>
+					<h2 className="mb-4 text-xl font-bold text-white">Active Hours</h2>
+					<p className="mb-4 text-sm text-white/80">
+						Set the hours you're actively playing each day. Queue timelines will add a gap when an upgrade finishes outside this window, reflecting when you'll actually be online to start the next one.
+					</p>
+					<div className="flex flex-wrap items-end gap-4">
+						<div className="flex flex-col gap-1">
+							<Label className="text-white/80 text-xs">Start time</Label>
+							<input
+								type="time"
+								value={activeStart}
+								onChange={(e) => setActiveStart(e.target.value)}
+								className="rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white scheme-dark"
+							/>
+						</div>
+						<div className="flex flex-col gap-1">
+							<Label className="text-white/80 text-xs">End time</Label>
+							<input
+								type="time"
+								value={activeEnd}
+								onChange={(e) => setActiveEnd(e.target.value)}
+								className="rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white scheme-dark"
+							/>
+						</div>
+						<Button onClick={handleSaveActiveHours}>Save</Button>
+						{appSettings.activeHours && (
+							<Button color="red" onClick={handleClearActiveHours}>Clear</Button>
+						)}
+					</div>
+					{appSettings.activeHours && (
+						<p className="mt-3 text-xs text-green-400">Active hours are set and applied to all queue timelines.</p>
+					)}
+				</Card>
 				</div>
 
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">

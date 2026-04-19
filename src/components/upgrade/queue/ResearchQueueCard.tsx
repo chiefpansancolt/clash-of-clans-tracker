@@ -19,11 +19,10 @@ import {
 import { RiLockLine, RiAddLine } from "react-icons/ri";
 import { LabelWithArrow } from "@/components/common/LabelWithArrow";
 import { FiEdit2 } from "react-icons/fi";
-import { formatTimeRemaining, formatBuildTime, formatFullNumber } from "@/lib/utils/upgradeHelpers";
+import { formatTimeRemaining, formatBuildTime, formatFullNumber, getGemCost, applyBoost, applyResearchBoostCost } from "@/lib/utils/upgradeHelpers";
 import { FinishEarlyModal } from "@/components/upgrade/FinishEarlyModal";
 import { AdjustTimeModal } from "@/components/upgrade/AdjustTimeModal";
 import { QueueItem } from "@/components/upgrade/queue/QueueItem";
-import type { ResearchQueueItem, QueueConflict } from "@/types/app/queue";
 import type { ResearchQueueCardProps, ActiveItemProps } from "@/types/components/queue";
 
 const RESOURCE_ICONS: Record<string, string> = {
@@ -44,12 +43,17 @@ const resourceColorClass = (resource: string) => {
 const ActiveItem = ({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemProps) => {
   const [countdown, setCountdown] = useState(() => formatTimeRemaining(upgrade.finishesAt));
   const [isReady, setIsReady] = useState(() => new Date(upgrade.finishesAt).getTime() <= Date.now());
+  const [gemCost, setGemCost] = useState(() => getGemCost(Math.max(0, new Date(upgrade.finishesAt).getTime() - Date.now())));
 
   useEffect(() => {
-    const id = setInterval(() => {
+    const tick = () => {
+      const remaining = Math.max(0, new Date(upgrade.finishesAt).getTime() - Date.now());
       setCountdown(formatTimeRemaining(upgrade.finishesAt));
-      setIsReady(new Date(upgrade.finishesAt).getTime() <= Date.now());
-    }, 1000);
+      setIsReady(remaining <= 0);
+      setGemCost(getGemCost(remaining));
+    };
+    tick();
+    const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [upgrade.finishesAt]);
 
@@ -69,7 +73,17 @@ const ActiveItem = ({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemPro
         <p className="text-[11px] font-bold text-white truncate">
           {parts[0]}<span className="text-accent"><LabelWithArrow label={parts[1] ?? ""} /></span>
         </p>
-        <p className="text-[10px] text-white/80">{isReady ? "Ready!" : countdown}</p>
+        <p className="flex items-center gap-1.5 text-[10px] text-white/80">
+          {isReady ? "Ready!" : countdown}
+          {!isReady && (
+            <span className="flex items-center gap-0.5 text-accent">
+              <span className="relative inline-block h-3 w-3 shrink-0">
+                <Image src={RESOURCE_ICONS.Gems} alt="Gems" fill className="object-contain" sizes="12px" />
+              </span>
+              {gemCost.toLocaleString()}
+            </span>
+          )}
+        </p>
       </div>
       {isReady ? (
         <button
@@ -105,7 +119,7 @@ const ActiveItem = ({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemPro
   );
 }
 
-export const ResearchQueueCard = ({ slot, queue, activeUpgrade, conflicts, onQueueChange, onAddClick, onStartFirst }: ResearchQueueCardProps) => {
+export const ResearchQueueCard = ({ slot, queue, activeUpgrade, conflicts, researchBoostPct = 0, onQueueChange, onAddClick, onStartFirst }: ResearchQueueCardProps) => {
   const conflictIds = new Set(conflicts.map((c) => c.queueItemId));
   const conflictMap = new Map(conflicts.map((c) => [c.queueItemId, c.message]));
   const hasErrors = conflicts.length > 0;
@@ -127,7 +141,7 @@ export const ResearchQueueCard = ({ slot, queue, activeUpgrade, conflicts, onQue
     onQueueChange(arrayMove(queue, oldIdx, newIdx));
   }
 
-  const totalMs = queue.reduce((s, i) => s + i.durationMs, 0);
+  const totalMs = queue.reduce((s, i) => s + applyBoost(i.durationMs, researchBoostPct), 0);
   const totalMinutes = Math.floor(totalMs / 60_000);
   const totalDuration = formatBuildTime({
     days: Math.floor(totalMinutes / 1440),
@@ -136,7 +150,7 @@ export const ResearchQueueCard = ({ slot, queue, activeUpgrade, conflicts, onQue
   });
 
   const resourceTotals = queue.reduce<Record<string, number>>((acc, item) => {
-    acc[item.costResource] = (acc[item.costResource] ?? 0) + item.cost;
+    acc[item.costResource] = (acc[item.costResource] ?? 0) + applyResearchBoostCost(item.cost, researchBoostPct);
     return acc;
   }, {});
 
@@ -144,11 +158,11 @@ export const ResearchQueueCard = ({ slot, queue, activeUpgrade, conflicts, onQue
     <div
       className={`w-full rounded-xl overflow-hidden ${
         hasErrors ? "border border-red-600/60" : "border border-secondary/80"
-      } bg-primary/40`}
+      } bg-primary`}
     >
       <div
         className={`flex items-center gap-2 px-3 py-2 border-b border-secondary/80 ${
-          hasErrors ? "bg-red-900/12" : "bg-primary/60"
+          hasErrors ? "bg-red-900/12" : "bg-primary"
         }`}
       >
         <span className={`h-1.75 w-1.75 shrink-0 rounded-full ${slot.busy ? "bg-accent" : "bg-white/20"}`} />
@@ -212,6 +226,8 @@ export const ResearchQueueCard = ({ slot, queue, activeUpgrade, conflicts, onQue
                   item={item}
                   isConflict={conflictIds.has(item.id)}
                   conflictMessage={conflictMap.get(item.id)}
+                  displayCost={applyResearchBoostCost(item.cost, researchBoostPct)}
+                  displayDurationMs={applyBoost(item.durationMs, researchBoostPct)}
                   onRemove={() => onQueueChange(queue.filter((i) => i.id !== item.id))}
                   onStart={!activeUpgrade && idx === 0 && onStartFirst ? () => onStartFirst(item) : undefined}
                 />

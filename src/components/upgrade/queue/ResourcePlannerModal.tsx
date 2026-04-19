@@ -1,6 +1,6 @@
 "use client";
 
-import { RiCloseLine } from "react-icons/ri";
+import { RiCloseLine, RiArrowRightLine } from "react-icons/ri";
 import { LabelWithArrow } from "@/components/common/LabelWithArrow";
 import { formatFullNumber } from "@/lib/utils/upgradeHelpers";
 import type { ResourcePlannerModalProps } from "@/types/components/queue";

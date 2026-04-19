@@ -38,7 +38,7 @@ import {
 } from "@/lib/utils/massEditHelpers";
 import {
   getBuilderQueueConflicts,
-  getBuilderResourceEvents,
+  getAllResourceEvents,
 } from "@/lib/utils/queueHelpers";
 import {
   startBuildingUpgrade,
@@ -74,7 +74,7 @@ import type { ActiveUpgradeForSlot } from "@/types/components/queue";
 
 const BuilderQueuePage = () => {
   const router = useRouter();
-  const { activePlaythrough, appSettings, isLoaded, updatePlaythrough } = usePlaythrough();
+  const { activePlaythrough, appSettings, isLoaded, updatePlaythrough, updateSettings } = usePlaythrough();
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -95,15 +95,18 @@ const BuilderQueuePage = () => {
   const thLevel = hv?.townHallLevel ?? 1;
   const slots = hv ? getBuilderSlots(hv, appSettings.goblinBuilderEnabled) : [];
   const builderBoostPct = (activePlaythrough?.dailies?.goldPass.builderBoostPct ?? 0) as 0 | 10 | 15 | 20;
+  const researchBoostPct = (activePlaythrough?.dailies?.goldPass.researchBoostPct ?? 0) as 0 | 10 | 15 | 20;
+
+  const activeHours = appSettings.activeHours;
 
   const timeline = useMemo(
-    () => (hv ? getBuilderTimeline(hv, slots) : {}),
-    [hv, slots]
+    () => (hv ? getBuilderTimeline(hv, slots, 90, activeHours, builderBoostPct) : {}),
+    [hv, slots, activeHours, builderBoostPct]
   );
 
   const conflicts = useMemo(
-    () => (hv ? getBuilderQueueConflicts(hv, slots) : []),
-    [hv, slots]
+    () => (hv ? getBuilderQueueConflicts(hv, slots, activeHours) : []),
+    [hv, slots, activeHours]
   );
 
   const conflictItemIds = useMemo(
@@ -123,8 +126,8 @@ const BuilderQueuePage = () => {
   }, [hv]);
 
   const resourceGroups = useMemo(
-    () => (hv ? getBuilderResourceEvents(hv, slots) : []),
-    [hv, slots]
+    () => (hv ? getAllResourceEvents(hv, appSettings, builderBoostPct, researchBoostPct) : []),
+    [hv, appSettings, builderBoostPct, researchBoostPct]
   );
 
   // Build a map of builderId → active upgrade info + action callbacks for display in cards
@@ -403,6 +406,8 @@ const BuilderQueuePage = () => {
           timeline={timeline}
           slots={slots}
           conflictItemIds={conflictItemIds}
+          activeHours={activeHours}
+          onActiveHoursChange={(h) => updateSettings({ activeHours: h })}
         />
 
         <div className="flex-1 p-4">
@@ -424,6 +429,7 @@ const BuilderQueuePage = () => {
                     (hv.builderQueues?.[String(slot.id)] ?? []).some((i) => i.id === c.queueItemId)
                   )}
                   multiInstanceBuildingIds={multiInstanceBuildingIds}
+                  builderBoostPct={builderBoostPct}
                   onQueueChange={(q) => handleQueueChange(slot.id, q)}
                   onAddClick={(id) => openPanel(id)}
                   onStartFirst={(item) => handleStartFirst(item, slot.id)}

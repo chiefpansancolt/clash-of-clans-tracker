@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
+import { usePersistedSet } from "@/lib/hooks/usePersistedSet";
 import Image from "next/image";
 import { nanoid } from "nanoid";
 import { RiCloseLine, RiArrowRightLine } from "react-icons/ri";
@@ -65,6 +66,8 @@ export const AvailableBuilderUpgradesPanel = ({ hv, slots, targetSlotId, builder
   const [category, setCategory] = useState<BuilderCategory>("all");
   const [search, setSearch] = useState("");
   const [selectedSlotId, setSelectedSlotId] = useState<number>(targetSlotId ?? slots[0]?.id ?? 1);
+  const [hiddenCategories, toggleHidden] = usePersistedSet("queue:builder:hiddenCategories");
+  const clickTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const thLevel = hv.townHallLevel;
 
   const activeUpgradeBuilderIds = useMemo(() => {
@@ -245,10 +248,16 @@ export const AvailableBuilderUpgradesPanel = ({ hv, slots, targetSlotId, builder
       if (category === "supercharges") return it.isSupercharge === true && (!search || it.name.toLowerCase().includes(search.toLowerCase()));
       if (category === "defenses") { if (it.isGuardian || it.isCrafted || it.isSupercharge || it.category !== "defenses") return false; }
       else if (category !== "all" && it.category !== category) return false;
+      if (category === "all") {
+        if (it.isGuardian && hiddenCategories.has("guardians")) return false;
+        if (it.isCrafted && hiddenCategories.has("craftedDefenses")) return false;
+        if (it.isSupercharge && hiddenCategories.has("supercharges")) return false;
+        if (!it.isGuardian && !it.isCrafted && !it.isSupercharge && hiddenCategories.has(it.category)) return false;
+      }
       if (search && !it.name.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [available, category, search]);
+  }, [available, category, search, hiddenCategories]);
 
   const multiInstanceIds = useMemo(() => {
     const seen = new Set<string>();
@@ -280,8 +289,8 @@ export const AvailableBuilderUpgradesPanel = ({ hv, slots, targetSlotId, builder
       id: nanoid(),
       name: it.name,
       targetLevel: it.nextLevel,
-      durationMs: applyBoost(it.durationMs, builderBoostPct),
-      cost: applyBuilderBoostCost(it.cost, builderBoostPct),
+      durationMs: it.durationMs,
+      cost: it.cost,
       costResource: it.costResource,
       imageUrl: it.imageUrl,
       category: it.category,
@@ -292,22 +301,43 @@ export const AvailableBuilderUpgradesPanel = ({ hv, slots, targetSlotId, builder
     onAdd(item, selectedSlotId);
   }
 
+  const handleFilterClick = (key: BuilderCategory) => {
+    if (key === "all") { setCategory("all"); return; }
+    if (clickTimers.current[key]) {
+      clearTimeout(clickTimers.current[key]);
+      delete clickTimers.current[key];
+      toggleHidden(key);
+    } else {
+      clickTimers.current[key] = setTimeout(() => {
+        delete clickTimers.current[key];
+        setCategory(key);
+      }, 250);
+    }
+  };
+
   return (
     <SlidePanel onClose={onClose} title="Add Upgrade" subtitle={`TH${thLevel} available`}>
       <div className="flex flex-wrap gap-1.5 px-3 py-2 border-b border-secondary/80">
-        {categories.map((c) => (
-          <button
-            key={c.key}
-            onClick={() => setCategory(c.key)}
-            className={`rounded-full px-3 py-1 text-[10px] font-bold cursor-pointer transition-colors ${
-              category === c.key
-                ? "bg-primary/80 border border-accent/40 text-white"
-                : "bg-white/6 border border-white/10 text-white/80 hover:bg-white/10"
-            }`}
-          >
-            {c.label}
-          </button>
-        ))}
+        {categories.map((c) => {
+          const isHidden = c.key !== "all" && hiddenCategories.has(c.key);
+          const isSelected = category === c.key;
+          return (
+            <button
+              key={c.key}
+              onClick={() => handleFilterClick(c.key)}
+              title={c.key === "all" ? undefined : isHidden ? "Double-click to show in All" : "Double-click to hide from All"}
+              className={`rounded-full px-3 py-1 text-[10px] font-bold cursor-pointer transition-colors border ${
+                isSelected && !isHidden
+                  ? "bg-primary/80 border-accent/40 text-white"
+                  : isHidden
+                  ? "bg-red-950/40 border-red-800/80 text-white/80 line-through"
+                  : "bg-white/6 border-white/10 text-white/80 hover:bg-white/10"
+              }`}
+            >
+              {c.label}
+            </button>
+          );
+        })}
       </div>
 
       <div className="px-3 py-2 border-b border-secondary/80">
@@ -414,6 +444,8 @@ export const AvailableResearchUpgradesPanel = ({ hv, slots, targetSlotId, resear
   const [category, setCategory] = useState<ResearchCategory>("all");
   const [search, setSearch] = useState("");
   const [selectedSlotId, setSelectedSlotId] = useState<number>(targetSlotId ?? slots[0]?.id ?? 1);
+  const [hiddenCategories, toggleHidden] = usePersistedSet("queue:research:hiddenCategories");
+  const clickTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const thLevel = hv.townHallLevel;
 
   const available = useMemo<AvailableResearchItem[]>(() => {
@@ -440,7 +472,7 @@ export const AvailableResearchUpgradesPanel = ({ hv, slots, targetSlotId, resear
         if (activeNames.has(def.name.toLowerCase())) continue;
         const saved = trackedArr.find((t) => t.name === def.name);
         const currentLevel = saved?.level ?? 0;
-        if (currentLevel === 0 || currentLevel >= def.maxLevel) continue;
+        if (currentLevel >= def.maxLevel) continue;
         const steps = getResearchUpgradeSteps(def.name, currentLevel, thLevel);
         for (const step of steps) {
           if (queuedKeys.has(`${def.name}:${step.level}`)) continue;
@@ -469,10 +501,11 @@ export const AvailableResearchUpgradesPanel = ({ hv, slots, targetSlotId, resear
   const filtered = useMemo(() => {
     return available.filter((it) => {
       if (category !== "all" && it.category !== category) return false;
+      if (category === "all" && hiddenCategories.has(it.category)) return false;
       if (search && !it.name.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [available, category, search]);
+  }, [available, category, search, hiddenCategories]);
 
   const categories: { key: ResearchCategory; label: string }[] = [
     { key: "all", label: "All" },
@@ -486,8 +519,8 @@ export const AvailableResearchUpgradesPanel = ({ hv, slots, targetSlotId, resear
       id: nanoid(),
       name: it.name,
       targetLevel: it.nextLevel,
-      durationMs: applyBoost(it.durationMs, researchBoostPct),
-      cost: applyResearchBoostCost(it.cost, researchBoostPct),
+      durationMs: it.durationMs,
+      cost: it.cost,
       costResource: it.costResource,
       imageUrl: it.imageUrl,
       category: it.category,
@@ -495,22 +528,43 @@ export const AvailableResearchUpgradesPanel = ({ hv, slots, targetSlotId, resear
     onAdd(item, selectedSlotId);
   }
 
+  const handleFilterClick = (key: ResearchCategory) => {
+    if (key === "all") { setCategory("all"); return; }
+    if (clickTimers.current[key]) {
+      clearTimeout(clickTimers.current[key]);
+      delete clickTimers.current[key];
+      toggleHidden(key);
+    } else {
+      clickTimers.current[key] = setTimeout(() => {
+        delete clickTimers.current[key];
+        setCategory(key);
+      }, 250);
+    }
+  };
+
   return (
     <SlidePanel onClose={onClose} title="Add Research" subtitle={`TH${thLevel} available`}>
       <div className="flex flex-wrap gap-1.5 px-3 py-2 border-b border-secondary/80">
-        {categories.map((c) => (
+        {categories.map((c) => {
+          const isHidden = c.key !== "all" && hiddenCategories.has(c.key);
+          const isSelected = category === c.key;
+          return (
           <button
             key={c.key}
-            onClick={() => setCategory(c.key)}
-            className={`rounded-full px-3 py-1 text-[10px] font-bold cursor-pointer transition-colors ${
-              category === c.key
-                ? "bg-primary/80 border border-accent/40 text-white"
-                : "bg-white/6 border border-white/10 text-white/80 hover:bg-white/10"
+            onClick={() => handleFilterClick(c.key)}
+            title={c.key === "all" ? undefined : isHidden ? "Double-click to show in All" : "Double-click to hide from All"}
+            className={`rounded-full px-3 py-1 text-[10px] font-bold cursor-pointer transition-colors border ${
+              isSelected && !isHidden
+                ? "bg-primary/80 border-accent/40 text-white"
+                : isHidden
+                ? "bg-red-950/40 border-red-800/80 text-white/80 line-through"
+                : "bg-white/6 border-white/10 text-white/80 hover:bg-white/10"
             }`}
           >
             {c.label}
           </button>
-        ))}
+          );
+        })}
       </div>
 
       <div className="px-3 py-2 border-b border-secondary/80">
@@ -604,34 +658,34 @@ export const AvailableResearchUpgradesPanel = ({ hv, slots, targetSlotId, resear
   );
 }
 
-export const AvailablePetUpgradesPanel = ({ hv, onAdd, onClose }: PetPanelProps) => {
+export const AvailablePetUpgradesPanel = ({ hv, researchBoostPct = 0, onAdd, onClose }: PetPanelProps) => {
   const [search, setSearch] = useState("");
   const thLevel = hv.townHallLevel;
 
   const available = useMemo<AvailablePetItem[]>(() => {
-    const activeNames = new Set(
-      hv.pets
+    const queuedKeys = new Set([
+      ...(hv.petQueue ?? []).map((i) => `${i.name}:${i.targetLevel}`),
+      ...hv.pets
         .filter((p) => isActiveUpgrade((p as any).upgrade?.finishesAt))
-        .map((p) => p.name.toLowerCase())
-    );
+        .map((p) => `${p.name}:${p.level + 1}`),
+    ]);
 
     return getPetsAtTH(thLevel).flatMap((def) => {
-      if (activeNames.has(def.name.toLowerCase())) return [];
       const saved = hv.pets.find((p) => p.name === def.name);
       const currentLevel = saved?.level ?? 0;
       if (currentLevel >= def.maxLevel) return [];
       const steps = getPetUpgradeSteps(def.name, currentLevel);
-      if (steps.length === 0) return [];
-      const step = steps[0];
-      return [{
-        name: def.name,
-        imageUrl: def.imageUrl,
-        currentLevel,
-        nextLevel: step.level,
-        cost: step.cost,
-        costResource: step.costResource,
-        durationMs: step.durationMs,
-      }];
+      return steps
+        .filter((step) => !queuedKeys.has(`${def.name}:${step.level}`))
+        .map((step) => ({
+          name: def.name,
+          imageUrl: def.imageUrl,
+          currentLevel: step.level - 1,
+          nextLevel: step.level,
+          cost: step.cost,
+          costResource: step.costResource,
+          durationMs: step.durationMs,
+        }));
     });
   }, [hv, thLevel]);
 
@@ -672,7 +726,7 @@ export const AvailablePetUpgradesPanel = ({ hv, onAdd, onClose }: PetPanelProps)
           <div className="grid grid-cols-2 gap-1.5">
             {filtered.map((it) => (
               <div
-                key={it.name}
+                key={`${it.name}:${it.nextLevel}`}
                 className="flex items-center gap-2 rounded-lg px-2.5 py-2 hover:bg-white/5 transition-colors"
               >
                 {it.imageUrl ? (
@@ -691,8 +745,22 @@ export const AvailablePetUpgradesPanel = ({ hv, onAdd, onClose }: PetPanelProps)
                         <Image src={RESOURCE_ICONS[it.costResource]} alt={it.costResource} fill className="object-contain" sizes="12px" />
                       </span>
                     )}
-                    <span>{formatFullNumber(it.cost)}</span>
+                    {researchBoostPct > 0 ? (
+                      <span className="text-accent font-bold">{formatFullNumber(applyResearchBoostCost(it.cost, researchBoostPct))}</span>
+                    ) : (
+                      <span>{formatFullNumber(it.cost)}</span>
+                    )}
                   </p>
+                  {it.durationMs > 0 && (() => {
+                    const boostedMs = applyBoost(it.durationMs, researchBoostPct);
+                    const totalMins = Math.floor(boostedMs / 60_000);
+                    const label = formatBuildTime({ days: Math.floor(totalMins / 1440), hours: Math.floor((totalMins % 1440) / 60), minutes: totalMins % 60 });
+                    return (
+                      <p className={`text-[10px] font-bold ${researchBoostPct > 0 ? "text-accent" : "text-white/80"}`}>
+                        {label}{researchBoostPct > 0 ? ` (−${researchBoostPct}%)` : ""}
+                      </p>
+                    );
+                  })()}
                 </div>
                 <button
                   onClick={() => handleAdd(it)}
