@@ -13,6 +13,7 @@ import {
 	HiPlus,
 	HiShieldCheck,
 } from "react-icons/hi";
+import { RiArrowRightLine } from "react-icons/ri";
 
 const APP_NAME = "Clash of Clans Tracker";
 const APP_TAGLINE = "Track Your Clash of Clans Progress";
@@ -116,7 +117,7 @@ const Home = () => {
 										href="#features"
 										className="text-sm/6 font-semibold text-gray-900 dark:text-white"
 									>
-										Learn more <span aria-hidden="true">→</span>
+										Learn more <RiArrowRightLine size={14} className="inline ml-0.5" />
 									</Link>
 								</div>
 							</div>

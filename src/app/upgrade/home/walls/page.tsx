@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { getWallLevelsAtTH } from "@/lib/utils/massEditHelpers";
+import { RiArrowRightLine } from "react-icons/ri";
 
 const WallsUpgradePage = () => {
   const router = useRouter();
@@ -137,7 +138,7 @@ const WallsUpgradePage = () => {
 
                 {canUpgrade && (
                   <div className="flex items-center gap-2 border-t border-secondary/80 px-3 py-2">
-                    <span className="text-[11px] text-white/80">→ Lvl {wl.level + 1}</span>
+                    <span className="flex items-center gap-0.5 text-[11px] text-white/80"><RiArrowRightLine size={11} /> Lvl {wl.level + 1}</span>
                     <div className="ml-auto flex items-center gap-2">
                       <button
                         type="button"

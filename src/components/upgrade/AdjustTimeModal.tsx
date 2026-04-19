@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Modal, ModalBody, ModalHeader } from "flowbite-react";
+import { RiArrowRightLine } from "react-icons/ri";
 import type { AdjustTimeModalProps } from "@/types/components/upgrade";
 
 const parseRemaining = (finishesAt: string) => {
@@ -40,7 +41,7 @@ export const AdjustTimeModal = ({
       <ModalBody>
         <div className="mb-4 rounded-lg border border-secondary/80 bg-primary/20 p-3">
           <p className="font-bold text-gray-900 dark:text-white">
-            {itemName} → Level {nextLevel}
+            {itemName} <RiArrowRightLine size={14} className="inline mx-0.5" /> Level {nextLevel}
           </p>
         </div>
 

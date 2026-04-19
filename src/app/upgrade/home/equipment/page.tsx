@@ -8,6 +8,7 @@ import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { getAllEquipment, getHeroesAtTH } from "@/lib/utils/massEditHelpers";
 import { getEquipmentUpgradeSteps } from "@/lib/utils/upgradeHelpers";
 import { usePersistedToggle } from "@/lib/hooks/usePersistedToggle";
+import { RiArrowRightLine } from "react-icons/ri";
 
 const ORE_ICONS: Record<string, string> = {
   shiny: "/images/other/ore/shiny-ore.png",
@@ -126,7 +127,7 @@ const EquipmentUpgradePage = () => {
                             {steps.map((step, si) => (
                               <div key={step.level} className="flex flex-col gap-1 rounded-md border border-white/80 bg-white/5 p-2">
                                 <div className="flex items-center justify-between">
-                                  <span className="text-[10px] font-bold text-white/80">→ Lv {step.level}</span>
+                                  <span className="flex items-center gap-0.5 text-[10px] font-bold text-white/80"><RiArrowRightLine size={10} /> Lv {step.level}</span>
                                 </div>
                                 <div className="flex flex-wrap gap-1.5">
                                   <OreCost icon={ORE_ICONS.shiny} amount={step.shinyOre} />

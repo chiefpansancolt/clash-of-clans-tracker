@@ -5,8 +5,9 @@ import Image from "next/image";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { RiLockLine, RiAddLine } from "react-icons/ri";
+import { LabelWithArrow } from "@/components/common/LabelWithArrow";
 import { FiEdit2 } from "react-icons/fi";
-import { formatTimeRemaining, formatFullNumber, formatBuildTime } from "@/lib/utils/upgradeHelpers";
+import { formatTimeRemaining, formatFullNumber, formatBuildTime, getGemCost } from "@/lib/utils/upgradeHelpers";
 import { FinishEarlyModal } from "@/components/upgrade/FinishEarlyModal";
 import { AdjustTimeModal } from "@/components/upgrade/AdjustTimeModal";
 
@@ -47,11 +48,14 @@ const ResourceFooterTotal = ({ resource, amount }: { resource: string; amount: n
 const ActiveItem = ({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemProps) => {
   const [countdown, setCountdown] = useState(() => formatTimeRemaining(upgrade.finishesAt));
   const [isReady, setIsReady] = useState(() => new Date(upgrade.finishesAt).getTime() <= Date.now());
+  const [gemCost, setGemCost] = useState(() => getGemCost(Math.max(0, new Date(upgrade.finishesAt).getTime() - Date.now())));
 
   useEffect(() => {
     const tick = () => {
+      const remaining = Math.max(0, new Date(upgrade.finishesAt).getTime() - Date.now());
       setCountdown(formatTimeRemaining(upgrade.finishesAt));
-      setIsReady(new Date(upgrade.finishesAt).getTime() <= Date.now());
+      setIsReady(remaining <= 0);
+      setGemCost(getGemCost(remaining));
     };
     tick();
     const id = setInterval(tick, 1000);
@@ -72,9 +76,19 @@ const ActiveItem = ({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemPro
       )}
       <div className="flex-1 min-w-0">
         <p className="text-[11px] font-bold text-white truncate">
-          {parts[0]}<span className="text-accent">{parts[1]}</span>
+          {parts[0]}<span className="text-accent"><LabelWithArrow label={parts[1] ?? ""} /></span>
         </p>
-        <p className="text-[10px] text-white/80">{isReady ? "Ready!" : countdown}</p>
+        <p className="text-[10px] text-white/80 flex items-center gap-1.5">
+          {isReady ? "Ready!" : countdown}
+          {!isReady && (
+            <span className="flex items-center gap-0.5 text-accent">
+              <span className="relative inline-block h-3 w-3 shrink-0">
+                <Image src={RESOURCE_ICONS.Gems} alt="Gems" fill className="object-contain" sizes="12px" />
+              </span>
+              {gemCost.toLocaleString()}
+            </span>
+          )}
+        </p>
       </div>
       {isReady ? (
         <button

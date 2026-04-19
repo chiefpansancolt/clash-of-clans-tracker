@@ -6,6 +6,7 @@ import type { UpgradeStep } from "@/types/app/upgrade";
 import type { InstanceData, UpgradeRowProps } from "@/types/components/upgrade";
 import { formatBuildTime, formatTimeRemaining, applyBoost, applyBuilderBoostCost, msToBuildTime, getGemCost } from "@/lib/utils/upgradeHelpers";
 import { FiEdit2 } from "react-icons/fi";
+import { RiArrowRightLine } from "react-icons/ri";
 import { BuilderPickerModal } from "./BuilderPickerModal";
 import { FinishEarlyModal } from "./FinishEarlyModal";
 import { AdjustTimeModal } from "./AdjustTimeModal";
@@ -176,7 +177,7 @@ export const UpgradeRow = ({
                   {upgrading && (
                     <div className="flex flex-wrap items-center gap-2 px-3 py-1.5">
                       <span className="text-xs text-amber-400">
-                        → {inst.currentLevel + 1} {isBuild ? "building" : "upgrading"} · {formatTimeRemaining(inst.upgradeState!.finishesAt)}
+                        <RiArrowRightLine size={12} className="shrink-0" /> {inst.currentLevel + 1} {isBuild ? "building" : "upgrading"} · {formatTimeRemaining(inst.upgradeState!.finishesAt)}
                       </span>
                       <span className="flex items-center gap-1">
                         <span className="relative inline-block h-3.5 w-3.5 shrink-0">
@@ -257,7 +258,7 @@ export const UpgradeRow = ({
                                     <span className="relative inline-block h-3.5 w-3.5 shrink-0">
                                       <Image src="/images/other/supercharge.png" alt="Supercharge" fill className="object-contain" sizes="14px" />
                                     </span>
-                                  ) : "→"} Lv {step.level}
+                                  ) : <RiArrowRightLine size={10} />} Lv {step.level}
                                 </span>
                                 <span className={`text-[10px] ${isBoosted ? "text-amber-400" : "text-white/80"}`}>{boostedTime}</span>
                               </div>

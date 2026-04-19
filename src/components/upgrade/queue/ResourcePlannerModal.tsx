@@ -1,6 +1,7 @@
 "use client";
 
 import { RiCloseLine } from "react-icons/ri";
+import { LabelWithArrow } from "@/components/common/LabelWithArrow";
 import { formatFullNumber } from "@/lib/utils/upgradeHelpers";
 import type { ResourcePlannerModalProps } from "@/types/components/queue";
 
@@ -87,11 +88,12 @@ export const ResourcePlannerModal = ({ groups, title = "Resource Planner", onClo
                           <div className="flex-1 min-w-0">
                             <p className="text-[10px] text-white/80 mb-0.5">
                               Finishes{" "}
-                              <span className="font-bold text-white">{ev.completingItem}</span>
+                              <span className="font-bold text-white"><LabelWithArrow label={ev.completingItem} /></span>
                               {" "}at {formatTime(ev.completesAt)}
                             </p>
-                            <p className="text-[12px] font-bold text-white truncate">
-                              ⟶ {ev.nextItem}
+                            <p className="text-[12px] font-bold text-white truncate flex items-center gap-1">
+                              <RiArrowRightLine size={12} className="shrink-0" />
+                              <LabelWithArrow label={ev.nextItem} />
                             </p>
                           </div>
 

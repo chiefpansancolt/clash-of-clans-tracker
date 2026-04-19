@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
+import { RiArrowRightLine } from "react-icons/ri";
 import {
   getForgeDurationMs,
   formatForgeDuration,
@@ -146,7 +147,7 @@ export const ForgeSlotRow = ({
             <span className="text-xs text-white/80">Idle</span>
             {selectedRate?.available && (
               <span className="text-[10px] text-white/80">
-                {selectedRate.cost > 0 ? `${(selectedRate.cost / 1000000).toFixed(1)}M → ` : ""}
+                {selectedRate.cost > 0 && <>{(selectedRate.cost / 1000000).toFixed(1)}M <RiArrowRightLine size={10} className="inline mx-0.5" /></>}
                 {selectedRate.capitalGold > 0 ? `${selectedRate.capitalGold.toLocaleString()} CG` : ""}
               </span>
             )}

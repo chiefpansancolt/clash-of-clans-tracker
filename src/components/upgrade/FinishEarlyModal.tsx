@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Modal, ModalBody, ModalHeader } from "flowbite-react";
 import { FiClock, FiBook, FiTool } from "react-icons/fi";
+import { RiArrowRightLine } from "react-icons/ri";
 import type { FinishEarlyModalProps, FinishMethod } from "@/types/components/upgrade";
 
 const FINISH_OPTIONS: {
@@ -55,7 +56,7 @@ export const FinishEarlyModal = ({
       <ModalBody>
         <div className="mb-4 rounded-lg border border-secondary/80 bg-primary/20 p-3">
           <p className="font-bold text-gray-900 dark:text-white">
-            {itemName} → Level {nextLevel}
+            {itemName} <RiArrowRightLine size={14} className="inline mx-0.5" /> Level {nextLevel}
           </p>
           <p className="text-sm text-gray-600 dark:text-white/80">
             {timeRemaining} remaining

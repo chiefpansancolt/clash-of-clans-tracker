@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { RiDraggable, RiCloseLine } from "react-icons/ri";
+import { RiDraggable, RiCloseLine, RiArrowRightLine } from "react-icons/ri";
 import { formatFullNumber, formatBuildTime } from "@/lib/utils/upgradeHelpers";
 import type { AnyQueueItem, BuilderQueueItem } from "@/types/app/queue";
 import type { QueueItemProps } from "@/types/components/queue";
@@ -52,7 +52,7 @@ export const QueueItemOverlay = ({ item, multiInstanceBuildingIds }: { item: Any
         <p className="text-[11px] font-bold text-white truncate">
           {item.name}
           {"instanceIndex" in item && multiInstanceBuildingIds?.has((item as BuilderQueueItem).buildingId) ? ` #${(item as BuilderQueueItem).instanceIndex + 1}` : ""}{" "}
-          {item.targetLevel - 1}→{item.targetLevel}
+          {item.targetLevel - 1}<RiArrowRightLine size={10} className="inline mx-0.5" />{item.targetLevel}
         </p>
         <p className="text-[10px] text-white/80">{durationLabel}</p>
       </div>
@@ -111,7 +111,7 @@ export const QueueItem = ({ item, isConflict, conflictMessage, multiInstanceBuil
         >
           {item.name}
           {"instanceIndex" in item && multiInstanceBuildingIds?.has((item as BuilderQueueItem).buildingId) ? ` #${(item as BuilderQueueItem).instanceIndex + 1}` : ""}{" "}
-          {item.targetLevel - 1}→{item.targetLevel}
+          {item.targetLevel - 1}<RiArrowRightLine size={10} className="inline mx-0.5" />{item.targetLevel}
         </p>
         <p className="text-[10px] text-white/80 flex items-center gap-1.5 flex-wrap">
           <ResourceIcon resource={item.costResource} cost={item.cost} />

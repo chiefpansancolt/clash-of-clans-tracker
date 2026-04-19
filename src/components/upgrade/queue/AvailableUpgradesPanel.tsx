@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import { nanoid } from "nanoid";
-import { RiCloseLine } from "react-icons/ri";
+import { RiCloseLine, RiArrowRightLine } from "react-icons/ri";
 import {
   getDefensesAtTH,
   getArmyBuildingsAtTH,
@@ -348,7 +348,7 @@ export const AvailableBuilderUpgradesPanel = ({ hv, slots, targetSlotId, builder
                   <p className={`text-[11px] font-bold truncate ${it.isSupercharge ? "text-cyan-300" : "text-white"}`}>
                     {it.name}{multiInstanceIds.has(it.buildingId) ? ` #${it.instanceIndex + 1}` : ""}
                   </p>
-                  <p className="text-[10px] text-white/80">{it.currentLevel}→{it.nextLevel}</p>
+                  <p className="text-[10px] text-white/80 flex items-center gap-0.5">{it.currentLevel}<RiArrowRightLine size={10} />{it.nextLevel}</p>
                   <p className="flex items-center gap-0.5 text-[10px] text-white/80">
                     {RESOURCE_ICONS[it.costResource] && (
                       <span className="relative inline-block h-3 w-3 shrink-0">
@@ -542,7 +542,7 @@ export const AvailableResearchUpgradesPanel = ({ hv, slots, targetSlotId, resear
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-[11px] font-bold text-white truncate">{it.name}</p>
-                  <p className="text-[10px] text-white/80">{it.currentLevel}→{it.nextLevel}</p>
+                  <p className="text-[10px] text-white/80 flex items-center gap-0.5">{it.currentLevel}<RiArrowRightLine size={10} />{it.nextLevel}</p>
                   <p className="flex items-center gap-0.5 text-[10px] text-white/80">
                     {RESOURCE_ICONS[it.costResource] && (
                       <span className="relative inline-block h-3 w-3 shrink-0">
@@ -684,7 +684,7 @@ export const AvailablePetUpgradesPanel = ({ hv, onAdd, onClose }: PetPanelProps)
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-[11px] font-bold text-white truncate">{it.name}</p>
-                  <p className="text-[10px] text-white/80">{it.currentLevel}→{it.nextLevel}</p>
+                  <p className="text-[10px] text-white/80 flex items-center gap-0.5">{it.currentLevel}<RiArrowRightLine size={10} />{it.nextLevel}</p>
                   <p className="flex items-center gap-0.5 text-[10px] text-white/80">
                     {RESOURCE_ICONS[it.costResource] && (
                       <span className="relative inline-block h-3 w-3 shrink-0">

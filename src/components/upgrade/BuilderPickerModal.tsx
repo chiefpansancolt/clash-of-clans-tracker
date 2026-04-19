@@ -1,6 +1,7 @@
 "use client";
 
 import { Modal, ModalBody, ModalHeader } from "flowbite-react";
+import { RiArrowRightLine } from "react-icons/ri";
 import { formatBuildTime, formatCost, formatTimeRemaining } from "@/lib/utils/upgradeHelpers";
 import type { BuilderPickerModalProps } from "@/types/components/upgrade";
 
@@ -21,7 +22,7 @@ export const BuilderPickerModal = ({
       <ModalBody>
         <div className="mb-4 rounded-lg border border-secondary/80 bg-primary/20 p-3">
           <p className="font-bold text-gray-900 dark:text-white">
-            {itemName} → Level {nextLevel}
+            {itemName} <RiArrowRightLine size={14} className="inline mx-0.5" /> Level {nextLevel}
           </p>
           <p className="text-sm text-gray-600 dark:text-white/80">
             {formatCost(step.cost)} {step.costResource} · {formatBuildTime(step.buildTime)}

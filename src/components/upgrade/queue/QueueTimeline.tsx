@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { RiArrowRightLine } from "react-icons/ri";
+import { LabelWithArrow } from "@/components/common/LabelWithArrow";
 import { formatBuildTime } from "@/lib/utils/upgradeHelpers";
 import type { TimelineBlock } from "@/types/app/queue";
 import type { QueueTimelineProps, HoveredBlock } from "@/types/components/queue";
@@ -33,13 +35,13 @@ const BlockTooltip = ({ block }: { block: TimelineBlock }) => {
 
   return (
     <div className="w-44 rounded-lg border border-secondary/80 bg-[#0f1e36] p-2.5 shadow-xl pointer-events-none">
-      <p className="text-[11px] font-bold text-white leading-tight mb-1">{block.label}</p>
+      <p className="text-[11px] font-bold text-white leading-tight mb-1"><LabelWithArrow label={block.label} /></p>
       {block.isIdle ? (
         <p className="text-[10px] text-white/80">Builder free</p>
       ) : (
         <>
           <p className="text-[10px] text-white/80">{formatTime(block.startsAt)}</p>
-          <p className="text-[10px] text-white/80">→ {formatTime(block.endsAt)}</p>
+          <p className="text-[10px] text-white/80 flex items-center gap-0.5"><RiArrowRightLine size={10} /> {formatTime(block.endsAt)}</p>
           <p className="mt-1 text-[10px] font-bold text-accent">{duration}</p>
         </>
       )}

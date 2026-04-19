@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FaCheck, FaLock } from "react-icons/fa";
+import { RiArrowRightLine } from "react-icons/ri";
 import { useEffect, useRef, useState } from "react";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
@@ -319,7 +320,7 @@ const AutoForgeChip = ({ autoForge, onStop }: AutoForgeChipProps) => {
       {autoForge.resourceAmount > 0 && (
         <span className="text-[9px] text-white/80">{autoForge.resourceAmount.toLocaleString()}</span>
       )}
-      <span className="text-[9px] text-white/80">→</span>
+      <RiArrowRightLine size={10} className="text-white/80 shrink-0" />
       <div className="relative h-4 w-4 shrink-0">
         <Image src={toPublicImageUrl("images/other/gold-c.png")} alt="Capital Gold" fill sizes="16px" className="object-contain" />
       </div>
@@ -336,7 +337,7 @@ const AutoForgeChip = ({ autoForge, onStop }: AutoForgeChipProps) => {
         <div className="flex flex-col gap-1">
           <span className="text-[10px] text-white/80">Not running</span>
           <Link href="/forge" className="text-[10px] font-bold text-accent hover:underline">
-            Go to Forge →
+            Go to Forge <RiArrowRightLine size={10} className="inline ml-0.5" />
           </Link>
         </div>
       ) : isDone ? (
@@ -358,7 +359,7 @@ const AutoForgeChip = ({ autoForge, onStop }: AutoForgeChipProps) => {
               Stop
             </button>
             <Link href="/forge" className="text-[10px] font-bold text-accent hover:underline">
-              Forge →
+              Forge <RiArrowRightLine size={10} className="inline ml-0.5" />
             </Link>
           </div>
         </div>

@@ -17,6 +17,7 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { RiLockLine, RiAddLine } from "react-icons/ri";
+import { LabelWithArrow } from "@/components/common/LabelWithArrow";
 import { FiEdit2 } from "react-icons/fi";
 import { formatTimeRemaining, formatBuildTime, formatFullNumber } from "@/lib/utils/upgradeHelpers";
 import { FinishEarlyModal } from "@/components/upgrade/FinishEarlyModal";
@@ -66,7 +67,7 @@ const ActiveItem = ({ upgrade, onRequestFinish, onRequestAdjust }: ActiveItemPro
       )}
       <div className="flex-1 min-w-0">
         <p className="text-[11px] font-bold text-white truncate">
-          {parts[0]}<span className="text-accent">{parts[1]}</span>
+          {parts[0]}<span className="text-accent"><LabelWithArrow label={parts[1] ?? ""} /></span>
         </p>
         <p className="text-[10px] text-white/80">{isReady ? "Ready!" : countdown}</p>
       </div>
