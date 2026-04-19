@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { RiArrowLeftLine } from "react-icons/ri";
+import { RiArrowLeftLine, RiBarChartLine } from "react-icons/ri";
 import {
   DndContext,
   DragOverlay,
@@ -368,7 +368,6 @@ const BuilderQueuePage = () => {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      {/* Header */}
       <div className="shrink-0 bg-highlight px-4 py-3">
         <div className="flex items-center gap-3">
           <Link
@@ -384,9 +383,10 @@ const BuilderQueuePage = () => {
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => setPlannerOpen(true)}
-              className="cursor-pointer rounded-lg border border-primary/80 bg-primary/10 px-3 py-1.5 text-[12px] font-bold text-primary hover:bg-primary/20 transition-colors"
+              className="cursor-pointer flex items-center gap-1.5 rounded-lg border border-primary/80 bg-primary/10 px-3 py-1.5 text-[12px] font-bold text-primary hover:bg-primary/20 transition-colors"
             >
-              📊 Resource Planner
+              <RiBarChartLine size={14} />
+              Resource Planner
             </button>
             <button
               onClick={() => openPanel(undefined)}
@@ -398,16 +398,13 @@ const BuilderQueuePage = () => {
         </div>
       </div>
 
-      {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto flex flex-col">
-        {/* Timeline */}
         <QueueTimeline
           timeline={timeline}
           slots={slots}
           conflictItemIds={conflictItemIds}
         />
 
-        {/* Queue cards */}
         <div className="flex-1 p-4">
           <DndContext
             sensors={sensors}
@@ -440,7 +437,6 @@ const BuilderQueuePage = () => {
         </div>
       </div>
 
-      {/* Slide-out panel */}
       {panelOpen && (
         <AvailableBuilderUpgradesPanel
           hv={hv}
@@ -452,7 +448,6 @@ const BuilderQueuePage = () => {
         />
       )}
 
-      {/* Resource Planner modal */}
       {plannerOpen && (
         <ResourcePlannerModal
           groups={resourceGroups}

@@ -112,7 +112,6 @@ export const QueueTimeline = ({ timeline, slots, conflictItemIds }: QueueTimelin
 
   return (
     <div className="shrink-0 border-b border-secondary/80 bg-primary px-4 py-3">
-      {/* Header row */}
       <div className="mb-2 flex items-center gap-3">
         <p className="text-[10px] font-bold uppercase tracking-widest text-white/80">Timeline</p>
         <div className="flex items-center gap-1 ml-auto">
@@ -134,7 +133,6 @@ export const QueueTimeline = ({ timeline, slots, conflictItemIds }: QueueTimelin
 
       <div className="overflow-x-auto">
         <div style={{ minWidth: 700 }} className="relative">
-          {/* Time labels row */}
           <div className="relative mb-1 h-4 pl-22.5">
             {timeMarkers.map((m) => (
               <span
@@ -147,7 +145,6 @@ export const QueueTimeline = ({ timeline, slots, conflictItemIds }: QueueTimelin
             ))}
           </div>
 
-          {/* Rows */}
           <div className="flex flex-col gap-0.75">
             {slots.map((slot) => {
               const blocks = timeline[String(slot.id)] ?? [];
@@ -221,7 +218,6 @@ export const QueueTimeline = ({ timeline, slots, conflictItemIds }: QueueTimelin
         </div>
       </div>
 
-      {/* Fixed tooltip — escapes all overflow containers */}
       {hovered && (
         <div
           className="fixed z-9999"

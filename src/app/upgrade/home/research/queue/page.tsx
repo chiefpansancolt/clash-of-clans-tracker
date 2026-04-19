@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { RiArrowLeftLine } from "react-icons/ri";
+import { RiArrowLeftLine, RiBarChartLine } from "react-icons/ri";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import {
   getResearchSlots,
@@ -177,9 +177,10 @@ const ResearchQueuePage = () => {
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => setPlannerOpen(true)}
-              className="cursor-pointer rounded-lg border border-primary/80 bg-primary/10 px-3 py-1.5 text-[12px] font-bold text-primary hover:bg-primary/20 transition-colors"
+              className="cursor-pointer flex items-center gap-1.5 rounded-lg border border-primary/80 bg-primary/10 px-3 py-1.5 text-[12px] font-bold text-primary hover:bg-primary/20 transition-colors"
             >
-              📊 Resource Planner
+              <RiBarChartLine size={14} />
+              Resource Planner
             </button>
             <button
               onClick={() => { setPanelSlotId(undefined); setPanelOpen(true); }}

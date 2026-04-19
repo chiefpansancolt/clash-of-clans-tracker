@@ -106,7 +106,6 @@ const EquipmentUpgradePage = () => {
 
                     return (
                       <div key={eq.name} className="overflow-hidden rounded-lg border border-secondary/80 bg-primary">
-                        {/* Header */}
                         <div className="flex items-center gap-3 border-b border-secondary/80 px-3 py-2">
                           {eq.imageUrl && (
                             <div className="relative h-9 w-9 shrink-0">
@@ -122,7 +121,6 @@ const EquipmentUpgradePage = () => {
                           )}
                         </div>
 
-                        {/* Upgrade steps */}
                         {steps.length > 0 && (
                           <div className="grid grid-cols-3 gap-1.5 p-2">
                             {steps.map((step, si) => (
@@ -149,7 +147,6 @@ const EquipmentUpgradePage = () => {
                           </div>
                         )}
 
-                        {/* Footer: cumulative remaining cost */}
                         {steps.length > 0 && (
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-secondary/80 px-3 py-2">
                             <span className="text-[11px] text-white/80">{steps.length} levels</span>

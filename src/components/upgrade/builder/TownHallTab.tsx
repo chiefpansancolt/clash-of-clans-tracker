@@ -29,7 +29,6 @@ export const TownHallTab = ({ hv, thLevel, slots, onSave }: TownHallTabProps) =>
 
   return (
     <div className="flex flex-col gap-2">
-      {/* TH weapon upgrade — only for THs with upgradeable weapons (currently TH17) */}
       {weaponInfo && weaponLevel < weaponInfo.maxLevel && (
         <UpgradeRow
           name={`${weaponInfo.name} (TH${thLevel})`}
@@ -52,7 +51,6 @@ export const TownHallTab = ({ hv, thLevel, slots, onSave }: TownHallTabProps) =>
         />
       )}
 
-      {/* TH upgrade to next level */}
       {nextStep && (
         <UpgradeRow
           name={`Town Hall ${thLevel + 1}`}
@@ -75,14 +73,12 @@ export const TownHallTab = ({ hv, thLevel, slots, onSave }: TownHallTabProps) =>
         />
       )}
 
-      {/* Max TH reached */}
       {thLevel >= maxTH && !weaponInfo && (
         <p className="py-8 text-center text-sm text-white/80">
           Town Hall {thLevel} is the maximum level.
         </p>
       )}
 
-      {/* TH17 at max weapon, max TH */}
       {thLevel >= maxTH && weaponInfo && weaponLevel >= weaponInfo.maxLevel && (
         <p className="py-8 text-center text-sm text-white/80">
           All Town Hall upgrades are complete.

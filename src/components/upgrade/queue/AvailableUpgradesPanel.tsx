@@ -294,7 +294,6 @@ export const AvailableBuilderUpgradesPanel = ({ hv, slots, targetSlotId, builder
 
   return (
     <SlidePanel onClose={onClose} title="Add Upgrade" subtitle={`TH${thLevel} available`}>
-      {/* Category chips */}
       <div className="flex flex-wrap gap-1.5 px-3 py-2 border-b border-secondary/80">
         {categories.map((c) => (
           <button
@@ -311,7 +310,6 @@ export const AvailableBuilderUpgradesPanel = ({ hv, slots, targetSlotId, builder
         ))}
       </div>
 
-      {/* Search */}
       <div className="px-3 py-2 border-b border-secondary/80">
         <input
           type="text"
@@ -322,7 +320,6 @@ export const AvailableBuilderUpgradesPanel = ({ hv, slots, targetSlotId, builder
         />
       </div>
 
-      {/* Items list */}
       <div className="flex-1 overflow-y-auto p-2">
         {filtered.length === 0 ? (
           <p className="py-8 text-center text-[11px] text-white/80">No upgrades available</p>
@@ -725,12 +722,10 @@ const SlidePanel = ({
 }) => {
   return (
     <>
-      {/* Overlay */}
       <div
         className="fixed inset-0 z-40 bg-black/50"
         onClick={onClose}
       />
-      {/* Panel */}
       <div className="fixed top-0 right-0 bottom-0 z-50 flex w-[min(640px,90vw)] flex-col border-l border-secondary/80 bg-[#0f1e36] animate-slide-in-right">
         <div className="flex shrink-0 items-center gap-2 border-b border-secondary/80 px-4 py-3.5">
           <div>

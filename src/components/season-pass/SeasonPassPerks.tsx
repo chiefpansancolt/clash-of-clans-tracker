@@ -62,7 +62,6 @@ export const SeasonPassPerks = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Boost perks */}
       <div className="rounded-xl border border-secondary/80 bg-primary/40 overflow-hidden">
         <div className="px-4 py-3 border-b border-secondary/80 bg-primary">
           <p className="text-[11px] font-bold uppercase tracking-widest text-accent">Boost Perks</p>
@@ -115,7 +114,6 @@ export const SeasonPassPerks = () => {
         </div>
       </div>
 
-      {/* Boolean perks */}
       <div className="rounded-xl border border-secondary/80 bg-primary/40 overflow-hidden">
         <div className="px-4 py-3 border-b border-secondary/80 bg-primary">
           <p className="text-[11px] font-bold uppercase tracking-widest text-accent">Perks</p>

@@ -19,8 +19,7 @@ const RESOURCE_ICONS: Record<string, string> = {
   Gems: "/images/other/gem.png",
 };
 import { QueueItem } from "@/components/upgrade/queue/QueueItem";
-import type { BuilderQueueItem, QueueConflict } from "@/types/app/queue";
-import type { BuilderQueueCardProps, ActiveUpgradeWithControls, ActiveItemProps } from "@/types/components/queue";
+import type { BuilderQueueCardProps, ActiveItemProps } from "@/types/components/queue";
 
 const resourceColorClass = (resource: string) => {
   if (resource === "Gold") return "text-accent";
@@ -144,9 +143,8 @@ export const BuilderQueueCard = ({ slot, queue, activeUpgrade, conflicts, multiI
         hasErrors
           ? "border border-red-600/60"
           : "border border-secondary/80"
-      } bg-primary/40`}
+      } bg-primary`}
     >
-      {/* Card header */}
       <div
         className={`flex items-center gap-2 px-3 py-2 border-b border-secondary/80 ${
           hasErrors ? "bg-red-900/12" : "bg-primary"
@@ -193,7 +191,6 @@ export const BuilderQueueCard = ({ slot, queue, activeUpgrade, conflicts, multiI
         </>
       )}
 
-      {/* Queue items */}
       <div
         ref={setDropRef}
         className={`min-h-10 transition-colors ${isOver && queue.length === 0 ? "bg-accent/8" : ""}`}
@@ -227,7 +224,6 @@ export const BuilderQueueCard = ({ slot, queue, activeUpgrade, conflicts, multiI
         )}
       </div>
 
-      {/* Totals footer */}
       {queue.length > 0 && (
         <div className="flex flex-wrap gap-3 px-3 py-2 border-t border-secondary/80 bg-primary">
           <div className="flex flex-col">

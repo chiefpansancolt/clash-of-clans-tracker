@@ -45,6 +45,7 @@ import type { HomeVillageSectionProps } from "@/types/components/dashboard";
 
 const _resourceBuildings = _h.resourceBuildings().get() as RawResourceBuilding[];
 const _rbMap = new Map(_resourceBuildings.map((b) => [b.id, b]));
+const _thLevels = (_h.townHall().get() as any[])[0]?.levels as Array<{ level: number; storageCapacity: { gold: number; elixir: number; darkElixir: number } }> ?? [];
 
 export const HomeVillageSection = ({ hv, playthrough }: HomeVillageSectionProps) => {
   const thLevel = hv.townHallLevel;
@@ -157,9 +158,10 @@ export const HomeVillageSection = ({ hv, playthrough }: HomeVillageSectionProps)
   const goldProduction = sumInstanceField("gold-mine", "productionRate");
   const elixirProduction = sumInstanceField("elixir-collector", "productionRate");
   const deProduction = sumInstanceField("dark-elixir-drill", "productionRate");
-  const goldStorage = sumInstanceField("gold-storage", "capacity");
-  const elixirStorage = sumInstanceField("elixir-storage", "capacity");
-  const deStorage = sumInstanceField("dark-elixir-storage", "capacity");
+  const thStorageCapacity = _thLevels.find((l) => l.level === thLevel)?.storageCapacity;
+  const goldStorage = sumInstanceField("gold-storage", "capacity") + (thStorageCapacity?.gold ?? 0);
+  const elixirStorage = sumInstanceField("elixir-storage", "capacity") + (thStorageCapacity?.elixir ?? 0);
+  const deStorage = sumInstanceField("dark-elixir-storage", "capacity") + (thStorageCapacity?.darkElixir ?? 0);
 
   const hasResourceData = goldStorage > 0 || elixirStorage > 0 || deStorage > 0;
 

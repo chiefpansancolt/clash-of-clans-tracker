@@ -28,7 +28,6 @@ export const ResourcePlannerModal = ({ groups, title = "Resource Planner", onClo
           style={{ maxHeight: "80vh" }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
           <div className="flex shrink-0 items-center gap-3 border-b border-secondary/80 px-5 py-4">
             <div>
               <p className="text-[15px] font-extrabold text-white">{title}</p>
@@ -42,7 +41,6 @@ export const ResourcePlannerModal = ({ groups, title = "Resource Planner", onClo
             </button>
           </div>
 
-          {/* Body */}
           <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4">
             {groups.length === 0 ? (
               <p className="py-8 text-center text-[13px] text-white/80">
@@ -60,7 +58,6 @@ export const ResourcePlannerModal = ({ groups, title = "Resource Planner", onClo
 
                 return (
                   <div key={gi} className="flex flex-col gap-1.5">
-                    {/* Day header */}
                     <div className="flex items-center gap-2">
                       <span className="rounded-full border border-accent/30 bg-primary/80 px-3 py-0.5 text-[11px] font-extrabold text-white whitespace-nowrap">
                         {group.dayOffset === 0 ? "Today" : `Day ${group.dayOffset}`}
@@ -73,7 +70,6 @@ export const ResourcePlannerModal = ({ groups, title = "Resource Planner", onClo
                       )}
                     </div>
 
-                    {/* Card */}
                     <div
                       className={`overflow-hidden rounded-xl border ${
                         isGrouped ? "border-red-600/40 bg-primary/35" : "border-secondary/80 bg-primary/30"
@@ -84,12 +80,10 @@ export const ResourcePlannerModal = ({ groups, title = "Resource Planner", onClo
                           key={ei}
                           className="flex items-center gap-3 px-4 py-2.5 border-b border-secondary/80 last:border-b-0"
                         >
-                          {/* Builder tag */}
                           <span className="shrink-0 rounded bg-white/8 px-2 py-0.5 text-[10px] font-bold text-white/80 whitespace-nowrap">
                             {ev.builderLabel}
                           </span>
 
-                          {/* Info */}
                           <div className="flex-1 min-w-0">
                             <p className="text-[10px] text-white/80 mb-0.5">
                               Finishes{" "}
@@ -101,7 +95,6 @@ export const ResourcePlannerModal = ({ groups, title = "Resource Planner", onClo
                             </p>
                           </div>
 
-                          {/* Cost */}
                           <div className="shrink-0 text-right">
                             <p className={`text-[13px] font-extrabold ${resourceClass(ev.costResource)}`}>
                               {formatFullNumber(ev.cost)}
@@ -113,7 +106,6 @@ export const ResourcePlannerModal = ({ groups, title = "Resource Planner", onClo
                         </div>
                       ))}
 
-                      {/* Totals footer — only for grouped cards */}
                       {isGrouped && (
                         <div className="flex flex-wrap items-center gap-2 border-t border-secondary/80 bg-black/20 px-4 py-2">
                           <span className="text-[10px] font-bold uppercase tracking-wide text-white/80 mr-1">
