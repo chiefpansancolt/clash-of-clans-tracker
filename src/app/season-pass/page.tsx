@@ -31,8 +31,8 @@ const SeasonPassPage = () => {
           />
         </div>
         <div>
-          <h1 className="text-[18px] font-extrabold text-white leading-tight">Season Pass</h1>
-          <p className="text-[11px] text-white/80">Gold Pass perks active this season</p>
+          <h1 className="text-[18px] font-extrabold text-primary leading-tight">Season Pass</h1>
+          <p className="text-[11px] text-secondary">Gold Pass perks active this season</p>
         </div>
       </div>
       <SeasonPassPerks />

@@ -134,7 +134,7 @@ const EquipmentUpgradePage = () => {
                     steps.forEach((s) => { totalShiny += s.shinyOre; totalGlowy += s.glowyOre; totalStarry += s.starryOre; });
 
                     return (
-                      <div key={eq.name} className="overflow-hidden rounded-lg border border-secondary/80 bg-primary">
+                      <div key={eq.name} className="overflow-hidden rounded-lg border border-secondary/80 bg-primary self-start">
                         <div className="flex items-center gap-3 border-b border-secondary/80 px-3 py-2">
                           {eq.imageUrl && (
                             <div className="relative h-9 w-9 shrink-0">

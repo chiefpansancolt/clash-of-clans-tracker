@@ -54,6 +54,10 @@ export interface TrackedAchievement {
   target: number;
   // "home" | "builderBase" | "clanCapital"
   village: string;
+  // Description from the API (e.g. "Upgrade Town Hall to level 8")
+  info?: string;
+  // When true, API refreshes will not overwrite this entry
+  isManual?: boolean;
 }
 
 /** Module levels for a single crafted defense (3 independent modules). */

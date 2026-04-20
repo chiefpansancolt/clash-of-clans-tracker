@@ -103,12 +103,18 @@ export const mapPlayerApiToVillageData = (player: PlayerApiResponse): VillageDat
     clanCapitalContributions: player.clanCapitalContributions ?? 0,
   };
 
-  const achievements = (player.achievements ?? []).map((a) => ({
+  const seen = new Set<string>();
+  const achievements = (player.achievements ?? []).reduce<typeof player.achievements>((acc, a) => {
+    const key = `${a.name}::${a.village}`;
+    if (!seen.has(key)) { seen.add(key); acc!.push(a); }
+    return acc;
+  }, [])!.map((a) => ({
     name: a.name,
     stars: a.stars,
     value: a.value,
     target: a.target,
     village: a.village,
+    info: a.info,
   }));
 
   return {
@@ -199,6 +205,7 @@ export const mergeWithBuildingData = (apiData: VillageData, buildingJson: Villag
       capitalPeak: buildingJson.clanCapital.capitalPeak,
       barbarianCamp: buildingJson.clanCapital.barbarianCamp,
       wizardValley: buildingJson.clanCapital.wizardValley,
+      balloonLagoon: buildingJson.clanCapital.balloonLagoon,
       buildersWorkshop: buildingJson.clanCapital.buildersWorkshop,
       dragonCliffs: buildingJson.clanCapital.dragonCliffs,
       golemQuarry: buildingJson.clanCapital.golemQuarry,

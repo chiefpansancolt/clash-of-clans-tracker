@@ -136,7 +136,7 @@ export const UpgradeRow = ({
         />
       )}
 
-      <div className="overflow-hidden rounded-lg border border-secondary/80 bg-primary">
+      <div className="overflow-hidden rounded-lg border border-secondary/80 bg-primary self-start">
         <div className="border-b border-secondary/80 px-3 py-2">
           <span className="text-sm font-bold text-white">{name}</span>
         </div>

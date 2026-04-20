@@ -94,7 +94,7 @@ const ResearchUpgradePage = () => {
 
           if (currentLevel === 0) {
             return (
-              <div key={item.name} className="overflow-hidden rounded-lg border border-secondary/80 bg-primary">
+              <div key={item.name} className="overflow-hidden rounded-lg border border-secondary/80 bg-primary self-start">
                 <div style={{ display: "grid", gridTemplateColumns: "112px 1px 1fr" }}>
                   <div className="flex items-center justify-center p-2">
                     {item.imageUrl ? (

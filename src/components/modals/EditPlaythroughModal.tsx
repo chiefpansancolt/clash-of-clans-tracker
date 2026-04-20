@@ -20,6 +20,7 @@ import { useApiCooldown } from "@/lib/hooks/useApiCooldown";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { isExportDataFormat, mapExportDataToVillageData } from "@/lib/utils/exportDataMapper";
 import { mapPlayerApiToVillageData, mergeWithBuildingData } from "@/lib/utils/playerApiMapper";
+import { mergeApiAchievements } from "@/lib/utils/achievementHelpers";
 import type { EditPlaythroughModalProps } from "@/types/components";
 import type { PlayerApiResponse } from "@/types/app";
 import type { VillageData } from "@/types/app/game";
@@ -118,6 +119,11 @@ export const EditPlaythroughModal = ({
 			// Merge API data with building source: new JSON if uploaded, otherwise keep existing buildings
 			const buildingSource = buildingData ?? currentPlaythrough.data;
 			data = mergeWithBuildingData(refreshedData, buildingSource);
+			// Preserve achievements the user has marked as manual
+			data = {
+				...data,
+				achievements: mergeApiAchievements(data.achievements, currentPlaythrough.data.achievements),
+			};
 		} else if (buildingData) {
 			data = mergeWithBuildingData(currentPlaythrough.data, buildingData);
 		}

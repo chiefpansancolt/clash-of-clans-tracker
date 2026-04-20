@@ -62,7 +62,7 @@ export const SeasonPassPerks = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="rounded-xl border border-secondary/80 bg-primary/40 overflow-hidden">
+      <div className="rounded-xl border border-secondary/80 bg-primary overflow-hidden">
         <div className="px-4 py-3 border-b border-secondary/80 bg-primary">
           <p className="text-[11px] font-bold uppercase tracking-widest text-accent">Boost Perks</p>
         </div>
@@ -114,7 +114,7 @@ export const SeasonPassPerks = () => {
         </div>
       </div>
 
-      <div className="rounded-xl border border-secondary/80 bg-primary/40 overflow-hidden">
+      <div className="rounded-xl border border-secondary/80 bg-primary overflow-hidden">
         <div className="px-4 py-3 border-b border-secondary/80 bg-primary">
           <p className="text-[11px] font-bold uppercase tracking-widest text-accent">Perks</p>
         </div>

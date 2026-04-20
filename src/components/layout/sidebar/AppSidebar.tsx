@@ -4,7 +4,7 @@ import { Sidebar, SidebarItem, SidebarItemGroup, SidebarItems } from "flowbite-r
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { HiChartPie, HiChevronDown, HiChevronRight, HiCog, HiHome, HiViewGrid } from "react-icons/hi";
+import { HiChartPie, HiChevronDown, HiChevronRight, HiCog, HiHome, HiStar, HiViewGrid } from "react-icons/hi";
 import { usePlaythrough } from "@/lib/contexts/PlaythroughContext";
 import { useUI } from "@/lib/contexts/UIContext";
 import {
@@ -98,6 +98,18 @@ export const AppSidebar = () => {
                     onClick={() => setSidebarOpen(false)}
                   >
                     Dashboard
+                  </SidebarItem>
+                )}
+
+                {activePlaythrough && (
+                  <SidebarItem
+                    as={Link}
+                    href="/achievements"
+                    icon={HiStar}
+                    active={pathname === "/achievements"}
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    Achievements
                   </SidebarItem>
                 )}
               </SidebarItemGroup>
