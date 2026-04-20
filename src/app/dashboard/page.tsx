@@ -42,6 +42,7 @@ const DashboardPage = () => {
         playthroughId={activePlaythrough.id}
         thLevel={thLevel}
         helperHutLevel={helperHutLevel}
+        hv={data.homeVillage}
       />
       <HomeVillageSection hv={data.homeVillage} playthrough={activePlaythrough} />
       {data.homeVillage.townHallLevel >= 6 && (

@@ -6,4 +6,5 @@ export interface AppItem {
   disabled?: boolean;
   lockedLabel?: string;
   minTH?: number;
+  requiresHelperHut?: boolean;
 }

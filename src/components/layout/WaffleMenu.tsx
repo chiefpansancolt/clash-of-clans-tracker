@@ -66,14 +66,16 @@ const APP_ITEMS: AppItem[] = [
     id: "helpers",
     label: "Helpers",
     image: "/images/other/avatar-prospector.png",
-    href: "#",
-    disabled: true,
+    href: "/helpers",
+    requiresHelperHut: true,
+    lockedLabel: "Build Helper Hut",
   },
 ];
 
 export const WaffleMenu = () => {
   const { activePlaythrough } = usePlaythrough();
   const thLevel = activePlaythrough?.data.homeVillage.townHallLevel ?? 0;
+  const helperHutBuilt = (activePlaythrough?.data.homeVillage.armyBuildings["helper-hut"]?.[0]?.level ?? 0) > 0;
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -112,7 +114,8 @@ export const WaffleMenu = () => {
           <div className="grid grid-cols-3 gap-1 p-3">
             {APP_ITEMS.map((item) => {
               const thLocked = item.minTH !== undefined && thLevel < item.minTH;
-              const isLocked = item.disabled || thLocked;
+              const hutLocked = !!item.requiresHelperHut && !helperHutBuilt;
+              const isLocked = item.disabled || thLocked || hutLocked;
               const lockLabel = thLocked ? `TH ${item.minTH}` : (item.lockedLabel ?? "Soon");
               return isLocked ? (
                 <div key={item.id} className={disabledItemClass} aria-disabled="true">

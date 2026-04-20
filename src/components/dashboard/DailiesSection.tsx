@@ -12,8 +12,15 @@ import {
   msUntilNextReset,
   formatCountdown,
 } from "@/lib/utils/dailyTimerHelpers";
-import type { AutoForgeData, DailiesData, DailyTimerData, ForgeResourceType, GoldPassData, HelpersData } from "@/types/app/playthrough";
+import type { DailiesData, DailyTimerData, ForgeResourceType, GoldPassData, HelpersData } from "@/types/app/playthrough";
 import type { AutoForgeChipProps, DailiesSectionProps, GoldPassItem, TimerChipProps } from "@/types/components/dashboard";
+import {
+  getBuildersApprenticeData,
+  getLabAssistantData,
+  getHelperReduction,
+  resolveAssignmentFinishesAt,
+  applyHelperReduction,
+} from "@/lib/utils/helperHelpers";
 
 const getCurrentMonthKey = (): string  => {
   const now = new Date();
@@ -369,7 +376,9 @@ const AutoForgeChip = ({ autoForge, onStop }: AutoForgeChipProps) => {
 }
 
 
-const HELPER_CHIPS: { key: Exclude<keyof HelpersData, "prospectorUnlocked">; label: string; image: string }[] = [
+type HelperTimerKey = "buildersApprentice" | "labAssistant" | "alchemist" | "prospector";
+
+const HELPER_CHIPS: { key: HelperTimerKey; label: string; image: string }[] = [
   { key: "buildersApprentice", label: "Builder's App", image: "images/home/other/helpers/builders-apprentice/normal.png" },
   { key: "labAssistant",       label: "Lab Asst",      image: "images/home/other/helpers/lab-assistant/normal.png" },
   { key: "alchemist",          label: "Alchemist",     image: "images/home/other/helpers/alchemist/normal.png" },
@@ -381,8 +390,8 @@ const DAILY_CHIPS: { key: "starBonus" | "capitalGold"; label: string; image: str
   { key: "capitalGold", label: "Capital Gold",  image: "images/other/gold-c.png" },
 ];
 
-export const DailiesSection = ({ dailies, playthroughId, thLevel, helperHutLevel }: DailiesSectionProps) => {
-  const { updatePlaythrough } = usePlaythrough();
+export const DailiesSection = ({ dailies, playthroughId, thLevel, helperHutLevel, hv }: DailiesSectionProps) => {
+  const { updatePlaythrough, activePlaythrough } = usePlaythrough();
 
   const showHelpers = helperHutLevel > 0;
   const showStarBonus = thLevel >= 3;
@@ -406,7 +415,7 @@ export const DailiesSection = ({ dailies, playthroughId, thLevel, helperHutLevel
 
   if (!showHelpers && !hasDailyChips && !showGoldPass) return null;
 
-  const updateHelper = (key: Exclude<keyof HelpersData, "prospectorUnlocked">, patch: Partial<DailyTimerData>)=> {
+  const updateHelper = (key: HelperTimerKey, patch: Partial<DailyTimerData>)=> {
     const existing = dailies.helpers[key] as DailyTimerData;
     updatePlaythrough(playthroughId, {
       dailies: {
@@ -422,11 +431,42 @@ export const DailiesSection = ({ dailies, playthroughId, thLevel, helperHutLevel
     });
   }
 
-  const handleHelperCollect = (key: Exclude<keyof HelpersData, "prospectorUnlocked">, resetTime: string | null)=> {
-    updateHelper(key, {
+  const handleHelperCollect = (key: HelperTimerKey, resetTime: string | null)=> {
+    const timerPatch: Partial<DailyTimerData> = {
       lastCollectedAt: new Date().toISOString(),
       ...(resetTime !== null ? { resetTime } : {}),
-    });
+    };
+
+    if (key === "buildersApprentice" || key === "labAssistant") {
+      const assignmentKey = key === "buildersApprentice" ? "buildersApprenticeAssignment" : "labAssistantAssignment";
+      const levelKey = key === "buildersApprentice" ? "buildersApprenticeLevel" : "labAssistantLevel";
+      const assignment = dailies.helpers[assignmentKey];
+      const level = dailies.helpers[levelKey];
+
+      if (assignment && level) {
+        const levelData = key === "buildersApprentice"
+          ? getBuildersApprenticeData().find((l) => l.level === level)
+          : getLabAssistantData().find((l) => l.level === level);
+
+        if (levelData) {
+          const finishesAt = resolveAssignmentFinishesAt(hv, assignment.target);
+          if (finishesAt) {
+            const remaining = Math.max(0, new Date(finishesAt).getTime() - Date.now());
+            const savedMs = getHelperReduction(levelData.workRate, remaining);
+            const newHv = savedMs > 0 ? applyHelperReduction(hv, assignment, savedMs) : hv;
+            const helpersPatch: Partial<HelpersData> = { [key]: { ...dailies.helpers[key] as DailyTimerData, ...timerPatch } };
+            if (assignment.mode === "once") helpersPatch[assignmentKey] = undefined;
+            updatePlaythrough(playthroughId, {
+              data: { ...activePlaythrough!.data, homeVillage: newHv },
+              dailies: { ...dailies, helpers: { ...dailies.helpers, ...helpersPatch } },
+            });
+            return;
+          }
+        }
+      }
+    }
+
+    updateHelper(key, timerPatch);
   }
 
   const handleDailyCollect = (key: "starBonus" | "capitalGold", resetTime: string | null)=> {

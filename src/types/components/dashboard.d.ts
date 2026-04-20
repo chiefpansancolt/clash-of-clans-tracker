@@ -69,6 +69,7 @@ export interface DailiesSectionProps {
   playthroughId: string;
   thLevel: number;
   helperHutLevel: number;
+  hv: HomeVillageData;
 }
 
 export interface PlayerHeaderProps {

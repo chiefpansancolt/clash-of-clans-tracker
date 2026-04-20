@@ -18,12 +18,28 @@ export interface GoldPassData {
   requestTimeReductionUnlocked: boolean;
 }
 
+export type HelperAssignmentTarget =
+  | { type: "building"; recordKey: "defenses" | "armyBuildings" | "resourceBuildings" | "traps"; buildingId: string; instanceIndex: number }
+  | { type: "hero"; name: string }
+  | { type: "research"; researchKey: "troops" | "spells" | "siegeMachines"; name: string }
+  | { type: "pet"; name: string };
+
+export interface HelperAssignment {
+  target: HelperAssignmentTarget;
+  mode: "once" | "continuous";
+}
+
 export interface HelpersData {
   prospectorUnlocked: boolean;
   prospector: DailyTimerData;
   alchemist: DailyTimerData;
   buildersApprentice: DailyTimerData;
   labAssistant: DailyTimerData;
+  buildersApprenticeLevel?: number;
+  labAssistantLevel?: number;
+  alchemistLevel?: number;
+  buildersApprenticeAssignment?: HelperAssignment;
+  labAssistantAssignment?: HelperAssignment;
 }
 
 export type ForgeResourceType = "gold" | "elixir" | "darkElixir" | "builderGold" | "builderElixir";
