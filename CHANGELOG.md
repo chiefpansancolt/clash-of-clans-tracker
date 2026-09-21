@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update dependencies to latest (Next.js 16.3, React 19.3, Tailwind 4.3, nanoid 6, clash-of-clans-data 0.18)
+- Update GitHub Actions (checkout v7, setup-node v7, pnpm/action-setup v6)
+- Dependabot now runs monthly
+- Fetch player data with native `fetch` instead of `clash-of-clans-api`
+
+### Removed
+
+- Unused `request`, `request-promise`, `ts-node` and `clash-of-clans-api` dependencies
+
+### Security
+
+- Resolve all `pnpm audit` advisories (Next.js, postcss, nanoid, sharp, `request` dependency tree, deepmerge-ts via override)
+
 ## [1.1.0] - 2026-03-13
 
 ### Added

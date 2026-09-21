@@ -2,9 +2,9 @@
 
 import { headers } from "next/headers";
 
-const { ClashApi } = require("clash-of-clans-api");
-
 import type { PlayerApiResponse } from "@/types/app";
+
+const COC_API_URL = "https://api.clashofclans.com/v1";
 
 // Module-level singleton: survives across requests in the same server process.
 // Keyed by client IP → timestamp of last successful call.
@@ -63,18 +63,23 @@ export const fetchPlayerByTag = async (
   const normalized = tag.trim().startsWith("#") ? tag.trim() : `#${tag.trim()}`;
 
   try {
-    const client = new ClashApi({ token });
-    const player = (await client.playerByTag(normalized)) as PlayerApiResponse;
+    const res = await fetch(`${COC_API_URL}/players/${encodeURIComponent(normalized)}`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      // Don't consume the rate limit slot on API errors so the user can correct and retry
+      _lastCall.delete(ip);
+      if (res.status === 404) return { success: false, error: `Player "${normalized}" not found.` };
+      if (res.status === 403) return { success: false, error: "API token is invalid or unauthorised." };
+      return { success: false, error: `API error ${res.status}.` };
+    }
+
+    const player = (await res.json()) as PlayerApiResponse;
     return { success: true, player };
   } catch (err: unknown) {
-    // Don't consume the rate limit slot on API errors so the user can correct and retry
     _lastCall.delete(ip);
-    if (err && typeof err === "object" && "statusCode" in err) {
-      const status = (err as { statusCode: number }).statusCode;
-      if (status === 404) return { success: false, error: `Player "${normalized}" not found.` };
-      if (status === 403) return { success: false, error: "API token is invalid or unauthorised." };
-      return { success: false, error: `API error ${status}.` };
-    }
     return {
       success: false,
       error: err instanceof Error ? err.message : "Network error fetching player.",
