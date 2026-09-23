@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 	subsets: ["latin"],
 });
 
-const siteUrl = "https://stardew-valley.gamerdex.app";
+const siteUrl = "https://coc.gamerdex.app";
 
 export const metadata: Metadata = {
 	metadataBase: new URL(siteUrl),
@@ -34,6 +34,9 @@ export const metadata: Metadata = {
 	],
 	authors: [{ name: "GamerDex" }],
 	creator: "GamerDex",
+	alternates: {
+		canonical: "/",
+	},
 	robots: {
 		index: true,
 		follow: true,
