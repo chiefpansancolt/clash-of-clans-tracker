@@ -11,13 +11,7 @@ import {
 } from "@/lib/utils/helperHelpers";
 import type { AlchemistResourceType } from "@/lib/utils/helperHelpers";
 import { ResourceSelect } from "@/components/helpers/ResourceSelect";
-import type { ResourceSelectOption } from "@/components/helpers/ResourceSelect";
-
-interface Props {
-  level: number | undefined;
-  thLevel: number;
-  onLevelChange: (level: number) => void;
-}
+import type { AlchemistCardProps, ResourceSelectOption } from "@/types/components/helpers";
 
 const RESOURCE_OPTIONS: ResourceSelectOption<AlchemistResourceType>[] = [
   { value: "gold",       label: "Gold",        image: "images/other/gold.png",       color: "text-accent" },
@@ -25,7 +19,7 @@ const RESOURCE_OPTIONS: ResourceSelectOption<AlchemistResourceType>[] = [
   { value: "darkElixir", label: "Dark Elixir", image: "images/other/dark-elixir.png", color: "text-blue-300" },
 ];
 
-export const AlchemistCard = ({ level, thLevel, onLevelChange }: Props) => {
+export const AlchemistCard = ({ level, thLevel, onLevelChange }: AlchemistCardProps) => {
   const levels = getAlchemistData();
   const minTH = 11;
   const locked = thLevel < minTH;

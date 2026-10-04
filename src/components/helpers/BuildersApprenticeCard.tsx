@@ -4,17 +4,8 @@ import Image from "next/image";
 import { RiLockLine } from "react-icons/ri";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
 import { getBuildersApprenticeData, getActiveBuilderUpgrades } from "@/lib/utils/helperHelpers";
-import type { HomeVillageData } from "@/types/app/game";
 import type { HelperAssignment } from "@/types/app/playthrough";
-
-interface Props {
-  hv: HomeVillageData;
-  level: number | undefined;
-  assignment: HelperAssignment | undefined;
-  thLevel: number;
-  onLevelChange: (level: number) => void;
-  onAssignmentChange: (assignment: HelperAssignment | undefined) => void;
-}
+import type { HelperAssignmentCardProps } from "@/types/components/helpers";
 
 const formatSavedTime = (ms: number): string => {
   if (ms <= 0) return "0m";
@@ -26,7 +17,7 @@ const formatSavedTime = (ms: number): string => {
   return `${m}m`;
 };
 
-export const BuildersApprenticeCard = ({ hv, level, assignment, thLevel, onLevelChange, onAssignmentChange }: Props) => {
+export const BuildersApprenticeCard = ({ hv, level, assignment, thLevel, onLevelChange, onAssignmentChange }: HelperAssignmentCardProps) => {
   const levels = getBuildersApprenticeData();
   const minTH = 10;
   const locked = thLevel < minTH;
@@ -52,7 +43,7 @@ export const BuildersApprenticeCard = ({ hv, level, assignment, thLevel, onLevel
           />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-extrabold text-white">Builder's Apprentice</p>
+          <p className="text-sm font-extrabold text-white">Builder&apos;s Apprentice</p>
           {locked && (
             <p className="flex items-center gap-1 text-[10px] text-white/80">
               <RiLockLine size={10} /> Unlocks at TH{minTH}

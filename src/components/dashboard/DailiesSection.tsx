@@ -13,7 +13,7 @@ import {
   formatCountdown,
 } from "@/lib/utils/dailyTimerHelpers";
 import type { DailiesData, DailyTimerData, ForgeResourceType, GoldPassData, HelpersData } from "@/types/app/playthrough";
-import type { AutoForgeChipProps, DailiesSectionProps, GoldPassItem, TimerChipProps } from "@/types/components/dashboard";
+import type { AutoForgeChipProps, DailiesSectionProps, GoldPassItem, HelperTimerKey, TimerChipProps } from "@/types/components/dashboard";
 import {
   getBuildersApprenticeData,
   getLabAssistantData,
@@ -376,8 +376,6 @@ const AutoForgeChip = ({ autoForge, onStop }: AutoForgeChipProps) => {
 }
 
 
-type HelperTimerKey = "buildersApprentice" | "labAssistant" | "alchemist" | "prospector";
-
 const HELPER_CHIPS: { key: HelperTimerKey; label: string; image: string }[] = [
   { key: "buildersApprentice", label: "Builder's App", image: "images/home/other/helpers/builders-apprentice/normal.png" },
   { key: "labAssistant",       label: "Lab Asst",      image: "images/home/other/helpers/lab-assistant/normal.png" },
@@ -432,8 +430,9 @@ export const DailiesSection = ({ dailies, playthroughId, thLevel, helperHutLevel
   }
 
   const handleHelperCollect = (key: HelperTimerKey, resetTime: string | null)=> {
+    const collectedAt = new Date();
     const timerPatch: Partial<DailyTimerData> = {
-      lastCollectedAt: new Date().toISOString(),
+      lastCollectedAt: collectedAt.toISOString(),
       ...(resetTime !== null ? { resetTime } : {}),
     };
 
@@ -451,7 +450,7 @@ export const DailiesSection = ({ dailies, playthroughId, thLevel, helperHutLevel
         if (levelData) {
           const finishesAt = resolveAssignmentFinishesAt(hv, assignment.target);
           if (finishesAt) {
-            const remaining = Math.max(0, new Date(finishesAt).getTime() - Date.now());
+            const remaining = Math.max(0, new Date(finishesAt).getTime() - collectedAt.getTime());
             const savedMs = getHelperReduction(levelData.workRate, remaining);
             const newHv = savedMs > 0 ? applyHelperReduction(hv, assignment, savedMs) : hv;
             const helpersPatch: Partial<HelpersData> = { [key]: { ...dailies.helpers[key] as DailyTimerData, ...timerPatch } };

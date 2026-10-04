@@ -57,16 +57,14 @@ const MassEditCapitalPage = () => {
     () => Object.fromEntries(
       DISTRICTS.map((d) => [d.id, getDistrictBuildings(d.id, districtHallDrafts[d.id] ?? 0)])
     ) as Record<string, BuildingEditData[]>,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [capitalHallDraft, ...DISTRICTS.map((d) => districtHallDrafts[d.id])]
+    [districtHallDrafts]
   );
 
   const districtArmyData = useMemo(
     () => Object.fromEntries(
       DISTRICTS.map((d) => [d.id, getDistrictArmyBuildings(d.id, districtHallDrafts[d.id] ?? 0)])
     ) as Record<string, BuildingEditData[]>,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [capitalHallDraft, ...DISTRICTS.map((d) => districtHallDrafts[d.id])]
+    [districtHallDrafts]
   );
 
   const capitalPeakTraps = useMemo(
@@ -77,8 +75,7 @@ const MassEditCapitalPage = () => {
     () => Object.fromEntries(
       DISTRICTS.map((d) => [d.id, getDistrictTraps(d.id, districtHallDrafts[d.id] ?? 0)])
     ) as Record<string, BuildingEditData[]>,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [capitalHallDraft, ...DISTRICTS.map((d) => districtHallDrafts[d.id])]
+    [districtHallDrafts]
   );
 
   const capitalPeakWallInfo = useMemo(
@@ -89,19 +86,16 @@ const MassEditCapitalPage = () => {
     () => Object.fromEntries(
       DISTRICTS.map((d) => [d.id, getDistrictWalls(d.id, districtHallDrafts[d.id] ?? 0)])
     ) as Record<string, CapitalWallInfo>,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [capitalHallDraft, ...DISTRICTS.map((d) => districtHallDrafts[d.id])]
+    [districtHallDrafts]
   );
 
   const troopData = useMemo(
     () => getCapitalTroops(districtHallDrafts),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [...DISTRICTS.map((d) => districtHallDrafts[d.id])]
+    [districtHallDrafts]
   );
   const spellData = useMemo(
     () => getCapitalSpells(districtHallDrafts),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [...DISTRICTS.map((d) => districtHallDrafts[d.id])]
+    [districtHallDrafts]
   );
 
   const [buildingLevels, setBuildingLevels] = useState<LevelMap>({});
@@ -110,8 +104,10 @@ const MassEditCapitalPage = () => {
   const [spellLevels,    setSpellLevels]    = useState<LevelMap>({});
   const [isDirty,        setIsDirty]        = useState(false);
 
-  useEffect(() => {
-    if (!activePlaythrough) return;
+  const [syncedPlaythroughId, setSyncedPlaythroughId] = useState<string | undefined>(undefined);
+
+  if (activePlaythrough && activePlaythrough.id !== syncedPlaythroughId) {
+    setSyncedPlaythroughId(activePlaythrough.id);
     const cap = activePlaythrough.data.clanCapital;
 
     setCapitalHallDraft(cap.capitalPeak.hallLevel);
@@ -164,8 +160,7 @@ const MassEditCapitalPage = () => {
     setSpellLevels(toMap(cap.spells));
 
     setIsDirty(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePlaythrough?.id]);
+  }
 
   useEffect(() => {
     if (!isDirty) return;

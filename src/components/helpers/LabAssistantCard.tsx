@@ -4,17 +4,8 @@ import Image from "next/image";
 import { RiLockLine } from "react-icons/ri";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
 import { getLabAssistantData, getActiveResearchUpgrades } from "@/lib/utils/helperHelpers";
-import type { HomeVillageData } from "@/types/app/game";
 import type { HelperAssignment } from "@/types/app/playthrough";
-
-interface Props {
-  hv: HomeVillageData;
-  level: number | undefined;
-  assignment: HelperAssignment | undefined;
-  thLevel: number;
-  onLevelChange: (level: number) => void;
-  onAssignmentChange: (assignment: HelperAssignment | undefined) => void;
-}
+import type { HelperAssignmentCardProps } from "@/types/components/helpers";
 
 const formatSavedTime = (ms: number): string => {
   if (ms <= 0) return "0m";
@@ -26,7 +17,7 @@ const formatSavedTime = (ms: number): string => {
   return `${m}m`;
 };
 
-export const LabAssistantCard = ({ hv, level, assignment, thLevel, onLevelChange, onAssignmentChange }: Props) => {
+export const LabAssistantCard = ({ hv, level, assignment, thLevel, onLevelChange, onAssignmentChange }: HelperAssignmentCardProps) => {
   const levels = getLabAssistantData();
   const minTH = 9;
   const locked = thLevel < minTH;

@@ -3,6 +3,8 @@ import type { BuilderBaseData, ClanCapitalData, HomeVillageData, TrackedHero, Tr
 import type { AutoForgeData, DailiesData, DailyTimerData, GoldPassData, Playthrough } from "@/types/app/playthrough";
 import type { ProgressResult } from "@/lib/utils/progressHelpers";
 
+export type HelperTimerKey = "buildersApprentice" | "labAssistant" | "alchemist" | "prospector";
+
 interface LootResources {
   goldAndElixir: number | null;
   darkElixir: number | null;

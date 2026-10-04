@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { SliderRowProps } from "@/types/components/massEdit";
 
 export const SliderRow = ({ label, imageUrl, currentLevel, maxLevel, onChange, indent = false, disabled = false, neverLocked = false }: SliderRowProps) => {
   const [inputValue, setInputValue] = useState(String(currentLevel));
+  const [syncedLevel, setSyncedLevel] = useState(currentLevel);
 
   // Sync text input when slider (or external state) changes
-  useEffect(() => {
+  if (currentLevel !== syncedLevel) {
+    setSyncedLevel(currentLevel);
     setInputValue(String(currentLevel));
-  }, [currentLevel]);
+  }
 
   const isLocked = !neverLocked && currentLevel === 0;
   const isMaxed = maxLevel > 0 && currentLevel >= maxLevel;

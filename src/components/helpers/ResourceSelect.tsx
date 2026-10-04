@@ -4,23 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { RiArrowDownSLine } from "react-icons/ri";
 import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
+import type { ResourceSelectProps } from "@/types/components/helpers";
 
-export interface ResourceSelectOption<T extends string = string> {
-  value: T;
-  label: string;
-  image: string;
-  color?: string;
-}
-
-interface Props<T extends string> {
-  options: ResourceSelectOption<T>[];
-  value: T;
-  disabledValue?: T;
-  label?: string;
-  onChange: (value: T) => void;
-}
-
-export const ResourceSelect = <T extends string>({ options, value, disabledValue, label, onChange }: Props<T>) => {
+export const ResourceSelect = <T extends string>({ options, value, disabledValue, label, onChange }: ResourceSelectProps<T>) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const selected = options.find((o) => o.value === value) ?? options[0];

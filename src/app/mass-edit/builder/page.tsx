@@ -51,8 +51,10 @@ const MassEditBuilderPage = () => {
   const [wallCounts,     setWallCounts]     = useState<LevelMap>({});
   const [isDirty,        setIsDirty]        = useState(false);
 
-  useEffect(() => {
-    if (!activePlaythrough) return;
+  const [syncedPlaythroughId, setSyncedPlaythroughId] = useState<string | undefined>(undefined);
+
+  if (activePlaythrough && activePlaythrough.id !== syncedPlaythroughId) {
+    setSyncedPlaythroughId(activePlaythrough.id);
     const bb = activePlaythrough.data.builderBase;
 
     const initBuildings = (editItems: BuildingEditData[], record: BuildingRecord)=> {
@@ -86,8 +88,7 @@ const MassEditBuilderPage = () => {
     setWallCounts(wMap);
 
     setIsDirty(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePlaythrough?.id]);
+  }
 
   useEffect(() => {
     if (!isDirty) return;

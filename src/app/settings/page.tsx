@@ -1,7 +1,7 @@
 "use client";
 
 import { Alert, Badge, Button, Card, FileInput, Label, ToggleSwitch } from "flowbite-react";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { localTimeToUtcMinutes, utcMinutesToLocalTimeStr } from "@/lib/utils/activeHoursHelpers";
 import {
 	HiCheckCircle,
@@ -27,12 +27,14 @@ const Settings = () => {
 		appSettings.activeHours ? utcMinutesToLocalTimeStr(appSettings.activeHours.endUtcMinutes) : "23:00"
 	);
 
-	useEffect(() => {
+	const [syncedActiveHours, setSyncedActiveHours] = useState(appSettings.activeHours);
+	if (appSettings.activeHours !== syncedActiveHours) {
+		setSyncedActiveHours(appSettings.activeHours);
 		if (appSettings.activeHours) {
 			setActiveStart(utcMinutesToLocalTimeStr(appSettings.activeHours.startUtcMinutes));
 			setActiveEnd(utcMinutesToLocalTimeStr(appSettings.activeHours.endUtcMinutes));
 		}
-	}, [appSettings.activeHours]);
+	}
 
 	const handleSaveActiveHours = () => {
 		updateSettings({
@@ -186,7 +188,7 @@ const Settings = () => {
 				<Card>
 					<h2 className="mb-4 text-xl font-bold text-white">Active Hours</h2>
 					<p className="mb-4 text-sm text-white/80">
-						Set the hours you're actively playing each day. Queue timelines will add a gap when an upgrade finishes outside this window, reflecting when you'll actually be online to start the next one.
+						Set the hours you&apos;re actively playing each day. Queue timelines will add a gap when an upgrade finishes outside this window, reflecting when you&apos;ll actually be online to start the next one.
 					</p>
 					<div className="flex flex-wrap items-end gap-4">
 						<div className="flex flex-col gap-1">

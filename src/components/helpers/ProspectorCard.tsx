@@ -7,12 +7,7 @@ import { toPublicImageUrl } from "@/lib/utils/imageHelpers";
 import { getProspectorData, calcProspectorConversion, getProspectorInputMax } from "@/lib/utils/helperHelpers";
 import type { OreType } from "@/lib/utils/helperHelpers";
 import { ResourceSelect } from "@/components/helpers/ResourceSelect";
-import type { ResourceSelectOption } from "@/components/helpers/ResourceSelect";
-
-interface Props {
-  thLevel: number;
-  prospectorUnlocked: boolean;
-}
+import type { ProspectorCardProps, ResourceSelectOption } from "@/types/components/helpers";
 
 const ORE_OPTIONS: ResourceSelectOption<OreType>[] = [
   { value: "shiny",  label: "Shiny",  image: "images/other/ore/shiny-ore.png",  color: "text-white" },
@@ -20,7 +15,7 @@ const ORE_OPTIONS: ResourceSelectOption<OreType>[] = [
   { value: "starry", label: "Starry", image: "images/other/ore/starry-ore.png", color: "text-purple-300" },
 ];
 
-export const ProspectorCard = ({ thLevel, prospectorUnlocked }: Props) => {
+export const ProspectorCard = ({ thLevel, prospectorUnlocked }: ProspectorCardProps) => {
   const data = getProspectorData();
   const minTH = 10;
   const thLocked = thLevel < minTH;
